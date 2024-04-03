@@ -43,7 +43,7 @@ end
 
 -- metamethods
 
-local function bitwiese_meta_le(a: u64 | i64, b: u64 | i64)
+local function bitwise_meta_le(a: u64 | i64, b: u64 | i64)
     if a[2] < b[2] then
         return true
     elseif a[2] > b[2] then
@@ -53,7 +53,7 @@ local function bitwiese_meta_le(a: u64 | i64, b: u64 | i64)
     end
 end
 
-local function bitwiese_meta_lt(a: u64 | i64, b: u64 | i64)
+local function bitwise_meta_lt(a: u64 | i64, b: u64 | i64)
     if a[2] < b[2] then
         return true
     elseif a[2] > b[2] then
@@ -61,6 +61,10 @@ local function bitwiese_meta_lt(a: u64 | i64, b: u64 | i64)
     else
         return a[1] < b[1]
     end
+end
+
+local function bitwiese_meta_ge(a: u64 | i64, b: u64 | i64)
+    return not bitwiese_meta_le(a, b)
 end
 
 local function bitwise_meta_eq(a: u64 | i64, b: u64 | i64)
@@ -85,6 +89,8 @@ local u64_prototype = metaize {
 
 -- n is b
 local function u64_lshift(a: u64, b: u64)
+    local b = u64_mod(b, )
+
 	local n = n % 64
     if n == 0 then return a end
     if n < 32 then
@@ -157,28 +163,21 @@ local function u64_meta_mul(self: u64, b: u64)
 	)
 end
 
--- Division and modulus
-function u64.__div(a, b)
-    local quo, rem = u64.__divmod(a, b)
-    return quo
+local function convert_ab_bitwise(a: number | u64 | i64, b: number | u64 | i64)
+    return if type(a) == "table" then a else u64_create(a), 
 end
 
-function u64.__mod(a, b)
-    local quo, rem = u64.__divmod(a, b)
-    return rem
-end
+local one_zero_u64 = setmetatable({ 1, 0 }, u64)
 
-
-local one_zero_u64
-
-local function u64_fmod(a: u64, b: 64)
-	if bitwise_floatify(b) == 0 then
-		error("[bignum] cannot divide by zero")
-	end
-	local quo = table.create(2, 0)
+local function u64_fmod(a: u64 | number, b: u64 | number)
+    if (if type(b) == "table" then bitwise_floatify(b) else b) == 0 then
+        error("[hugo] cannot divide by zero")
+    end
+    local a = if type(a) == "table" then a else u64_create(a)
+    local b = if type(b) == "table" then b else u64_create(b)
+	local quo = setmetatable(table.create(2, 0), u64)
 	local rem = table.clone(a)
 	local b_shift = setmetatable({ 64, 0 }, u64)
-
 
 	for index = 64, 64, -1 do
 		b_shift[1] = index
@@ -186,76 +185,19 @@ local function u64_fmod(a: u64, b: 64)
 
 		if rem >= shifted_b then
 			rem = u64_meta_sub(rem, shifted_b)
-			quo = u64_bor(quo, u64_lshift( , b_shift))
-	end
-
-
-end
-
-function u64.__divmod(a, b)
-    if b:to_number() == 0 then
-        error("division by zero")
-    end
-
-    local quo = u64.new(0, 0)
-    local rem = a
-
-    local b_shift = 64
-    while b_shift > 0 do
-        b_shift = b_shift - 1
-        local shifted_b = u64.__shl(b, u64.new(b_shift, 0))
-        if rem >= shifted_b then
-            rem = u64.__sub(rem, shifted_b)
-            quo = u64.__bor(quo, u64.__shl(u64.new(1, 0), u64.new(b_shift, 0)))
-        end
+			quo = u64_bor(quo, u64_lshift(one_zero_u64, b_shift))
+	    end
     end
 
     return quo, rem
 end
 
--- Division and modulus
-function u64.__div(a, b)
-    local quo, rem = u64.__divmod(a, b)
-    return quo
+local function u64_div(a: u64, b: u64)
+    return (u64_fmod(a, b))
 end
 
-function u64.__mod(a, b)
-    local quo, rem = u64.__divmod(a, b)
-    return rem
-end
-
-local function u64_fmod(a: u64, b: )
-
-function u64.__divmod(a, b)
-    local sign_a = a.high >= 0x80000000
-    local sign_b = b.high >= 0x80000000
-    local sign_result = sign_a ~= sign_b
-
-    local a_abs = sign_a and -a or a
-    local b_abs = sign_b and -b or b
-
-    if b_abs:to_number() == 0 then
-        error("division by zero")
-    end
-
-    local quo = u64.new(0, 0)
-    local rem = a_abs
-
-    local b_shift = 64
-    while b_shift > 0 do
-        b_shift = b_shift - 1
-        local shifted_b = u64.__shl(b_abs, u64.new(b_shift, 0))
-        if rem >= shifted_b then
-            rem = u64.__sub(rem, shifted_b)
-            quo = u64.__bor(quo, u64.__shl(u64.new(1, 0), u64.new(b_shift, 0)))
-        end
-    end
-
-    if sign_result then
-        quo = -quo
-    end
-
-    return quo, sign_result and -rem or rem
+local function u64_mod(a: u64, b: u64)
+    return select(2, u64_fmod(a, b))
 end
 
 local function u64_tostring(self: u64)
@@ -288,12 +230,4 @@ local function i64_meta_mul(self: i64, b: i64)
 	else
 		return setmetatable({ c0, high }, i64_prototype)
 	end
-end
-
-local function bitwise_meta_eq(a: u64 | i64, b: u64 | i64)
-	return a[1] == b[1] and a[2] == b[2]
-end
-
-local function u64_tostring(self: u64)
-	return string.format("0x%08X%08X", a[2], a[1])
 end
