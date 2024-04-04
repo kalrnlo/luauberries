@@ -1,11 +1,30 @@
+--!strict
+--!native
 
+-- hugo
+-- library for u64s in luau
+-- @kalrnlo
+-- 03/04/2024
 
-local function metaize<tbl>(tbl: tbl): tbl & {__index: tbl}
-	tbl.__index = tbl
-	return table.freeze(tbl)
+local function get_lows_and_highs(a: number | u64, b: number | u64)
+    return (
+        if type(a) == "table" then
+           (a[1], a[2])
+        else
+            (bit32.band(a, 0xFFFFFFFF), bit32.rshift(a, 32))
+    ), (
+        if type(b) == "table" then
+           (b[1], b[2])
+        else
+            (bit32.band(b, 0xFFFFFFFF), bit32.rshift(b, 32))
+    )
 end
 
-local function bitwise_vararg_op(op: (...number) -> number, ...: u64 | i64)
+local function create(n: number)
+    return { bit32.band(n, 0xFFFFFFFF), bit32.rshift(b, 32) }
+end
+
+local function vararg_op(op: (...number) -> number, ...: u64 | number)
     local result = select(1, ...)
 	local high = result[2]
 	local low = result[1]
@@ -21,7 +40,9 @@ local function bitwise_vararg_op(op: (...number) -> number, ...: u64 | i64)
 	}, getmetatable(result))
 end
 
-local function biwtise_lshift(a: u64 | i64, b: u64 | i64) 
+local function lshift(a: u64 | number, b: u64 | number) 
+    local a_low, a_high, b_low, b_high = get_lows_and_highs(a, b)
+
     local a = a % 64
 
     if a == 0 then 
@@ -37,13 +58,11 @@ local function biwtise_lshift(a: u64 | i64, b: u64 | i64)
     end
 end
 
-local function bitwise_floatify(n: u64 | i64)
-    return (self[1] + self[2]) * 0x100000000
+local function floatify(u64: u64)
+    return (u64[1] + u64[2]) * 0x100000000
 end
 
--- metamethods
-
-local function bitwise_meta_le(a: u64 | i64, b: u64 | i64)
+local function le(a: u64 | number, b: u64 | number)
     if a[2] < b[2] then
         return true
     elseif a[2] > b[2] then
@@ -53,7 +72,7 @@ local function bitwise_meta_le(a: u64 | i64, b: u64 | i64)
     end
 end
 
-local function bitwise_meta_lt(a: u64 | i64, b: u64 | i64)
+local function lt(a: u64 | number, b: u64 | number)
     if a[2] < b[2] then
         return true
     elseif a[2] > b[2] then
@@ -63,32 +82,28 @@ local function bitwise_meta_lt(a: u64 | i64, b: u64 | i64)
     end
 end
 
-local function bitwiese_meta_ge(a: u64 | i64, b: u64 | i64)
-    return not bitwiese_meta_le(a, b)
+local function ge(a: u64 | number, b: u64 | number)
+    return not le(a, b)
 end
 
-local function bitwise_meta_eq(a: u64 | i64, b: u64 | i64)
+local function q(a: u64 | number, b: u64 | number)
 	return a[1] == b[1] and a[2] == b[2]
 end
 
-local function u64_band(...: u64)
+local function band(...: u64 | number)
 	return bitwise_vararg_op(bit32.band, ...)
 end
 
-local function u64_bxor(...: u64)
+local function bxor(...: u64 | number)
 	return bitwise_vararg_op(bit32.bxor, ...)
 end
 
-local function u64_bor(...: u64)
+local function bor(...: u64 | number)
 	return bitwise_vararg_op(bit32.bor, ...)
 end
 
-local u64_prototype = metaize {
-	__le = u64_meta_le,
-}
-
 -- n is b
-local function u64_lshift(a: u64, b: u64)
+local function lshift(a: u64 | number, b: u64 | number)
     local b = u64_mod(b, )
 
 	local n = n % 64
@@ -105,7 +120,7 @@ local function u64_lshift(a: u64, b: u64)
 end
 
 -- n is b
-local function u64_rshift(a: u64, b: u64)
+local function rshift(a: u64 | number, b: u64 | number)
     local n = n % 64
     if n == 0 then return a end
     if n < 32 then
@@ -120,8 +135,8 @@ local function u64_rshift(a: u64, b: u64)
 end
 
 -- Addition and subtraction
-local function u64_meta_add(self: u64, b: u64)
-	local lows_added = self[1] + b[1]
+local function add(a: u64 | number, b: u64 | number)
+	local lows_added = a[1] + b[1]
 
 	return setmetatable(
 		{
@@ -132,8 +147,8 @@ local function u64_meta_add(self: u64, b: u64)
 	)
 end
 
-local function u64_meta_sub(self: u64, b: u64)
-	local lows_subtracted = self[1] - b[1]
+local function sub(a: u64 | number, b: u64 | number)
+	local lows_subtracted = a[1] - b[1]
 
 	return setmetatable(
 		{
@@ -144,7 +159,7 @@ local function u64_meta_sub(self: u64, b: u64)
 	)
 end
 
-local function u64_meta_mul(self: u64, b: u64)
+local function mul(a: u64 | number, b: u64 | number)
     local al = a[1]
     local ah = a[2]
     local bl = b[1]
@@ -163,13 +178,9 @@ local function u64_meta_mul(self: u64, b: u64)
 	)
 end
 
-local function convert_ab_bitwise(a: number | u64 | i64, b: number | u64 | i64)
-    return if type(a) == "table" then a else u64_create(a), 
-end
-
 local one_zero_u64 = setmetatable({ 1, 0 }, u64)
 
-local function u64_fmod(a: u64 | number, b: u64 | number)
+local function fmod(a: u64 | number, b: u64 | number)
     if (if type(b) == "table" then bitwise_floatify(b) else b) == 0 then
         error("[hugo] cannot divide by zero")
     end
@@ -192,21 +203,25 @@ local function u64_fmod(a: u64 | number, b: u64 | number)
     return quo, rem
 end
 
-local function u64_div(a: u64, b: u64)
+local function div(a: u64 | number, b: u64 | number)
     return (u64_fmod(a, b))
 end
 
-local function u64_mod(a: u64, b: u64)
+local function mod(a: u64 | number, b: u64 | number)
     return select(2, u64_fmod(a, b))
 end
 
-local function u64_tostring(self: u64)
-	return string.format("0x%08X%08X", a[2], a[1])
+local function tostring(u64: u64)
+	return string.format("0x%08X%08X", u64[2], u64[1])
 end
 
-local function i64_meta_mul(self: i64, b: i64)
-    local a_low = self[1]
-    local a_high = self[2]
+--------------------------------------------------------------------------------
+-- i64
+--------------------------------------------------------------------------------
+
+local function i64_mul(a: i64, b: i64)
+    local a_low = a[1]
+    local a_high = a[2]
     local b_low = b[1]
     local b_high = b[2]
 
@@ -231,3 +246,55 @@ local function i64_meta_mul(self: i64, b: i64)
 		return setmetatable({ c0, high }, i64_prototype)
 	end
 end
+
+--------------------------------------------------------------------------------
+-- buffer
+--------------------------------------------------------------------------------
+
+local function buffer_writeu64(b: buffer, offset: number, u64: u64)
+
+end
+
+local function buffer_readu64(b: buffer, offset: number): u64
+
+end
+
+local function buffer_writei64(b: buffer, offset: number, i64: i64)
+
+end
+
+local function buffer_readi64(b: buffer, offset: number): i64
+
+end
+
+--------------------------------------------------------------------------------
+-- exports
+--------------------------------------------------------------------------------
+
+local exports = table.freeze {
+    buffer = table.freeze {
+        write = buffer_write,
+        read = buffer_read,
+    }
+    floatify = floatify,
+    tostring = tostring,
+    create = create,
+    lshift = lshift,
+    rshift = rshift,
+    bxor = bxor,
+    band = band,
+    fmod = fmod,
+    idiv = idiv,
+    bor = bor,
+    add = add,
+    mul = mul,
+    div = div,
+    mod = mod,
+    eq = eq,
+    lt = lt,
+    le = le,
+    ge = ge,
+    gt = gt,
+}
+
+return exports 
