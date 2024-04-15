@@ -1,2 +1,2 @@
 # luau-libs
-Monorepo of all of my libraries I've made for [luau](https://luau-lang.org)
+Monorepo of all of my libraries and modules I've made for [luau](https://luau-lang.org)
