@@ -68,7 +68,8 @@ local function add_existing_tools<T>(
     observe_callback: (T) -> () -> (),
 	map: Map<T>,
     character: Model,
-    tag: string
+    tag: string,
+    player: Player?
 )
     for _, child in character:GetChildren() do
         if not connection.Connected then
@@ -88,7 +89,7 @@ local function localtool_observer(tag: string, callback: (tool: tool) -> () -> (
 	local add_existing_thread: thread?
 	local map = {} :: Map<Tool>
 	
-	remove_connection = ContextActionService.LocalToolUnequipped:Connect(function(tool)
+    remove_connection = ContextActionService.LocalToolUnequipped:Connect(function(tool)
         cleanup_object(map, tool)
 	end)
 	add_connection = ContextActionService.LocalToolEquipped:Connect(function(tool)
@@ -114,12 +115,12 @@ local function localtool_observer(tag: string, callback: (tool: tool) -> () -> (
 	end
 
 	return function()
-		if AddExistingThread then
-			task.cancel(AddExistingThread)
+		if add_existing_thread then
+			task.cancel(add_existing_thread)
 		end
-		RemoveConnection:Disconnect()
-		AddConnection:Disconnect()
-		CleanupMap(Map)
+		remove_connection:Disconnect()
+		add_connection:Disconnect()
+		cleanup_map(map)
 	end
 end
 
@@ -161,56 +162,57 @@ local function tool_observer(tag: string, callback: (tool: Tool, player: Player)
 	local add_existing_thread: thread?
 	local map = {} :: Map<Tool>
 
-	AddConnection = Players.PlayerAdded:Connect(function(player)
+	add_connection = Players.PlayerAdded:Connect(function(player)
 		local character_connection
 
-		CharacterConnection = Player.CharacterAdded:Connect(function(Character)
-			local ChildConnection
+		character_connection = Player.CharacterAdded:Connect(function(Character)
+			local child_connection
 
-			if not AddConnection.Connected then
-				CharacterConnection:Disconnect()
+			if not add_connection.Connected then
+				character_connection:Disconnect()
 				return
 			end
 
-			ChildConnection = Character.ChildAdded:Connect(function(Child)
-				if not AddConnection.Connected then
-					CharacterConnection:Disconnect()
-					ChildConnection:Disconnect()
+			child_connection = Character.ChildAdded:Connect(function(child)
+				if not add_connection.Connected then
+					character_connection:Disconnect()
+					child_connection:Disconnect()
 					return
-				elseif Child:HasTag(Tag) and Child:IsA("Tool") then
-					ObserveTool(AddConnection, Map, Callback, Child :: Tool, Player)
+				elseif child:HasTag(Tag) and child:IsA("Tool") then
+					observe_tool(add_connection, callback, map, child, player)
 				end
 			end)
 		end)
 	end)
 
-	if not DontAddExisting then
-        AddExistingThread = task.defer(function(AddConnection, Map, Callback, Tag)
-			for _, Player in Players:GetPlayers() do
-				if not AddConnection.Connected then break end
-				local Character = Player.Character
+	if not dont_add_existing then
+        add_existing_thread = task.defer(function(add_connection, map, callback, tag)
+			for _, player in Players:GetPlayers() do
+				if not add_connection.Connected then break end
+				local character = player.Character
 
-				if Character then
-					task.spawn(function(Player, Character, Map, Callback, Tag)
-						for Index, Value in Character:GetChildren() do
-							if not AddConnection.Connected then break end
-
-							if Value:IsA("Tool") and Value:HasTag(Tag) then
-								task.spawn(ObserveTool, AddConnection, Map, Callback, Value, Player)
-							end
-						end
-					end, Player, Character, Map, Callback, Tag)
+				if character then
+					task.spawn(
+                        add_existing_tools,
+                        observe_tool,
+                        add_connection,
+                        callback,
+                        map,
+                        character,
+                        tag,
+                        player
+                    )
 				end
 			end
-		end, AddConnection, Map, Callback, Tag)
+		end, add_connection, map, callback, tag)
 	end
 
 	return function()
-		if AddExistingThread then
-			task.cancel(AddExistingThread)
+		if add_existing_thread then
+			task.cancel(add_existing_thread)
 		end
-		AddConnection:Disconnect()
-		CleanupMap(Map)
+		add_connection:Disconnect()
+		cleanup_map(map)
 	end
 end
 
@@ -220,31 +222,20 @@ local function tag_observer(tag: string, callback: (Instance: Instance) -> () ->
 	local add_existing_thread: thread?
 	local map = {} :: Map<Instance>
 	
-	remove_connection = CollectionService:GetInstanceRemovedSignal(tag):Connect(function(Object)
-		local cleanup = map[Object]
-
-		if cleanup then
-			map[Object] = nil
-			cleanup()
-		end
+	remove_connection = CollectionService:GetInstanceRemovedSignal(tag):Connect(function(object)
+        cleanup_object(map, object)
 	end)
-	add_connection = CollectionService:GetInstanceAddedSignal(tag):Connect(function(Object)
-		local cleanup = callback(Object)
-
-		if add_connection.Connected and Object then
-			map[Object] = cleanup
-		else
-			cleanup()
-		end
+	add_connection = CollectionService:GetInstanceAddedSignal(tag):Connect(function(object)
+        add_existing_object(add_connection, callback, map, object)
 	end)
 
 	if not dont_add_existing then
 		add_existing_thread = task.defer(
-			AddExistingToMap,
+			add_existing_objects,
 			add_connection,
+            callback,
 			map,
-			CollectionService:GetTagged(tag), 
-			callback
+			CollectionService:GetTagged(tag)
 		)
 	end
 
@@ -254,34 +245,34 @@ local function tag_observer(tag: string, callback: (Instance: Instance) -> () ->
 		end
 		remove_connection:Disconnect()
 		add_connection:Disconnect()
-		CleanupMap(map)
+		cleanup_map(map)
 	end
 end
 
-local function observe_player_for_character(Player: Player, Callback: Callback<Model, Player>)
-	local RemoveConnection: RBXScriptConnection
-	local AddConnection: RBXScriptConnection
-	local CleanupCallback: (() -> ())?
+local function observe_player_for_character(player: Player, callback: (character: Model, player: Player) -> () -> ())
+	local remove_connection: RBXScriptConnection
+	local add_connection: RBXScriptConnection
+	local cleanup: (() -> ())?
 
-	RemoveConnection = Player.CharacterRemoving:Connect(function(Character)
-		if CleanupCallback then
-			CleanupCallback()
+	remove_connection = Player.CharacterRemoving:Connect(function()
+		if cleanup then
+			cleanup()
 		end
 	end)
-	AddConnection = Player.CharacterAdded:Connect(function(Character)
-		CleanupCallback = Callback(Character, Player)
+	add_connection = player.CharacterAdded:Connect(function(character)
+		cleanup = callback(character, player)
 	
-		if CleanupCallback and not AddConnection.Connected then
-			CleanupCallback()
+		if cleanup and not add_connection.Connected then
+			cleanup()
 		end
 	end)
 
 	return function()		
-		RemoveConnection:Disconnect()
-		AddConnection:Disconnect()
+		remove_connection:Disconnect()
+		add_connection:Disconnect()
 
-		if CleanupCallback then
-			CleanupCallback()
+		if cleanup then
+			cleanup()
 		end
 	end
 end
@@ -334,39 +325,26 @@ local function character_player_observer(Callback: Callback<Model, Player>, Dont
 	end
 end
 
-local function PlayerObserver(Callback: Callback<Player>, DontAddExisting: boolean?)
-	local RemoveConnection: RBXScriptConnection
-	local AddConnection: RBXScriptConnection
+local function player_observer(callback: (player: Player) -> () -> (), dont_add_existing: boolean?)
+	local remove_connection: RBXScriptConnection
+	local add_connection: RBXScriptConnection
 	local AddExistingThread: thread?
 	local Map = {} :: Map<Player>
 	
-	RemoveConnection = Players.PlayerRemoving:Connect(function(Player)
-		local CleanupCallback = Map[Player]
-
-		if CleanupCallback then
-			Map[Player] = nil
-			CleanupCallback()
-		end
+	remove_connection = Players.PlayerRemoving:Connect(function(player)
+        cleanup_object(map, player)
 	end)
-	AddConnection = Players.PlayerAdded:Connect(function(Player)
-		local CleanupCallback = Callback(Player) or nil
-
-		if CleanupCallback then
-			if AddConnection.Connected and Player then
-				Map[Player] = CleanupCallback
-			else
-				CleanupCallback()
-			end
-		end
+	add_connection = Players.PlayerAdded:Connect(function(player)
+        add_existing_object(add_connection, callback, map, player)
 	end)
 
-	if not DontAddExisting then
+	if not dont_add_existing then
 		AddExistingThread = task.defer(
-			AddExistingToMap,
-			AddConnection,
-			Map,
-			Players:GetPlayers(), 
-			Callback
+			add_existing_objects,
+			add_connection,
+            callback,
+			map,
+			Players:GetPlayers()
 		)
 	end
 
