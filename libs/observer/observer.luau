@@ -12,97 +12,104 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-
-export type Callback<T...> = ((T...) -> ()) & ((T...) -> (() -> ())?)
-type TagConstructor<T...> = (tag: string, callback: Callback<T...>, dont_add_existing: boolean?) -> () -> ()
-type Constructor<T...> = (callback: Callback<T...>, dont_add_existing: boolean?) -> () -> ()
 type Map<T> = {[T]: () -> ()}
 
-local function AddExistingObjectToMap(
-	Connection: RBXScriptConnection,
-	Map: Map<any>,
-	Object: any,
-	Callback: Callback<any>
+local function add_existing_object<T>(
+	connection: RBXScriptConnection,
+    callback: (T) -> () -> (),
+    map: Map<T>,
+	object: T
 )
-	local CleanupCallback = Callback(Object) or nil
+	local cleanup = callback(object)
 
-	if CleanupCallback then
-		if Connection.Connected and Object then
-			Map[Object] = CleanupCallback
-		else
-			CleanupCallback()
-		end
+	if connection.Connected and object then
+		map[object] = cleanup
+	else
+		cleanup()
 	end
 end
 
-local function AddExistingToMap<T>(
-	Connection: RBXScriptConnection,
-	Map: Map<T>, 
-	Objects: {T},
-	Callback: Callback<T>
+local function add_existing_objects<T>(
+	connection: RBXScriptConnection,
+    callback: (T) -> () -> (),
+	map: Map<T>, 
+	objects: {T}
 )
-	for _, Object in Objects do
-		if not Connection.Connected then 
+	for _, object in objects do
+		if not connection.Connected then 
             return 
-        elseif not Object then
+        elseif not object then
             continue
-        elseif not Map[Object] then
-            task.spawn(AddExistingObjectToMap, Connection, Map, Object, Callback)
+        elseif not map[object] then
+            task.spawn(add_existing_object, connection, callback, map, object)
         end
 	end
 end
 
-local function CleanupMap(Map: Map<any>)
-	for Key, Callback in Map do
-		task.spawn(Callback)
-		Map[Key] = nil
+local function cleanup_object<T>(map: Map<T>, object: T)
+    local cleanup = map[object]
+
+    if cleanup then
+        map[object] = nil
+        cleanup()
+    end
+end
+
+local function cleanup_map<T>(map: Map<T>)
+	for object, cleanup in map do
+		task.spawn(cleanup)
+		map[key] = nil
 	end
 end
 
-local function LocalToolObserver(Tag: string, Callback: (Tool: Tool) -> () -> (), DontAddExisting: boolean?)
+local function add_existing_tools<T>(
+    add_callback: any,
+    connection: RBXScriptConnection,
+    observe_callback: (T) -> () -> (),
+	map: Map<T>,
+    character: Model,
+    tag: string
+)
+    for _, child in character:GetChildren() do
+        if not connection.Connected then
+            break
+        elseif child:IsA("Tool") and child:HasTag(tag) then
+            task.spawn(add_callback, connection, callback, map, child, player)
+        end
+    end
+end
+
+local function localtool_observer(tag: string, callback: (tool: tool) -> () -> (), dont_add_existing: boolean?)
 	if not RunService:IsClient() then
 		error("[Observer] A LocalTool observer is only usable on the client")
 	end
-	local RemoveConnection: RBXScriptConnection
-	local AddConnection: RBXScriptConnection
-	local AddExistingThread: thread?
-	local Map = {} :: Map<Tool>
+	local remove_connection: RBXScriptConnection
+	local add_connection: RBXScriptConnection
+	local add_existing_thread: thread?
+	local map = {} :: Map<Tool>
 	
-	RemoveConnection = ContextActionService.LocalToolUnequipped:Connect(function(Tool)
-		local CleanupCallback = Map[Tool]
-
-		if CleanupCallback then
-			Map[Tool] = nil
-			CleanupCallback()
-		end
+	remove_connection = ContextActionService.LocalToolUnequipped:Connect(function(tool)
+        cleanup_object(map, tool)
 	end)
-	AddConnection = ContextActionService.LocalToolEquipped:Connect(function(Tool)
-		if Tool:HasTag(Tag) then
-			local CleanupCallback = Callback(Tool) or nil
-
-			if CleanupCallback then
-				if AddConnection.Connected and Tool then
-					Map[Tool] = CleanupCallback
-				else
-					CleanupCallback()
-				end
-			end
+	add_connection = ContextActionService.LocalToolEquipped:Connect(function(tool)
+		if tool:HasTag(tag) then
+            add_existing_object(add_connection, callback, map, tool)
 		end
 	end)
 
-	if not DontAddExisting then
-		local Character = Players.LocalPlayer.Character
+	if not dont_add_existing then
+		local character = Players.LocalPlayer.Character
 
-		 if Character then
-            AddExistingThread = task.defer(function(Character, AddConnection, Map, Callback, Tag)
-			    for Index, Value in Character:GetChildren() do
-					if not AddConnection.Connected then break end
-					
-				    if Value:IsA("Tool") and Value:HasTag(Tag) then
-                        task.spawn(AddExistingObjectToMap, AddConnection, Map, Value, Callback)
-				    end
-			    end
-		    end, Character, AddConnection, Map, Callback, Tag)
+		 if character then
+            add_existing_thread = task.defer(
+                add_existing_tools,
+                add_existing_object,
+                add_connection,
+                callback,
+                map,
+                character,
+                tag
+            )
         end
 	end
 
@@ -116,45 +123,46 @@ local function LocalToolObserver(Tag: string, Callback: (Tool: Tool) -> () -> ()
 	end
 end
 
-local function ObserveTool(Connection: RBXScriptConnection, Map: Map<Tool>, Callback: (Tool: Tool, Player: Player) -> () -> (), Tool: Tool, Player: Player)
-	local CleanupCallback: (() -> ())?	
-	local UnequippedConnection
-	local DestroyingConnection
+local function observe_tool(
+    connection: RBXScriptConnection,
+    callback: (tool: Tool, player: Player) -> () -> (),
+    map: Map<Tool>,
+    tool: Tool, 
+    player: Player
+)
+    local destroying_connection: RBXScriptConnection
 
-	UnequippedConnection = Tool.Unequipped:Once(function()
-		if DestroyingConnection then
-			DestroyingConnection:Disconnect()
+	local unequipped_connection = tool.Unequipped:Once(function()
+		if destroying_connection then
+			destroying_connection:Disconnect()
 		end
-		if CleanupCallback then
-			CleanupCallback()
+		if cleanup then
+			cleanup()
 		end
 	end)
-	DestroyingConnection = Tool.Destroying:Once(function()
-		if UnequippedConnection then
-			UnequippedConnection:Disconnect()
+	destroying_connection = tool.Destroying:Once(function()
+		if unequipped_connection then
+			unequipped_connection:Disconnect()
 		end
-		if CleanupCallback then
-			CleanupCallback()
-		end
+        cleanup_object(map, tool)
 	end)
-	CleanupCallback = Callback(Tool, Player) or nil
 
-	if CleanupCallback then
-		if Connection.Connected and Tool then
-			Map[Tool] = CleanupCallback
-		else
-			CleanupCallback()
-		end
+	local cleanup = callback(tool, player)
+
+	if connection.Connected and tool then
+		map[tool] = cleanup
+	else
+		cleanup
 	end
 end
 
-local function ToolObserver(Tag: string, Callback: (Tool: Tool, Player: Player) -> () -> (), DontAddExisting: boolean?)
-	local AddConnection: RBXScriptConnection
-	local AddExistingThread: thread?
-	local Map = {} :: Map<Tool>
+local function tool_observer(tag: string, callback: (tool: Tool, player: Player) -> () -> (), dont_add_existing: boolean?)
+	local add_connection: RBXScriptConnection
+	local add_existing_thread: thread?
+	local map = {} :: Map<Tool>
 
-	AddConnection = Players.PlayerAdded:Connect(function(Player)
-		local CharacterConnection
+	AddConnection = Players.PlayerAdded:Connect(function(player)
+		local character_connection
 
 		CharacterConnection = Player.CharacterAdded:Connect(function(Character)
 			local ChildConnection
@@ -250,7 +258,7 @@ local function tag_observer(tag: string, callback: (Instance: Instance) -> () ->
 	end
 end
 
-local function ObservePlayerForCharacter(Player: Player, Callback: Callback<Model, Player>)
+local function observe_player_for_character(Player: Player, Callback: Callback<Model, Player>)
 	local RemoveConnection: RBXScriptConnection
 	local AddConnection: RBXScriptConnection
 	local CleanupCallback: (() -> ())?
@@ -278,7 +286,7 @@ local function ObservePlayerForCharacter(Player: Player, Callback: Callback<Mode
 	end
 end
 
-local function PlayerCharacterObserver(Callback: Callback<Model, Player>, DontAddExisting: boolean?)
+local function character_player_observer(Callback: Callback<Model, Player>, DontAddExisting: boolean?)
 	local AddExistingThread: thread?
 	local Map = {} :: Map<Player>
 	local AddConnection
@@ -292,7 +300,7 @@ local function PlayerCharacterObserver(Callback: Callback<Model, Player>, DontAd
 		end
 	end)
 	AddConnection = Players.PlayerAdded:Connect(function(Player)
-		local CleanupCallback = ObservePlayerForCharacter(Player, Callback)
+		local CleanupCallback = observe_player_for_character(Player, Callback)
 	
 		if AddConnection.Connected and Player then
 			Map[Player] = CleanupCallback
@@ -304,7 +312,7 @@ local function PlayerCharacterObserver(Callback: Callback<Model, Player>, DontAd
 	if not DontAddExisting then
         AddExistingThread = task.defer(function(Connection, Map, Callback)
             for _, Player in Players:GetPlayers() do
-                local CleanupCallback = ObservePlayerForCharacter(Player, Callback)
+                local CleanupCallback = observe_player_for_character(Player, Callback)
 
                 if Connection.Connected and Player then
                     Map[Player] = CleanupCallback
@@ -373,12 +381,12 @@ local function PlayerObserver(Callback: Callback<Player>, DontAddExisting: boole
 end
 
 local Exports = table.freeze {
-    character = ObservePlayerForCharacter :: (player: Player, callback: Callback<Model, Player>) -> () -> (),
-	character_and_player = PlayerCharacterObserver :: Constructor<Model, Player>,
-	localtool = LocalToolObserver :: TagConstructor<Tool>,
-    tool = ToolObserver :: TagConstructor<Tool, Player>,
-	player = PlayerObserver :: :: Constructor<Player>,
-	tag = TagObserver :: Constructor<Instance>,
+    character = ObservePlayerForCharacter,
+	character_and_player = player_character_observer :: Constructor<Model, Player>,
+	localtool = localtool_observer,
+    tool = tool_observer,
+	player = player_observer :: :: Constructor<Player>,
+	tag = tag_observer :: Constructor<Instance>,
 }
 
 return Exports
