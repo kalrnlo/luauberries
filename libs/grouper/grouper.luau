@@ -24,20 +24,20 @@ local has_initiated = false
 local defualt_rank = 0
 local config = {
 	rank_refresh_rate = 30,
-	group_id = 0,
+	groupid = 0,
 }
 
-local function FETCH_RANK(userid: number): number?
+local function FETCH_RANK(userid: number, groupid: number): number?
 	local success, groups = pcall(group_service.GetGroupsAsync, group_service, userid)
 	
 	if success then
 		for _, group in groups do
-			if group.Id ~= config.group_id then continue end
+			if group.Id ~= groupid then continue end
 			role_cache[group.Rank + 1] = group.Role
 			return group.Rank
 		end
 	else
-		warn `[Grouper] Couldn't fetch rank for user {userid}\n\tgroup_service_err: {groups}`
+		warn `[Grouper] Couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`
 	end
 	
 	return nil
@@ -49,9 +49,10 @@ end
 
 local function on_player_added(player: Player)
 	local rate = config.rank_refresh_rate
+	local groupid = config.groupid
 	local userid = player.UserId
 	local start = time()
-	local rank = FETCH_RANK(userid) or 0
+	local rank = FETCH_RANK(userid, groupid) or 0
 
 	if player and player:IsDescendantOf(players) then
 		local threads_waiting = player_ranks[userid]
@@ -69,7 +70,7 @@ local function on_player_added(player: Player)
 		end
 
 		while player_ranks[userid] do
-			local new_rank = FETCH_RANK(userid)
+			local new_rank = FETCH_RANK(userid, groupid)
 
 			if not player_ranks[userid] then
 				break
@@ -104,7 +105,7 @@ local callback_prototype = {
 callback_prototype.__index = callback_prototype
 table.freeze(callback_prototype)
 
-local function init(new_config: { rank_refresh_rate: number?, group_id: number? })
+local function init(new_config: { rank_refresh_rate: number?, groupid: number? }?)
 	if has_initiated then return end
 	has_initiated = true
 
