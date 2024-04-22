@@ -131,9 +131,10 @@ local function observe_tool(
     tool: Tool, 
     player: Player
 )
+	local unequipped_connection: RBXScriptConnection
     local destroying_connection: RBXScriptConnection
 
-	local unequipped_connection = tool.Unequipped:Once(function()
+	unequipped_connection = tool.Unequipped:Once(function()
 		if destroying_connection then
 			destroying_connection:Disconnect()
 		end
@@ -262,7 +263,7 @@ local function observe_player_for_character(player: Player, callback: (character
 	add_connection = player.CharacterAdded:Connect(function(character)
 		cleanup = callback(character, player)
 	
-		if cleanup and not add_connection.Connected then
+		if not add_connection.Connected then
 			cleanup()
 		end
 	end)
@@ -277,59 +278,60 @@ local function observe_player_for_character(player: Player, callback: (character
 	end
 end
 
-local function character_player_observer(Callback: Callback<Model, Player>, DontAddExisting: boolean?)
-	local AddExistingThread: thread?
-	local Map = {} :: Map<Player>
-	local AddConnection
+local function character_player_observer(callback: (character: Model, player: Player) -> () -> (), dont_add_existing: boolean?)
+	local remove_connection: RBXScriptConnection
+	local add_connection: RBXScriptConnection
+	local add_existing_thread: thread?
+	local map = {} :: Map<Player>
 	
-	local RemovingConnection = Players.PlayerRemoving:Connect(function(Player)
-		local CleanupCallback = Map[Player]
+	remove_connection = Players.PlayerRemoving:Connect(function(player)
+		local cleanup = map[player]
 
-		if CleanupCallback then
-			Map[Player] = nil
-			CleanupCallback()
+		if cleanup then
+			map[player] = nil
+			cleanup()
 		end
 	end)
-	AddConnection = Players.PlayerAdded:Connect(function(Player)
-		local CleanupCallback = observe_player_for_character(Player, Callback)
+	add_connection = Players.PlayerAdded:Connect(function(Player)
+		local cleanup = observe_player_for_character(player, callback)
 	
-		if AddConnection.Connected and Player then
-			Map[Player] = CleanupCallback
+		if add_connection.Connected and player then
+			map[player] = cleanup
 		else
-			CleanupCallback()
+			cleanup()
 		end
 	end)
 
-	if not DontAddExisting then
-        AddExistingThread = task.defer(function(Connection, Map, Callback)
-            for _, Player in Players:GetPlayers() do
-                local CleanupCallback = observe_player_for_character(Player, Callback)
-
-                if Connection.Connected and Player then
-                    Map[Player] = CleanupCallback
-                else
-                    CleanupCallback()
-                end
+	if not dont_add_existing then
+        add_existing_thread = task.defer(function(add_connection, map, callback)
+            for _, player in Players:GetPlayers() do
+				local cleanup = observe_player_for_character(player, callback)
+	
+				if add_connection.Connected and player then
+					map[player] = cleanup
+				else
+					cleanup()
+				end
             end
-        end, AddConnection, Map, Callback)
+        end, add_connection, map, callback)
 	end
 
 	return function()
-		if AddExistingThread then
-			task.cancel(AddExistingThread)
+		if add_existing_thread then
+			task.cancel(add_existing_thread)
 		end
 		
-		RemovingConnection:Disconnect()
-		AddConnection:Disconnect()
-		CleanupMap(Map)
+		remove_connection:Disconnect()
+		add_connection:Disconnect()
+		cleanup_map(map)
 	end
 end
 
 local function player_observer(callback: (player: Player) -> () -> (), dont_add_existing: boolean?)
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
-	local AddExistingThread: thread?
-	local Map = {} :: Map<Player>
+	local add_existing_thread: thread?
+	local map = {} :: Map<Player>
 	
 	remove_connection = Players.PlayerRemoving:Connect(function(player)
         cleanup_object(map, player)
@@ -339,7 +341,7 @@ local function player_observer(callback: (player: Player) -> () -> (), dont_add_
 	end)
 
 	if not dont_add_existing then
-		AddExistingThread = task.defer(
+		add_existing_thread = task.defer(
 			add_existing_objects,
 			add_connection,
             callback,
@@ -349,22 +351,21 @@ local function player_observer(callback: (player: Player) -> () -> (), dont_add_
 	end
 
 	return function()
-		if AddExistingThread then
-			task.cancel(AddExistingThread)
+		if add_existing_thread then
+			task.cancel(add_existing_thread)
 		end
-		RemoveConnection:Disconnect()
-		AddConnection:Disconnect()
-		CleanupMap(Map)
+		remove_connection:Disconnect()
+		add_connection:Disconnect()
+		cleanup_map(map)
 	end
 end
 
-local Exports = table.freeze {
-    character = ObservePlayerForCharacter,
-	character_and_player = player_character_observer :: Constructor<Model, Player>,
+local exports = table.freeze {
+	character = player_character_observer,
 	localtool = localtool_observer,
-    tool = tool_observer,
-	player = player_observer :: :: Constructor<Player>,
-	tag = tag_observer :: Constructor<Instance>,
+	player = player_observer,
+	tool = tool_observer,
+	tag = tag_observer,
 }
 
-return Exports
+return exports

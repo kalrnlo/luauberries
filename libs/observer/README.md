@@ -12,13 +12,13 @@ local observer = require("@kalrnlo/observer")
 #### methods
 
 ```lua
-character_and_player(callback, dont_add_existing)
+localtool(tag, callback, dont_add_existing)
 ```
 - reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
 - pre_allocate_threads: a number of threads to preallocate, by defualt 2
 
 ```lua
-localtool(tag, callback, dont_add_existing)
+character(callback, dont_add_existing)
 ```
 - reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
 - pre_allocate_threads: a number of threads to preallocate, by defualt 2
@@ -40,10 +40,3 @@ player(callback, dont_add_existing)
 ```
 - reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
 - pre_allocate_threads: a number of threads to preallocate, by defualt 2
-
-```lua
-character(player, callback)
-```
-- reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
-- pre_allocate_threads: a number of threads to preallocate, by defualt 2
-
