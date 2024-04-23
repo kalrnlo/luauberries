@@ -173,7 +173,7 @@ end
 local function ReuseValueSender_Call<T>(self: Sender<T>, Value: T)
 	local Signal = self[1]
 
-	if Value ~= Signal.Value then
+	if Value ~= Signal.value then
 		Signal.value = Value
 		ReuseRunConnections(Signal, Value)
 	end
@@ -186,7 +186,7 @@ end
 local function ValueSender_Call<T>(self: Sender<T>, Value: T)
 	local Signal = self[1]
 
-	if Value ~= Signal.Value then
+	if Value ~= Signal.value then
 		Signal.value = Value
 		RunConnections(Signal.connections, Value)
 	end
