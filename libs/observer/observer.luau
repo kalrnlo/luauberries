@@ -12,6 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
+type CharacterObserverCallback = ((character: Model, player: Player) -> ()) & ((character: Model, player: Player) -> () -> ())
 type ToolObserverCallback = ((tool: Tool, player: Player) -> ()) & ((tool: Tool, player: Player) -> () -> ())
 type Map<T> = {[T]: () -> ()}
 
@@ -259,11 +260,11 @@ local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) 
 	end
 end
 
-local function observe_player_for_character(player: Player, callback: (character: Model, player: Player) -> () -> ())
+local function observe_player_for_character(player: Player, callback: CharacterObserverCallback)
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local cleanup: (() -> ())?
-
+)
 	remove_connection = Player.CharacterRemoving:Connect(function()
 		if cleanup then
 			cleanup()
@@ -287,7 +288,7 @@ local function observe_player_for_character(player: Player, callback: (character
 	end
 end
 
-local function character_player_observer(callback: (character: Model, player: Player) -> () -> (), dont_add_existing: boolean?)
+local function character_player_observer(callback: CharacterObserverCallback, dont_add_existing: boolean?)
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?
