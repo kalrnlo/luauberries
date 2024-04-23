@@ -22,7 +22,6 @@ local module = table.freeze {
 }
 
 -- Module Consumer
-
 local module = require("Module")
 
 module.init({

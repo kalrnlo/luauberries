@@ -70,31 +70,31 @@ end)
 > Every method except init can yield but only in select cases such as, if group service is being really slow, you're playtesting in studio, or init hasn't been called
 
 ```lua
-grouper.get_rank_and_role(player)
+get_rank_and_role(player)
 ```
 Returns the current rank and role for the given player in the group.
 - player: the player to get the rank and role of
 
 ```lua
-grouper.is_in_group(player)
+is_in_group(player)
 ```
 Returns a boolean indicating if the given player is in the group.
 - player: the player to check if they're in the group
 
 ```lua
-grouper.get_rank(player)
+get_rank(player)
 ```
 Returns the given players current rank in the group
 - player: the player to get the rank of
 
 ```lua
-grouper.get_role(player)
+get_role(player)
 ```
 Returns the given players current role in the group
 - player: the player to get the role of
 
 ```lua
-grouper.init(new_config)
+init(new_config)
 ```
 Initates grouper starting rank tracking
 - new_config: an optional config with the following optional fields, groupid, and rank_refresh_rate
@@ -102,6 +102,6 @@ Initates grouper starting rank tracking
 #### properties
 
 ```lua
-grouper.config
+config
 ```
 The current config grouper is using
