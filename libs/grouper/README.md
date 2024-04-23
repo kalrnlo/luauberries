@@ -9,7 +9,7 @@ local players = game:GetService("Players")
 local grouper = require("@kalrnlo/Grouper")
 
 local text_channels = text_chat_service:WaitForChild("TextChannels")
-local general = text_chat_service:WaitForChild("RBXGeneral")
+local general = text_channels:WaitForChild("RBXGeneral")
 
 local function create_text_channel(name: string)
 	local channel = Instance.new("TextChannel")
