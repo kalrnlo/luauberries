@@ -9,7 +9,7 @@
 
 local group_service = game:GetService("GroupService")
 local players = game:GetService("Players")
-local config_merge = require(Path.To.config_merge)
+local config_merge = require("@kalrnlo/ConfigMerge")
 
 type CallbackClass = typeof(setmetatable({} :: { RankChangedCallback }, {} :: CallbackPrototype))
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
@@ -71,7 +71,7 @@ local function on_player_added(player: Player)
 			local new_rank = FETCH_RANK(userid, groupid)
 
 			if not player_ranks[userid] then
-				break
+				return
 			elseif new_rank and new_rank ~= rank then
 				player_ranks[userid] = new_rank
 
@@ -82,9 +82,9 @@ local function on_player_added(player: Player)
 			end
 			task.wait(rate)
 		end
+	else
+		player_ranks[user_id] = nil
 	end
-
-	player_ranks[user_id] = nil
 end
 
 local function callback_call(self: CallbackClass)
