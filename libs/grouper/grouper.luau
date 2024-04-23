@@ -125,7 +125,6 @@ local function on_rank_changed(callback: RankChangedCallback): () -> ()
 end
 
 local function get_rank(player: Player): number
-	local userid = player.UserId
 	local rank = player_ranks[userid]
 
 	if type(rank) == "number" then
@@ -134,7 +133,7 @@ local function get_rank(player: Player): number
 		table.insert(rank, coroutine.running())
 		return coroutine.yield()
 	elseif player and player:IsDescendantOf(players) then
-		player_ranks[userid] = { coroutine.running() }
+		player_ranks[player.UserId] = { coroutine.running() }
 		return coroutine.yield()
 	else
 		error "[GROUPER] Player has left game too early"
