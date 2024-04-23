@@ -5,7 +5,7 @@ Utility function for merging a partial version of a config, with the main config
 #### example
 ```lua
 -- Module
-local config_merge = require("@kalrnlo/Config_Merge")
+local config_merge = require("@kalrnlo/ConfigMerge")
 
 local config = {
 	rank_refresh_rate = 60,
