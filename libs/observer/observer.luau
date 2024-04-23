@@ -12,6 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
+type ToolObserverCallback = ((tool: Tool, player: Player) -> ()) & ((tool: Tool, player: Player) -> () -> ())
 type Map<T> = {[T]: () -> ()}
 
 local function add_existing_object<T>(
@@ -20,12 +21,14 @@ local function add_existing_object<T>(
     map: Map<T>,
 	object: T
 )
-	local cleanup = callback(object)
+	local cleanup = callback(object) or nil
 
-	if connection.Connected and object then
-		map[object] = cleanup
-	else
-		cleanup()
+	if cleanup then
+		if connection.Connected and object then
+			map[object] = cleanup
+		else
+			cleanup()
+		end
 	end
 end
 
@@ -80,7 +83,7 @@ local function add_existing_tools<T>(
     end
 end
 
-local function localtool_observer(tag: string, callback: (tool: tool) -> () -> (), dont_add_existing: boolean?)
+local function localtool_observer(tag: string, callback: ((tool: Tool) -> ()) & ((tool: Tool) -> () -> ()), dont_add_existing: boolean?)
 	if not RunService:IsClient() then
 		error("[Observer] A LocalTool observer is only usable on the client")
 	end
@@ -126,13 +129,14 @@ end
 
 local function observe_tool(
     connection: RBXScriptConnection,
-    callback: (tool: Tool, player: Player) -> () -> (),
+    callback: ToolObserverCallback,
     map: Map<Tool>,
     tool: Tool, 
     player: Player
 )
 	local unequipped_connection: RBXScriptConnection
     local destroying_connection: RBXScriptConnection
+	local cleanup: (() -> ())?
 
 	unequipped_connection = tool.Unequipped:Once(function()
 		if destroying_connection then
@@ -148,17 +152,22 @@ local function observe_tool(
 		end
         cleanup_object(map, tool)
 	end)
+	cleanup = callback(tool, player) or nil
 
-	local cleanup = callback(tool, player)
-
-	if connection.Connected and tool then
-		map[tool] = cleanup
-	else
-		cleanup
+	if cleanup then
+		if connection.Connected and tool then
+			map[tool] = cleanup
+		else
+			cleanup()
+		end
 	end
 end
 
-local function tool_observer(tag: string, callback: (tool: Tool, player: Player) -> () -> (), dont_add_existing: boolean?)
+local function tool_observer(
+	tag: string,
+	callback: ToolObserverCallback,
+	dont_add_existing: boolean?
+)
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?
 	local map = {} :: Map<Tool>
@@ -217,7 +226,7 @@ local function tool_observer(tag: string, callback: (tool: Tool, player: Player)
 	end
 end
 
-local function tag_observer(tag: string, callback: (Instance: Instance) -> () -> (), dont_add_existing: boolean?)
+local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) & ((instance: Instance) -> () -> ()), dont_add_existing: boolean?)
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?
@@ -285,12 +294,7 @@ local function character_player_observer(callback: (character: Model, player: Pl
 	local map = {} :: Map<Player>
 	
 	remove_connection = Players.PlayerRemoving:Connect(function(player)
-		local cleanup = map[player]
-
-		if cleanup then
-			map[player] = nil
-			cleanup()
-		end
+		cleanup_object(map, player)
 	end)
 	add_connection = Players.PlayerAdded:Connect(function(Player)
 		local cleanup = observe_player_for_character(player, callback)
@@ -327,7 +331,7 @@ local function character_player_observer(callback: (character: Model, player: Pl
 	end
 end
 
-local function player_observer(callback: (player: Player) -> () -> (), dont_add_existing: boolean?)
+local function player_observer(callback: ((player: Player) -> ()) & ((player: Player) -> () -> ()), dont_add_existing: boolean?)
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?

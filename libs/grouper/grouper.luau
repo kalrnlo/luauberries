@@ -12,16 +12,14 @@ local players = game:GetService("Players")
 local config_merge = require(Path.To.config_merge)
 
 type CallbackClass = typeof(setmetatable({} :: { RankChangedCallback }, {} :: CallbackPrototype))
-export type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
-type CallbackPrototype = {__call: (self: CallbackClass) -> ()}
+type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
+type CallbackPrototype = { __call: (self: CallbackClass) -> () }
 
-local rank_changed_callbacks = {} :: { CallbackClass }
 -- {[user_id] = rank | treads_waiting_for_player_rank_to_be_fetched }
-local player_ranks = {} :: {[number]: number | { thread }}
-local defualt_role = "Guest"
-local role_cache = table.create(256, defualt_role)
+local player_ranks = {} :: { [number]: number | { thread } }
+local rank_changed_callbacks = {} :: { CallbackClass }
+local role_cache = table.create(256, "Guest")
 local has_initiated = false
-local defualt_rank = 0
 local config = {
 	rank_refresh_rate = 30,
 	groupid = 0,
@@ -37,7 +35,7 @@ local function FETCH_RANK(userid: number, groupid: number): number?
 			return group.Rank
 		end
 	else
-		warn `[Grouper] Couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`
+		warn `[GROUPER] Couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`
 	end
 	
 	return nil
@@ -128,7 +126,7 @@ end
 
 local function get_rank(player: Player): number
 	local userid = player.UserId
-	local rank = player_ranks[user_id]
+	local rank = player_ranks[userid]
 
 	if type(rank) == "number" then
 		return rank
@@ -139,7 +137,7 @@ local function get_rank(player: Player): number
 		player_ranks[userid] = { coroutine.running() }
 		return coroutine.yield()
 	else
-		error "[Grouper] Player has left game too early"
+		error "[GROUPER] Player has left game too early"
 	end
 end
 
@@ -147,11 +145,11 @@ local function get_rank_and_role(player: Player)
 	local rank = get_rank(player)
 	return rank, role_cache[rank + 1]
 end
-			
+
 local function is_in_group(player: Player)
-	return get_rank(player) > 0
+	return get_rank(player) ~= 0
 end
-			
+
 local function get_role(player: Player)
 	return role_cache[get_rank(Player) + 1]
 end
