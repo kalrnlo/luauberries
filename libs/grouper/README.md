@@ -67,7 +67,7 @@ end)
 #### methods
 
 > [!IMPORTANT]
-> Every method except init can yield but only in select cases, if group service is being really slow, you're playtesting in studio, or init hasn't been called
+> Every method except init can yield but only in select cases such as, if group service is being really slow, you're playtesting in studio, or init hasn't been called
 
 ```lua
 grouper.get_rank_and_role(player)
