@@ -125,7 +125,7 @@ local function on_rank_changed(callback: RankChangedCallback): () -> ()
 end
 
 local function get_rank(player: Player): number
-	local rank = player_ranks[userid]
+	local rank = player_ranks[player.UserId]
 
 	if type(rank) == "number" then
 		return rank
