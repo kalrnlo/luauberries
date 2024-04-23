@@ -100,7 +100,7 @@ Initates grouper starting rank tracking
 - new_config: an optional config with the following optional fields, groupid, and rank_refresh_rate
 
 #### properties
-Y
+
 ```lua
 grouper.config
 ```
