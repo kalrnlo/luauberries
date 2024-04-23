@@ -14,29 +14,32 @@ local observer = require("@kalrnlo/observer")
 ```lua
 localtool(tag, callback, dont_add_existing)
 ```
-- reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
-- pre_allocate_threads: a number of threads to preallocate, by defualt 2
+- tag: the tag a tool should have to be observed
+- callback: a function to be used to observe a tool, that returns a function to be called when the tool is unequipped
+- dont_add_existing: a boolean that if true, the observer will not observe already equipped tools with the given tag
 
 ```lua
 character(callback, dont_add_existing)
 ```
-- reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
-- pre_allocate_threads: a number of threads to preallocate, by defualt 2
+- callback: a function to be used to observe a character and a player, that returns a function thats called when a character is destroyed
+- dont_add_existing: a boolean that if true, the observer will not observe already existing character and player pairs
 
 ```lua
 tool(tag, callback, dont_add_existing)
 ```
-- reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
-- pre_allocate_threads: a number of threads to preallocate, by defualt 2
+- tag: the tag a tool should have to be observed
+- callback: a function to be used to observe a tool, that returns a function to be called when that tool is unequipped 
+- dont_add_existing: a boolean that if true, the observer will not observe already equipped tools with the given tag
 
 ```lua
 tag(tag, callback, dont_add_existing)
 ```
-- tag: boolean indicating whether or not the signal created should partake in thread reuse
-- pre_allocate_threads: a number of threads to preallocate, by defualt 2
+- tag: the tag a instance should have to be observed
+- callback: a function to be used to observe a instance, that returns a function to be called when that instance is destroyed
+- dont_add_existing: a boolean that if true will not observe already existing instances with the given tag
 
 ```lua
 player(callback, dont_add_existing)
 ```
-- reuse_threads: boolean indicating whether or not the signal created should partake in thread reuse
-- pre_allocate_threads: a number of threads to preallocate, by defualt 2
+- callback: a function to be used to observe a player, that returns a function to be called when the player leaves the game
+- dont_add_existing: a boolean that if true, the observer will not observe already existing players
