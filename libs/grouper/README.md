@@ -79,7 +79,7 @@ Returns the current rank and role for the given player in the group.
 ```lua
 on_rank_changed(callback)
 ```
-Returns a disconnect function for discon
+Returns a disconnect function for the callback to be removed from the list of callbacks grouper will call when a players rank changes
 - callback: a callback to be called each time a players rank changes with the following args, `player, new_rank, old_rank`
 
 ```lua
