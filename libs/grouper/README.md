@@ -6,7 +6,7 @@ A module for getting accurate group ranks for players on the server, and detecti
 ```lua
 local text_chat_service = game:GetService("TextChatService")
 local players = game:GetService("Players")
-local grouper = require("@kalrnlo/Grouper")
+local grouper = require("@kalrnlo/grouper")
 
 local text_channels = text_chat_service:WaitForChild("TextChannels")
 local general = text_channels:WaitForChild("RBXGeneral")
@@ -67,13 +67,20 @@ end)
 #### methods
 
 > [!IMPORTANT]
-> Every method except init can yield but only in select cases such as, if group service is being really slow, you're playtesting in studio, or init hasn't been called
+> Every method except `init` and `on_rank_changed` can yield but only in select cases such as, if group service is being really slow, you're playtesting in studio, or init hasn't been called
 
 ```lua
 get_rank_and_role(player)
 ```
 Returns the current rank and role for the given player in the group.
 - player: the player to get the rank and role of
+
+
+```lua
+on_rank_changed(callback)
+```
+Returns a disconnect function for discon
+- callback: a callback to be called each time a players rank changes with the following args, `player, new_rank, old_rank`
 
 ```lua
 is_in_group(player)
