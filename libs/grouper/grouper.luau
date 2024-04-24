@@ -5,20 +5,19 @@
 -- 🐟 Grouper
 -- Used for getting the latest group rank or role of a player on the server.
 -- @kalrnlo
--- 22/04/2024
+-- 23/04/2024
 
 local group_service = game:GetService("GroupService")
 local players = game:GetService("Players")
-local config_merge = require("@kalrnlo/ConfigMerge")
+local add_callback, run_callbacks = require "@kalrnlo/callbacker"
+local config_merge = require "@kalrnlo/ConfigMerge"
 
-type CallbackClass = typeof(setmetatable({} :: { RankChangedCallback }, {} :: CallbackPrototype))
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
-type CallbackPrototype = { __call: (self: CallbackClass) -> () }
 
 -- {[user_id] = rank | treads_waiting_for_player_rank_to_be_fetched }
 local player_ranks = {} :: { [number]: number | { thread } }
-local rank_changed_callbacks = {} :: { CallbackClass }
 local role_cache = table.create(256, "Guest")
+local rank_changed_callbacks = {}
 local has_initiated = false
 local config = {
 	rank_refresh_rate = 30,
@@ -74,10 +73,12 @@ local function on_player_added(player: Player)
 				return
 			elseif new_rank and new_rank ~= rank then
 				player_ranks[userid] = new_rank
-
-				for _, callback in rank_changed_callbacks do
-					task.spawn(callback[1], player, new_rank, rank)
-				end
+				run_callbacks(
+					rank_changed_callbacks,
+					player,
+					new_rank,
+					rank
+				)
 				rank = new_rank
 			end
 			task.wait(rate)
@@ -86,22 +87,6 @@ local function on_player_added(player: Player)
 		player_ranks[user_id] = nil
 	end
 end
-
-local function callback_call(self: CallbackClass)
-	if #rank_changed_callbacks > 1 then
-		local index = table.find(rank_changed_callbacks, self) :: number
-		rank_changed_callbacks[index] = rank_changed_callbacks[#rank_changed_callbacks]
-		rank_changed_callbacks[#rank_changed_callbacks] = nil
-	else
-		rank_changed_callbacks[1] = nil
-	end
-end
-
-local callback_prototype = {
-	__call = callback_call
-}
-callback_prototype.__index = callback_prototype
-table.freeze(callback_prototype)
 
 local function init(new_config: { rank_refresh_rate: number?, groupid: number? }?)
 	if has_initiated then return end
@@ -118,10 +103,8 @@ local function init(new_config: { rank_refresh_rate: number?, groupid: number? }
 	players.PlayerAdded:Connect(on_player_added)
 end
 
-local function on_rank_changed(callback: RankChangedCallback): () -> ()
-	local callback_data = setmetatable(table.create(1, Callback), callback_prototype) :: any
-	table.insert(rank_changed_callbacks, callback_data)
-	return callback_data
+local function on_rank_changed(callback: RankChangedCallback)
+	return add_callback(rank_changed_callbacks, callback)
 end
 
 local function get_rank(player: Player): number

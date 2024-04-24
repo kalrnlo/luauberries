@@ -7,7 +7,9 @@
 -- infact this signal is so anti-ordering that it uses swap removal
 -- based on roblox's signal-lua and LemonSignal.
 -- @Kalrnlo
--- 03/04/2024
+-- 23/04/2024
+
+local Metaize = require "@kalrnlo/metaize"
 
 type Sender<values...> = typeof(setmetatable({} :: {Signal<values...>}, {} :: SenderPrototype<values...>))
 
@@ -55,13 +57,7 @@ local function Resume<T...>(ThreadOrCallback: thread | (...T) -> (), ...: T...)
 	end
 end
 
-local function Metaize<tbl>(tbl: tbl ): tbl & {__index: tbl}
-	tbl.__index = tbl
-	return table.freeze(tbl)
-end
-
 local TaskSpawn = if task then task.spawn else Resume
-local Empty = function() end
 
 local function run_callback<values...>(free_threads: {thread}, thread: thread, callback: (...values) -> (), ...: values)
 	callback(...)
@@ -79,7 +75,6 @@ end
 --------------------------------------------------------------------------------
 
 local function Connection_Call<T...>(self: Connection<T...>)
-	self[1] = Empty
 	local Signal = self[2] :: Signal<T...>
 	local Index = table.find(Signal.connections, self)
 
