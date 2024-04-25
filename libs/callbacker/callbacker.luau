@@ -10,8 +10,8 @@ local metaize = require "@kalrnlo/metaize"
 type ConnectionPrototype<T...> = { __call: (self: Connection<T...>) -> () }
 type Connection<T...> = typeof(setmetatable(
     {} :: { (T...) -> () | CallbackArray<T...> }, 
-    {} :: CallbackPrototype)
-)
+    {} :: CallbackPrototype
+))
 
 local function connection_call<T...>(self: Connection<T...>)
     local arr: { Connection<T...> } = self[2] :: any
