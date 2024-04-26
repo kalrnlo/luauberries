@@ -1,9 +1,9 @@
 --!strict
 
 -- TextChatUtil
--- simple utility module for TextChat
+-- simple utility module for TextChatService
 -- @Kalrnlo
--- 21/03/2023
+-- 25/04/2024
 
 local text_chat_service = game:GetService("TextChatService")
 local players = game:GetService("Players")
