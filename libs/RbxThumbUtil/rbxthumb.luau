@@ -1,12 +1,13 @@
 --!strict
 
 -- rbxthumbutil
--- module for easily creating roblox thumbnail urls
+-- module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
+-- although with types 
 -- @kalrnlo
--- 26/04/2024
+-- 29/04/2024
 
-local BASE_URL = "rbxthumb://type=%s&id=%d&w=%s&h=%s"
-local CIRCULAR_URL = `{BASE_URL}&filters=circular`
+type PlayerThumbnailFormatter<sizes> = (player: Player, size: sizes, circular: boolean?) -> string
+type ThumbnailFormatter<sizes> = (id: number, size: sizes, circular: boolean?) -> string
 
 export type ThumbnailType = "Asset" | "Avatar" | "AvatarHeadShot" | "BadgeIcon"  | 
 	"BundleThumbnail" | "GameIcon" | "GamePass" | "GroupIcon" | "Outfit" | "FontFamily" | 
@@ -15,236 +16,91 @@ export type ThumbnailType = "Asset" | "Avatar" | "AvatarHeadShot" | "BadgeIcon" 
 export type ThumbnailSize = "1200×80" | "720x720" | "420x420" |"352x352" | "150x150" | 
 	"100x100" | "60x60" | "50x50" | "48x48" | "180x180"
 
-type HeadshotThumbnailSize = "48×48" | "60×60" | "100×100" | "150×150" | "180×180" |
+type AvatarHeadshotThumbnailSize = "48×48" | "60×60" | "100×100" | "150×150" | "180×180" |
     "352×352" | "420×420"
 
-type BustThumbnailSize = "100x100" | "150x15" | "75×75" | "100×100" | "150×150" | "180×180" | 
+type AvatarBustThumbnailSize = "100x100" | "150x15" | "75×75" | "100×100" | "150×150" | "180×180" | 
     "352×352" | "420×420"
 
-type FullThumbnailSize = "50×50" | "60×60" | "75×75" | "100×100" | "150×150" | "180×180" | 
+type FullAvatarThumbnailSize = "50×50" | "60×60" | "75×75" | "100×100" | "150×150" | "180×180" | 
     "352×352" | "420×420"
 
-local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize, circular: boolean?)
+local BASE_URL = "rbxthumb://type=%*&id=%*&w=%*&h=%*"
+local CIRCULAR_URL = `{BASE_URL}&filters=circular`
+local ASSET_ENUM = Enum.AvatarItemType.Asset
+local BUNDLE_STR = "BundleThumbnail"
+local DEFUALT_SIZE = "150x150"
+local DEFUALT_SIZE_NUM = 150
+local ASSET_STR = "Asset"
+local X = "x"
+
+local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
+    return if avatar_item_type == ASSET_ENUM then ASSET_STR else BUNDLE_STR
+end
+
+local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_height: number)
+    if size then
+        local splitted = string.split(size, X)
+        return splitted[1] or defualt_width, splitted[2] or defualt_height
+    else
+        return defualt_width, defualt_height
+    end
+end
+
+local function RAW_FORMAT(id: number, type: ThumbnailType, width: number, height: number, circular: boolean?)
 	return string.format(
 		if circular then CIRCULAR_URL else BASE_URL,
 		type,
 		id,
-		table.unpack(string.split(size, "x"))
+        width,
+        height
 	)
 end
 
-local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
-	if AvatarItemType == Enum.AvatarItemType.Bundle then
-		return "BundleThumbnail"
-	elseif AvatarItemType == Enum.AvatarItemType.Asset then
-		return "Asset"
-	else
-		error "[RBX_THUMB_UTIL]: Invalid avatar_item_type provided"
-	end
+local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize, circular: boolean?)
+    return RAW_FORMAT(id, type, SPLIT_SIZE(size, DEFUALT_SIZE_NUM, DEFUALT_SIZE_NUM), circular)
+end
+
+local function CREATE_PLAYER_FORMATTER<sizes>(type: ThumbnailType, defualt_width: number?, defualt_height: number?): PlayerThumbnailFormatter<sizes>
+    local defualt_height = defualt_height or DEFUALT_SIZE_NUM
+    local defualt_width = defualt_width or DEFUALT_SIZE_NUM
+
+    return function(player: Player, size: sizes?, circular: boolean?)
+        return RAW_FORMAT(player.UserId, type, SPLIT_SIZE(size, defualt_width, defualt_height), circular)
+    end
+end
+
+local function CREATE_FORMATTER<sizes>(type: ThumbnailType, defualt_width: number?, defualt_height: number?): ThumbnailFormatter<sizes>
+    local defualt_height = defualt_height or DEFUALT_SIZE_NUM
+    local defualt_width = defualt_width or DEFUALT_SIZE_NUM
+
+    return function(id: number, size: sizes?, circular: boolean?)
+        return RAW_FORMAT(id, type, SPLIT_SIZE(size, defualt_width, defualt_height), circular)
+    end
 end
 
 local exports = table.freeze {
-    format = FORMAT_RBXTHUMB_URL,
     avatar = table.freeze {
-        headshot,
-        bust,
-        full,
+        headshot = CREATE_FORMATTER("AvatarHeadShot") :: ThumbnailFormatter<AvatarHeadshotThumbnailSize>,
+        bust = CREATE_FORMATTER("AvatarBust") :: ThumbnailFormatter<AvatarBustThumbnailSize>,
+        full = CREATE_FORMATTER("Avatar") :: ThumbnailFormatter<FullAvatarThumbnailSize>,
     },
-    avatar = table.freeze {
-        headshot,
-        bust,
-        full,
+    player = table.freeze {
+        headshot = CREATE_PLAYER_FORMATTER("AvatarHeadShot") :: PlayerThumbnailFormatter<AvatarHeadshotThumbnailSize>,
+        bust = CREATE_PLAYER_FORMATTER("AvatarBust") :: PlayerThumbnailFormatter<AvatarBustThumbnailSize>,
+        full = CREATE_PLAYER_FORMATTER("Avatar") :: PlayerThumbnailFormatter<FullAvatarThumbnailSize>,
     },
-    experience,
-    fontfamily,
-    badge,
-    gamepass,
-    group,
-    bundle,
-    outfit,
-    asset,
+    bundle = CREATE_FORMATTER("BundleThumbnail") :: ThumbnailFormatter<"150x150" | "420x420">,
+    fontfamily = CREATE_FORMATTER("FontFamily", 1200, 80) :: ThumbnailFormatter<"1200×80">,
+    group = CREATE_FORMATTER("GroupIcon") :: ThumbnailFormatter<"150x150" | "420x420">,
+    outfit = CREATE_FORMATTER("Outfit") :: ThumbnailFormatter<"150x150" | "420x420">,
+    asset = CREATE_FORMATTER("Asset") :: ThumbnailFormatter<"150x150" | "420x420">,
+    experience = CREATE_FORMATTER("GameIcon"):: ThumbnailFormatter<"150x150">,
+    gamepass = CREATE_FORMATTER("GamePass") :: ThumbnailFormatter<"150x150">,
+    badge = CREATE_FORMATTER("BadgeIcon") :: ThumbnailFormatter<"150x150">,
 
-    avatar_item_type_to_thumbnail_type,
+    avatar_item_type_to_thumbnail_type = avatar_item_type_to_thumbnail_type,
+    format = FORMAT_RBXTHUMB_URL,
 }
 
---!strict
-
--- RbxThumbUtils
--- Wraps the rbxthumb URL api surface to generate a URL for a thumbnail on the cloud.
--- These thumbnails are automatically batched for performance.
--- Originally by @Quenty
--- Modified by @Kalrnlo
--- 16/01/2023
-
-export type RobloxThumbnailType = "Asset" | "Avatar" | "AvatarHeadShot" | "BadgeIcon"  | 
-	"BundleThumbnail" | "GameIcon" | "GamePass" | "GroupIcon" | "Outfit" | "FontFamily" | 
-	"AvatarBust"
-export type RobloxThumbnailSize = "1200×80" | "720x720" | "420x420" |"352x352" | "150x150" | 
-	"100x100" | "60x60" | "50x50" | "48x48" | "180x180"
-
-local UrlBase = "rbxthumb://type=%s&id=%d&w=%d&h=%d"
-local CircularUrlBase = `{UrlBase}&filters=circular`
-local RbxThumbUtils = {}
-
-function RbxThumbUtils.AvatarItemTypeToThumbnailType(AvatarItemType: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
-	if AvatarItemType == Enum.AvatarItemType.Bundle then
-		return "BundleThumbnail"
-	elseif AvatarItemType == Enum.AvatarItemType.Asset then
-		return "Asset"
-	else
-		return nil :: any
-	end
-end
-
-function RbxThumbUtils.GetThumbnail(
-	ThumbnailType: RobloxThumbnailType,
-	Id: number,
-	ThumbnailSize: RobloxThumbnailSize?,
-	IsCircular: boolean?
-)
-	local ThumbnailSize = ThumbnailSize or "150x150"	
-	local IsCircular = IsCircular or false
-	local Height: number
-	local Width: number
-
-	for Match in ThumbnailSize:gmatch("%d+") do
-		-- The first number in the thumbnailsize string is always
-		-- the width, with the second being the height
-		-- so were just using a loop to easily extract those
-		if not Width then
-			Width = tonumber(Match) :: number
-			continue
-		else
-			Height = tonumber(Match) :: number
-			break
-		end
-	end
-
-	if IsCircular then
-		return string.format(CircularUrlBase, ThumbnailType, Id, Width, Height)
-	else
-		return string.format(UrlBase, ThumbnailType, Id, Width, Height)	
-	end
-end
-
-function RbxThumbUtils.GetExperienceIconThumbnail(
-	ExperienceId: number,
-	ThumbnailSize: "150x150"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("GameIcon", ExperienceId, ThumbnailSize, IsCircular)
-end
-
-function RbxThumbUtils.GetAvatarHeadShotThumbnail(
-	UserId: number,
-	ThumbnailSize: "48×48" | "60×60" | "100×100" | "150×150" | "180×180" |
-	"352×352" | "420×420"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("AvatarHeadShot", UserId, ThumbnailSize :: any, IsCircular)
-end
-
-function RbxThumbUtils.GetPlayerHeadShotThumbnail(
-	Player: Player,
-	ThumbnailSize: "48×48" | "60×60" | "100×100" | "150×150" | "180×180" | 
-	"352×352" | "420×420",
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("AvatarHeadShot", Player.UserId, ThumbnailSize :: any, IsCircular)
-end
-
-function RbxThumbUtils.GetPlayerBustThumbnail(
-	Player: Player,
-	ThumbnailSize: "100x100" | "150x15" | "75×75" | "100×100" | "150×150" | "180×180" | 
-	"352×352" | "420×420",
-	IsCircular: boolean?
-)	
-	return RbxThumbUtils.GetThumbnail("AvatarBust", Player.UserId, ThumbnailSize :: any, IsCircular)
-end
-
-function RbxThumbUtils.GetPlayerFullThumbnail(
-	Player: Player,
-	ThumbnailSize: "50×50" | "60×60" | "75×75" | "100×100" | "150×150" | "180×180" | 
-	"352×352" | "420×420"?, 
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("Avatar", Player.UserId, ThumbnailSize :: any, IsCircular)
-end
-
-function RbxThumbUtils.GetAvatarBustThumbnail(
-	UserId: number,
-	ThumbnailSize: "50×50" | "60×60" | "75×75" | "100×100" | "150×150" |
-	"180×180" | "352×352" | "420×420",
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("AvatarBust", UserId, ThumbnailSize :: any, IsCircular)
-end
-
-function RbxThumbUtils.GetFullAvatarThumbnail(
-	UserId: number,
-	ThumbnailSize: "48×48" | "60×60" | "100×100" | "150×150" | "180×180" |
-	"352×352" | "420×420" | "720×720"?, 
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("Avatar", UserId, ThumbnailSize :: any, IsCircular)
-end
-
-function RbxThumbUtils.GetFontFamilyThumbnail(
-	AssetId: number,
-	ThumbnailSize: "1200×80"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("FontFamily", AssetId, ThumbnailSize or "1200×80", IsCircular)
-end
-
-
-function RbxThumbUtils.GetBadgeIconThumbnail(
-	BadgeId: number,
-	ThumbnailSize: "150x150"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("BadgeIcon", BadgeId, ThumbnailSize, IsCircular)
-end
-
-function RbxThumbUtils.GetGroupIconThumbnail(
-	GroupId: number,
-	ThumbnailSize: "150x150" | "420x420"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("GroupIcon", GroupId, ThumbnailSize, IsCircular)
-end
-
-function RbxThumbUtils.GetGamePassThumbnail(
-	GamepassId: number,
-	ThumbnailSize: "150x150"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("GamePass", GamepassId, ThumbnailSize, IsCircular)
-end
-
-function RbxThumbUtils.GetBundleThumbnail(
-	BundleId: number,
-	ThumbnailSize: "150x150" | "420x420"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("BundleThumbnail", BundleId, ThumbnailSize, IsCircular)
-end
-
-function RbxThumbUtils.GetOutfitThumbnail(
-	OutfitId: number,
-	ThumbnailSize: "150x150" | "420x420"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("Outfit", OutfitId, ThumbnailSize, IsCircular)
-end
-
-function RbxThumbUtils.GetAssetThumbnail(
-	AssetId: number,
-	ThumbnailSize: "150x150" | "420x420"?,
-	IsCircular: boolean?
-)
-	return RbxThumbUtils.GetThumbnail("Asset", AssetId, ThumbnailSize, IsCircular)
-end
-
-return RbxThumbUtils
-
+return exports
