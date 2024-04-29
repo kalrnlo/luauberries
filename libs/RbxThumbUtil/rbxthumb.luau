@@ -29,7 +29,6 @@ local BASE_URL = "rbxthumb://type=%*&id=%*&w=%*&h=%*"
 local CIRCULAR_URL = `{BASE_URL}&filters=circular`
 local ASSET_ENUM = Enum.AvatarItemType.Asset
 local BUNDLE_STR = "BundleThumbnail"
-local DEFUALT_SIZE = "150x150"
 local DEFUALT_SIZE_NUM = 150
 local ASSET_STR = "Asset"
 local X = "x"
