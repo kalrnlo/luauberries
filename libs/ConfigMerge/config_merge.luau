@@ -7,7 +7,7 @@
 
 -- TODO: when luau gets typefunctions change new_configs type to be a type function that makes every key
 -- in config optional
-local function config_merge<Config>(config: Config, new_config: {[unknown]: unknown}?)
+local function config_merge<Config, K, V>(config: Config & {[K]: V}, new_config: (Config & {[K]: V?})?)
 	if new_config then
 		for key, value in config do
 			if new_config[key] then
