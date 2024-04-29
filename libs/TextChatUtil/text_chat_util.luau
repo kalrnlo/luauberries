@@ -86,13 +86,13 @@ local function wait_for_player_chat_loaded(player: Player)
 		elseif has_player_loaded then
 			table.insert(has_player_loaded, coroutine.running())
 			return coroutine.yield()
-		else
+		elseif player and player:IsDescendantOf(players) then
 			players_chat_loaded[player.UserId] = { coroutine.running() }
 			return coroutine.yield()
 		end
-	else
-		return false
 	end
+
+	return false
 end
 
 local function add_player_to_channel(player: Player, channel: TextChannel): ((true, TextSource) | (false, nil))
@@ -185,10 +185,10 @@ local function get_chat_prefix(
 	local prefix = prefix or defualt_message_prefix
 
 	if is_verified then
-		displayed_name = `{verified_char}{displayed_name}`
+		return `<font color="#{color_hex}">{verified_char}{displayed_name}</font>{prefix}`
+	else
+		return `<font color="#{color_hex}">{displayed_name}</font>{prefix}`
 	end
-
-	return `<font color="#{color_hex}">{displayed_name}</font>{prefix}`
 end
 
 local function get_chat_prefix_for_player(player: Player, include_name: boolean?, prefix: string?)
