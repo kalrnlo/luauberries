@@ -12,3 +12,8 @@ private: false
 realm: shared
 indices:
   default: https://github.com/daimond113/pesde-index
+dependencies:
+  metaize:
+    name: kalrnlo/metaize
+    version: ^0.1.0
+    index: default
