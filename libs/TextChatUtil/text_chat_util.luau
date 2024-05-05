@@ -79,7 +79,7 @@ end)
 
 local function wait_for_player_chat_loaded(player: Player)
 	if text_chat_service:CanUserChatAsync(player.UserId) then
-		local has_player_loaded = players_chat_loaded[player.UserId]
+		local has_player_loaded: true | {thread} = players_chat_loaded[player.UserId]
 	
 		if has_player_loaded == true then
 			return true
@@ -95,17 +95,18 @@ local function wait_for_player_chat_loaded(player: Player)
 	return false
 end
 
-local function add_player_to_channel(player: Player, channel: TextChannel): ((true, TextSource) | (false, nil))
-	if wait_for_player_chat_loaded() then
+local function add_player_to_channel(player: Player, channel: TextChannel): (boolean, TextSource)
+	if wait_for_player_chat_loaded(player) then
+		-- ignore type error in luau lsp, its wrong
 		local source, success = channel:AddUserAsync(player.UserId)
 		return success, source
 	else
-		return false, nil
+		return false, nil :: any
 	end
 end
 
 local function remove_player_from_channel(player: Player, channel: TextChannel)
-	if wait_for_player_chat_loaded() then
+	if wait_for_player_chat_loaded(player) then
 		local source = channel:FindFirstChild(player.Name)
 
 		if source then
@@ -129,30 +130,30 @@ local function get_color_for_name(name: string)
 end
 
 local function set_player_mute(player: Player, ismuted: boolean, channel: TextChannel?)
-	if wait_for_player_chat_loaded() then
+	if wait_for_player_chat_loaded(player) then
 		local sources = player_sources[player.UserId]
 
 		if channel then
-			for _, source in sources do
+			for _, source: any in sources do
 				if source:IsDescendantOf(channel) then
 					source.IsMuted = ismuted
 					return
 				end
 			end
 		else
-			for _, source in sources do
+			for _, source: any in sources do
 				source.IsMuted = ismuted
 			end
 		end
 	end
 end
 
-local function is_player_muted(player: Player, channel: TextChannel?)
-	if wait_for_player_chat_loaded() then
+local function is_player_muted(player: Player, channel: TextChannel?): boolean
+	if wait_for_player_chat_loaded(player) then
 		local sources = player_sources[player.UserId]
 
 		if channel then
-			for _, source in sources do
+			for _, source: any in sources do
 				if source:IsDescendantOf(channel) then
 					return source.IsMuted
 				end
@@ -162,7 +163,7 @@ local function is_player_muted(player: Player, channel: TextChannel?)
 		else
 			local muted_count = 0
 
-			for _, source in sources do
+			for _, source: any in sources do
 				if source.IsMuted then
 					muted_count += 1
 				end
@@ -170,6 +171,8 @@ local function is_player_muted(player: Player, channel: TextChannel?)
 
 			return #sources == muted_count
 		end
+	else
+		return false
 	end
 end
 

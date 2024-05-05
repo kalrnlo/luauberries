@@ -1,0 +1,14 @@
+name: kalrnlo/callbacker
+version: 0.1.0
+description: Module for easily handling callbacks
+license: MIT
+authors:
+- kalrnlo
+repository: https://github.com/kalrnlo/luau-libs
+exports: {}
+path_style: !roblox
+  place: {}
+private: false
+realm: shared
+indices:
+  default: https://github.com/daimond113/pesde-index

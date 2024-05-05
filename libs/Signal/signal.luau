@@ -9,7 +9,7 @@
 -- @Kalrnlo
 -- 23/04/2024
 
-local Metaize = require "@kalrnlo/metaize"
+local Metaize = require(script.Parent.metaize)
 
 type Sender<values...> = typeof(setmetatable({} :: {Signal<values...>}, {} :: SenderPrototype<values...>))
 

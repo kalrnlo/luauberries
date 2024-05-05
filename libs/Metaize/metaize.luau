@@ -14,4 +14,4 @@ local function metaize(metatable: {[string]: any}, inherit: {[string]: any}?)
 end
 
 return metaize :: (<mt>(mt: mt) -> mt & { __index: mt }) 
-    & (<mt, parent>(mt: mt, inherit: parent?) -> mt & parent & { __index: mt })
+    & (<MT, MTK, MTV, P, PK, PV>(mt: MT & {[MTK]: MTV}, inherit: P & {[PK]: PV}) -> typeof(setmetatable({} :: MT & { __index: MT }, {} :: P))

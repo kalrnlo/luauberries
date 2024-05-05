@@ -1,0 +1,14 @@
+name: kalrnlo/textchat
+version: 0.1.0
+description: a utility module for working with robloxs TextChatService
+repository: https://github.com/kalrnlo/luau-libs
+license: MIT
+authors:
+- kalrnlo
+exports: {}
+path_style: !roblox
+  place: {}
+private: false
+realm: shared
+indices:
+  default: https://github.com/daimond113/pesde-index

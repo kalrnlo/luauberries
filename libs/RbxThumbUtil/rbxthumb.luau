@@ -34,13 +34,13 @@ local ASSET_STR = "Asset"
 local X = "x"
 
 local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
-    return if avatar_item_type == ASSET_ENUM then ASSET_STR else BUNDLE_STR
+    return if avatar_item_type == ASSET_ENUM then ASSET_STR :: any else BUNDLE_STR
 end
 
-local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_height: number)
+local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_height: number): (number, number)
     if size then
         local splitted = string.split(size, X)
-        return splitted[1] or defualt_width, splitted[2] or defualt_height
+        return tonumber(splitted[1]) or defualt_width, tonumber(splitted[2]) or defualt_height
     else
         return defualt_width, defualt_height
     end
@@ -57,7 +57,8 @@ local function RAW_FORMAT(id: number, type: ThumbnailType, width: number, height
 end
 
 local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize, circular: boolean?)
-    return RAW_FORMAT(id, type, SPLIT_SIZE(size, DEFUALT_SIZE_NUM, DEFUALT_SIZE_NUM), circular)
+    local width, height = SPLIT_SIZE(size, DEFUALT_SIZE_NUM, DEFUALT_SIZE_NUM)
+    return RAW_FORMAT(id, type, width, height, circular)
 end
 
 local function CREATE_PLAYER_FORMATTER<sizes>(type: ThumbnailType, defualt_width: number?, defualt_height: number?): PlayerThumbnailFormatter<sizes>
@@ -74,7 +75,8 @@ local function CREATE_FORMATTER<sizes>(type: ThumbnailType, defualt_width: numbe
     local defualt_width = defualt_width or DEFUALT_SIZE_NUM
 
     return function(id: number, size: sizes?, circular: boolean?)
-        return RAW_FORMAT(id, type, SPLIT_SIZE(size, defualt_width, defualt_height), circular)
+        local width, height = SPLIT_SIZE(size :: any, defualt_width, defualt_height)
+        return RAW_FORMAT(id, type, width, height, circular)
     end
 end
 

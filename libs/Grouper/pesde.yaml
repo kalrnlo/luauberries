@@ -1,0 +1,14 @@
+name: kalrnlo/grouper
+version: 0.1.0
+description: module for easily getting up to date ranks of players in a group on the server
+repository: https://github.com/kalrnlo/luau-libs
+license: MIT
+authors:
+- kalrnlo
+exports: {}
+path_style: !roblox
+  place: {}
+private: false
+realm: server
+indices:
+  default: https://github.com/daimond113/pesde-index

@@ -5,12 +5,12 @@
 -- @kalrnlo
 -- 23/04/2024
 
-local metaize = require "@kalrnlo/metaize"
+local metaize = require(script.Parent.metaize)
 
 type ConnectionPrototype<T...> = { __call: (self: Connection<T...>) -> () }
 type Connection<T...> = typeof(setmetatable(
     {} :: { (T...) -> () | { Connection<T...> } }, 
-    {} :: CallbackPrototype
+    {} :: ConnectionPrototype<T...>
 ))
 
 local function connection_call<T...>(self: Connection<T...>)
@@ -32,7 +32,7 @@ local connection_prototype = metaize {
 local function add_callback<T...>(arr: { Connection<T...> }, callback: (T...) -> ()): () -> ()
     local connection_data = table.create(2)
     connection_data[1] = callback
-    connection_data[2] = arr
+    connection_data[2] = arr :: any
 
     local self = setmetatable(
         table.freeze(connection_data),
@@ -43,9 +43,9 @@ local function add_callback<T...>(arr: { Connection<T...> }, callback: (T...) ->
     return self
 end
 
-local function run_callbacks<T...>(arr: { Connection<T...> }, ...: T)
+local function run_callbacks<T...>(arr: { Connection<T...> }, ...: T...)
     for _, connection in arr do
-        task.spawn(connection[1], ...)
+        task.spawn(connection[1] :: any, ...)
     end
 end
 

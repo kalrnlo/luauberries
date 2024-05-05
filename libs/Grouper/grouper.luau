@@ -9,8 +9,8 @@
 
 local group_service = game:GetService("GroupService")
 local players = game:GetService("Players")
-local add_callback, run_callbacks = require "@kalrnlo/callbacker"
-local config_merge = require "@kalrnlo/ConfigMerge"
+local add_callback, run_callbacks = require(script.Parent.callbacker)
+local config_merge = require(script.Parent.configmerge)
 
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
 
@@ -34,7 +34,7 @@ local function FETCH_RANK(userid: number, groupid: number): number?
 			return group.Rank
 		end
 	else
-		warn `[GROUPER] Couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`
+		warn(`[GROUPER] Couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`)
 	end
 	
 	return nil
@@ -52,7 +52,7 @@ local function on_player_added(player: Player)
 	local rank = FETCH_RANK(userid, groupid) or 0
 
 	if player and player:IsDescendantOf(players) then
-		local threads_waiting = player_ranks[userid]
+		local threads_waiting: {thread} = player_ranks[userid] :: {thread}
 		player_ranks[userid] = rank
 	
 		if threads_waiting then
@@ -84,7 +84,7 @@ local function on_player_added(player: Player)
 			task.wait(rate)
 		end
 	else
-		player_ranks[user_id] = nil
+		player_ranks[userid] = nil
 	end
 end
 
@@ -133,7 +133,7 @@ local function is_in_group(player: Player)
 end
 
 local function get_role(player: Player)
-	return role_cache[get_rank(Player) + 1]
+	return role_cache[get_rank(player) + 1]
 end
 
 local exports = table.freeze {

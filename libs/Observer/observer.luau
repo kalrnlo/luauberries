@@ -8,7 +8,6 @@
 
 local ContextActionService = game:GetService("ContextActionService")
 local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
@@ -62,14 +61,14 @@ end
 local function cleanup_map<T>(map: Map<T>)
 	for object, cleanup in map do
 		task.spawn(cleanup)
-		map[key] = nil
+		map[object] = nil
 	end
 end
 
 local function add_existing_tools<T>(
     add_callback: any,
     connection: RBXScriptConnection,
-    observe_callback: (T) -> () -> (),
+    observe_callback: any,
 	map: Map<T>,
     character: Model,
     tag: string,
@@ -79,7 +78,7 @@ local function add_existing_tools<T>(
         if not connection.Connected then
             break
         elseif child:IsA("Tool") and child:HasTag(tag) then
-            task.spawn(add_callback, connection, callback, map, child, player)
+            task.spawn(add_callback, connection, observe_callback, map, child, player)
         end
     end
 end
@@ -176,7 +175,7 @@ local function tool_observer(
 	add_connection = Players.PlayerAdded:Connect(function(player)
 		local character_connection
 
-		character_connection = Player.CharacterAdded:Connect(function(Character)
+		character_connection = player.CharacterAdded:Connect(function(Character)
 			local child_connection
 
 			if not add_connection.Connected then
@@ -189,7 +188,7 @@ local function tool_observer(
 					character_connection:Disconnect()
 					child_connection:Disconnect()
 					return
-				elseif child:HasTag(Tag) and child:IsA("Tool") then
+				elseif child:HasTag(tag) and child:IsA("Tool") then
 					observe_tool(add_connection, callback, map, child, player)
 				end
 			end)
@@ -264,8 +263,8 @@ local function observe_player_for_character(player: Player, callback: CharacterO
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local cleanup: (() -> ())?
-)
-	remove_connection = Player.CharacterRemoving:Connect(function()
+
+	remove_connection = player.CharacterRemoving:Connect(function()
 		if cleanup then
 			cleanup()
 		end
@@ -273,7 +272,7 @@ local function observe_player_for_character(player: Player, callback: CharacterO
 	add_connection = player.CharacterAdded:Connect(function(character)
 		cleanup = callback(character, player)
 	
-		if not add_connection.Connected then
+		if cleanup and not add_connection.Connected then
 			cleanup()
 		end
 	end)
@@ -297,7 +296,7 @@ local function character_player_observer(callback: CharacterObserverCallback, do
 	remove_connection = Players.PlayerRemoving:Connect(function(player)
 		cleanup_object(map, player)
 	end)
-	add_connection = Players.PlayerAdded:Connect(function(Player)
+	add_connection = Players.PlayerAdded:Connect(function(player)
 		local cleanup = observe_player_for_character(player, callback)
 	
 		if add_connection.Connected and player then
@@ -366,7 +365,7 @@ local function player_observer(callback: ((player: Player) -> ()) & ((player: Pl
 end
 
 local exports = table.freeze {
-	character = player_character_observer,
+	character = character_player_observer,
 	localtool = localtool_observer,
 	player = player_observer,
 	tool = tool_observer,

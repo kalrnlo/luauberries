@@ -1,0 +1,14 @@
+name: kalrnlo/rbxthumb
+version: 0.1.0
+description: module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
+license: MIT
+repository: https://github.com/kalrnlo/luau-libs
+authors:
+- kalrnlo
+exports: {}
+path_style: !roblox
+  place: {}
+private: false
+realm: shared
+indices:
+  default: https://github.com/daimond113/pesde-index
