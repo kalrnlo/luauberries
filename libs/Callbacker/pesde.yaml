@@ -1,11 +1,12 @@
 name: kalrnlo/callbacker
-version: 0.1.0
+version: 0.1.1
 description: Module for easily handling callbacks
 license: MIT
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs
-exports: {}
+exports:
+  lib: 'true'
 path_style: !roblox
   place: {}
 private: false
@@ -15,5 +16,5 @@ indices:
 dependencies:
   metaize:
     name: kalrnlo/metaize
-    version: ^0.1.0
+    version: ^0.1.1
     index: default

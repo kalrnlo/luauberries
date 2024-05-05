@@ -1,10 +1,11 @@
 name: kalrnlo/metaize
-version: 0.1.0
+version: 0.1.1
 description: utility function for making classes
 license: MIT
+exports:
+  lib: 'true'
 authors:
 - kalrnlo
-exports: {}
 repository: https://github.com/kalrnlo/luau-libs
 path_style: !roblox
   place: {}

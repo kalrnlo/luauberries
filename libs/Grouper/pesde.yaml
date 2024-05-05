@@ -1,11 +1,12 @@
 name: kalrnlo/grouper
-version: 0.1.0
+version: 0.1.1
 description: module for easily getting up to date ranks of players in a group on the server
 license: MIT
+exports:
+  lib: 'true'
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs
-exports: {}
 path_style: !roblox
   place: {}
 private: false
@@ -15,9 +16,9 @@ indices:
 dependencies:
   callbacker:
     name: kalrnlo/callbacker
-    version: ^0.1.0
+    version: ^0.1.1
     index: default
   configmerge:
     name: kalrnlo/configmerge
-    version: ^0.1.0
+    version: ^0.1.1
     index: default
