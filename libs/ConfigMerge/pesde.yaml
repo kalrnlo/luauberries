@@ -1,10 +1,10 @@
 name: kalrnlo/configmerge
-version: 0.1.1
+version: 0.1.2
 description: utility function for merging a new config, with an existing config
 repository: https://github.com/kalrnlo/luau-libs
 license: MIT
 exports:
-  lib: 'true'
+  lib: 'configmerge.luau'
 authors:
 - kalrnlo
 path_style: !roblox

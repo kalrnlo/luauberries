@@ -17,4 +17,5 @@ local function config_merge<C, CK, CV>(config: C & {[CK]: CV}, new_config: (C & 
 	end
 	return config
 end
+
 return config_merge

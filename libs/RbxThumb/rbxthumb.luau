@@ -1,6 +1,6 @@
 --!strict
 
--- rbxthumbutil
+-- rbxthumb
 -- module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
 -- although with types 
 -- @kalrnlo

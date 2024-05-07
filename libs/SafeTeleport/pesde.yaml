@@ -1,0 +1,20 @@
+name: kalrnlo/safeteleport
+version: 0.1.0
+description: A modified version of robloxs safe teleport function on the docs for TeleportAsync with types and api improvements
+license: MIT
+authors:
+- kalrnlo
+repository: https://github.com/kalrnlo/luau-libs
+exports:
+  lib: 'safeteleport.luau'
+path_style: !roblox
+  place: {}
+private: false
+realm: shared
+indices:
+  default: https://github.com/daimond113/pesde-index
+dependencies:
+  retryer:
+    name: kalrnlo/retryer
+    version: ^0.1.0
+    index: default

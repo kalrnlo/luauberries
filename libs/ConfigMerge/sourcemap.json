@@ -1,0 +1,6 @@
+{
+	"name": "configmerge",
+	"tree": {
+		"$path": "configmerge.luau"
+	}
+}

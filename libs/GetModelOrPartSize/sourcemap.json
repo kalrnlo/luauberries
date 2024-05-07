@@ -1,0 +1,6 @@
+{
+	"name": "grouper",
+	"tree": {
+		"$path": "grouper.luau"
+	}
+}

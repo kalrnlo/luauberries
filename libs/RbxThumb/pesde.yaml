@@ -1,10 +1,10 @@
 name: kalrnlo/rbxthumb
-version: 0.1.1
+version: 0.1.2
 description: module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
 license: MIT
 repository: https://github.com/kalrnlo/luau-libs
 exports:
-  lib: 'true'
+  lib: 'rbxthumb.luau'
 authors:
 - kalrnlo
 path_style: !roblox
