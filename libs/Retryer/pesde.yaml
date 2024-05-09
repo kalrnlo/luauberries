@@ -1,5 +1,5 @@
 name: kalrnlo/retryer
-version: 0.1.1
+version: 0.1.4
 description: Module for easily retrying functions
 license: MIT
 authors:
@@ -16,5 +16,5 @@ indices:
 dependencies:
   metaize:
     name: kalrnlo/metaize
-    version: ^0.1.2
+    version: ^0.1.4
     index: default

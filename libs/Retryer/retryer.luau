@@ -1,4 +1,3 @@
---!strict
 --!native
 
 -- retryer
@@ -51,16 +50,13 @@ local function retry<T..., A...>(self: unknown, max_attempts: number, callback: 
 end
 
 local mt =  {
-	delay = retry_with_delay,
 	__call = retry,
 }
 mt.__index = mt
 table.freeze(mt)
 
-local tbl = table.freeze {
+local exports = setmetatable(table.freeze({
 	delay = retry_with_delay
-}
-
-local exports = setmetatable(tbl, mt) :: typeof(setmetatable({} :: typeof(tbl), {} :: typeof(mt)))
+}), mt) :: typeof(setmetatable({} :: { delay: typeof(retry_with_delay) }, {} :: { __call: typeof(retry)}))
 
 return exports

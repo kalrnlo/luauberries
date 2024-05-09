@@ -1,5 +1,5 @@
 name: kalrnlo/signal
-version: 0.1.3
+version: 0.1.6
 description: A pure Luau signal implementation, based on LemonSignal & robloxs signal-lua. With thread reuse as an option that can be used with the constructors.
 license: MIT
 authors:
@@ -16,5 +16,5 @@ indices:
 dependencies:
   metaize:
     name: kalrnlo/metaize
-    version: ^0.1.2
+    version: ^0.1.5
     index: default

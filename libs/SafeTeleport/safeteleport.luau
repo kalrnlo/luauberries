@@ -25,15 +25,7 @@ export type SafeTeleportInfo = {
     job_id: string?,
 }
 
-local function PARSE_INFO(info: SafeTeleportInfo)
-    local opts = Instance.new("TeleportOptions")
-    opts.ReservedServerAccessCode = info.reserved_server_acess_code :: any
-    opts.ShouldReserveServer = info.reserve_server :: any
-    opts.ServerInstanceId = info.job_id :: any
-    return opts
-end
-
-local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo): (boolean, SafeTeleportResult)
+local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
 	local success, result = retryer.delay(
         RETRY_DELAY, 
         ATTEMPT_LIMIT,
@@ -41,7 +33,7 @@ local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Pla
         teleport_service,  
         place_id, 
         if type(players_or_player) == "table" then players_or_player else table.create(1, players_or_player), 
-        if info then PARSE_INFO(info) else nil
+        opts
     )
 
 	if not success then
@@ -67,4 +59,16 @@ teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_
 	SAFE_TELEPORT(place_id, player, opts)
 end)
 
-return SAFE_TELEPORT
+local function export(place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
+    if info then
+        local opts = Instance.new("TeleportOptions")
+        opts.ReservedServerAccessCode = info.reserved_server_acess_code :: any
+        opts.ShouldReserveServer = info.reserve_server :: any
+        opts.ServerInstanceId = info.job_id :: any
+        return SAFE_TELEPORT(place_id, players_or_player, opts)
+    else
+        return SAFE_TELEPORT(place_id, players_or_player)
+    end
+end
+
+return export
