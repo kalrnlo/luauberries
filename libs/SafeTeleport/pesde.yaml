@@ -1,5 +1,5 @@
 name: kalrnlo/safeteleport
-version: 0.1.1
+version: 0.1.2
 description: A modified version of robloxs safe teleport function on the docs for TeleportAsync with types and api improvements
 license: MIT
 authors:
@@ -16,5 +16,9 @@ indices:
 dependencies:
   retryer:
     name: kalrnlo/retryer
-    version: ^0.1.4
+    version: ^0.1.6
+    index: default
+  metaize:
+    name: kalrnlo/metaize
+    version: ^0.1.6
     index: default

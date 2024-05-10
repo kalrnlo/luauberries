@@ -3,17 +3,17 @@
 -- TextChatUtil
 -- simple utility module for TextChatService
 -- @Kalrnlo
--- 25/04/2024
+-- 10/05/2024
 
 local text_chat_service = game:GetService("TextChatService")
 local players = game:GetService("Players")
 
-local players_chat_loaded = {} :: { [number]: { thread } | true }
-local player_sources = {} :: { [number]: { TextSource } }
- -- chat verified icon unicode
-local verified_char = utf8.char(0xE000)
-local defualt_message_prefix = ":  "
-local chat_name_colors = {
+local VERIFIED_CHAT_PREFIX_FORMAT = "<font color=\"#%*\">\u{E000}%*</font>%*`"
+local CHAT_PREFIX_FORMAT = "<font color=\"#%*\">%*</font>%*`"
+local PLAYERS_CHAT_LOADED = {} :: { [number]: { thread } | true }
+local PLAYER_SOURCES = {} :: { [number]: { TextSource } }
+local DEFUALT_CHAT_PREFIX = ":  "
+local CHAT_COLORS = table.freeze {
 	 -- BrickColor.new("Bright red").Color,
 	Color3.new(253/255, 41/255, 67/255),
 	 -- BrickColor.new("Bright blue").Color,
@@ -26,15 +26,15 @@ local chat_name_colors = {
 	BrickColor.new("Light reddish violet").Color,
 	BrickColor.new("Brick yellow").Color,
 }
-local color_amount = #chat_name_colors
+local COLOR_COUNT = #CHAT_COLORS
 
 local function on_descendant_added(descendant: Instance)
 	if descendant:IsA("TextSource") then
-		local threads_waiting = players_chat_loaded[descendant.UserId]
-		local sources = player_sources[descendant.UserId]
+		local threads_waiting = PLAYERS_CHAT_LOADED[descendant.UserId]
+		local sources = PLAYER_SOURCES[descendant.UserId]
 
 		if type(threads_waiting) == "table" then
-			players_chat_loaded[descendant.UserId] = true
+			PLAYERS_CHAT_LOADED[descendant.UserId] = true
 			for _, thread in threads_waiting do
 				task.spawn(thread, true)
 			end
@@ -43,14 +43,14 @@ local function on_descendant_added(descendant: Instance)
 		if sources then
 			table.insert(sources, descendant)
 		else
-			player_sources[descendant.UserId] = { descendant }
+			PLAYER_SOURCES[descendant.UserId] = { descendant }
 		end
 	end
 end
 
 local function on_descendant_removed(descendant: Instance)
 	if descendant:IsA("TextSource") then
-		local sources = player_sources[descendant.UserId]
+		local sources = PLAYER_SOURCES[descendant.UserId]
 
 		if sources then
 			local index = table.find(sources, descendant)
@@ -65,8 +65,8 @@ end
 task.spawn(function()
 	text_chat_service.DescendantRemoving:Connect(on_descendant_removed)
 	players.PlayerRemoving:Connect(function(player)
-		players_chat_loaded[player.UserId] = nil
-		player_sources[player.UserId] = nil
+		PLAYERS_CHAT_LOADED[player.UserId] = nil
+		PLAYER_SOURCES[player.UserId] = nil
 	end)
 	task.spawn(function()
 		for _, descendant in text_chat_service:GetDescendants() do
@@ -77,9 +77,9 @@ task.spawn(function()
 	text_chat_service.DescendantAdded:Connect(on_descendant_added)
 end)
 
-local function wait_for_player_chat_loaded(player: Player)
+local function wait_for_player_chat_loaded(player: Player): boolean
 	if text_chat_service:CanUserChatAsync(player.UserId) then
-		local has_player_loaded: true | {thread} = players_chat_loaded[player.UserId]
+		local has_player_loaded: true | {thread} = PLAYERS_CHAT_LOADED[player.UserId]
 	
 		if has_player_loaded == true then
 			return true
@@ -87,7 +87,7 @@ local function wait_for_player_chat_loaded(player: Player)
 			table.insert(has_player_loaded, coroutine.running())
 			return coroutine.yield()
 		elseif player and player:IsDescendantOf(players) then
-			players_chat_loaded[player.UserId] = { coroutine.running() }
+			PLAYERS_CHAT_LOADED[player.UserId] = { coroutine.running() }
 			return coroutine.yield()
 		end
 	end
@@ -115,7 +115,7 @@ local function remove_player_from_channel(player: Player, channel: TextChannel)
 	end
 end
 
-local function get_color_for_name(name: string)
+local function get_color_for_name(name: string): Color3
 	local sub_number = if #name % 2 == 1 then -1 else 0
 	local name_value = 0
 	
@@ -126,22 +126,19 @@ local function get_color_for_name(name: string)
 				codepoint
 	end
 	
-	return chat_name_colors[(name_value % color_amount) + 1]
+	return CHAT_COLORS[(name_value % color_amount) + 1]
 end
 
 local function set_player_mute(player: Player, ismuted: boolean, channel: TextChannel?)
 	if wait_for_player_chat_loaded(player) then
-		local sources = player_sources[player.UserId]
-
 		if channel then
-			for _, source: any in sources do
-				if source:IsDescendantOf(channel) then
-					source.IsMuted = ismuted
-					return
-				end
+			local source = channel:FindFirstChild(player.Name)
+
+			if source then
+				source.IsMuted = ismuted
 			end
 		else
-			for _, source: any in sources do
+			for _, source: any in PLAYER_SOURCES[player.UserId] do
 				source.IsMuted = ismuted
 			end
 		end
@@ -150,17 +147,12 @@ end
 
 local function is_player_muted(player: Player, channel: TextChannel?): boolean
 	if wait_for_player_chat_loaded(player) then
-		local sources = player_sources[player.UserId]
-
 		if channel then
-			for _, source: any in sources do
-				if source:IsDescendantOf(channel) then
-					return source.IsMuted
-				end
-			end
+			local source = channel:FindFirstChild(player.Name)
 
-			return false
+			return if source then source.IsMuted else false
 		else
+			local sources = PLAYER_SOURCES[player.UserId]
 			local muted_count = 0
 
 			for _, source: any in sources do
@@ -171,8 +163,6 @@ local function is_player_muted(player: Player, channel: TextChannel?): boolean
 
 			return #sources == muted_count
 		end
-	else
-		return false
 	end
 end
 
@@ -182,19 +172,16 @@ local function get_chat_prefix(
 	is_verified: boolean?,
 	include_name: boolean?,
 	prefix: string?
-)
-	local displayed_name = if include_name then `{display}(@{name})` else display
-	local color_hex = get_color_for_name(name):ToHex()
-	local prefix = prefix or defualt_message_prefix
-
-	if is_verified then
-		return `<font color="#{color_hex}">{verified_char}{displayed_name}</font>{prefix}`
-	else
-		return `<font color="#{color_hex}">{displayed_name}</font>{prefix}`
-	end
+): string
+	return string.format(
+		if is_verified then VERIFIED_CHAT_PREFIX_FORMAT else CHAT_PREFIX_FORMAT, 
+		get_color_for_name(name):ToHex(),
+		if include_name then `{display}(@{name})` else display,
+		prefix or defualt_message_prefix
+	)
 end
 
-local function get_chat_prefix_for_player(player: Player, include_name: boolean?, prefix: string?)
+local function get_chat_prefix_for_player(player: Player, include_name: boolean?, prefix: string?): string
 	return get_chat_prefix(
 		player.DisplayName,
 		player.Name,
@@ -204,7 +191,7 @@ local function get_chat_prefix_for_player(player: Player, include_name: boolean?
 	)
 end
 
-local function get_color_for_player(player: Player)
+local function get_color_for_player(player: Player): Color3
 	return get_color_for_name(player.Name)
 end
 

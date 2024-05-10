@@ -50,7 +50,7 @@ local function Resume<T...>(ThreadOrCallback: thread | (...T) -> (), ...: T...)
 
 	local Success, Message = coroutine.resume(Thread, ...)
 
-	if Success == false then
+	if not Success then
 		coroutine.wrap(error)(
 			debug.traceback(`[Signal] Could not resume thread, Message: {Message}`, 3), 3
 		)

@@ -1,5 +1,5 @@
 name: kalrnlo/configmerge
-version: 0.1.3
+version: 0.1.4
 description: utility function for merging a new config, with an existing config
 repository: https://github.com/kalrnlo/luau-libs
 license: MIT

@@ -4,10 +4,10 @@
 -- module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
 -- although with types 
 -- @kalrnlo
--- 29/04/2024
+-- 10/05/2024
 
-type PlayerThumbnailFormatter<sizes> = (player: Player, size: sizes, circular: boolean?) -> string
-type ThumbnailFormatter<sizes> = (id: number, size: sizes, circular: boolean?) -> string
+type PlayerThumbnailFormatter<sizes> = (player: Player, size: (sizes & string)?, circular: boolean?) -> string
+type ThumbnailFormatter<sizes> = (id: number, size: (sizes & string)?, circular: boolean?) -> string
 
 export type ThumbnailType = "Asset" | "Avatar" | "AvatarHeadShot" | "BadgeIcon"  | 
 	"BundleThumbnail" | "GameIcon" | "GamePass" | "GroupIcon" | "Outfit" | "FontFamily" | 
@@ -25,7 +25,9 @@ type AvatarBustThumbnailSize = "100x100" | "150x15" | "75×75" | "100×100" | "1
 type FullAvatarThumbnailSize = "50×50" | "60×60" | "75×75" | "100×100" | "150×150" | "180×180" | 
     "352×352" | "420×420"
 
-local BASE_URL = "rbxthumb://type=%*&id=%*&w=%*&h=%*"
+type 
+
+local BASE_URL = "rbxthumb://type=%s&id=%d&w=%d&h=%d"
 local CIRCULAR_URL = `{BASE_URL}&filters=circular`
 local ASSET_ENUM = Enum.AvatarItemType.Asset
 local BUNDLE_STR = "BundleThumbnail"
@@ -33,8 +35,14 @@ local DEFUALT_SIZE_NUM = 150
 local ASSET_STR = "Asset"
 local X = "x"
 
-local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
-    return if avatar_item_type == ASSET_ENUM then ASSET_STR :: any else BUNDLE_STR
+local function RAW_FORMAT(id: number, type: ThumbnailType, width: number, height: number, circular: boolean?): string
+	return string.format(
+		if circular then CIRCULAR_URL else BASE_URL,
+		type,
+		id,
+        width,
+        height
+	)
 end
 
 local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_height: number): (number, number)
@@ -46,17 +54,7 @@ local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_h
     end
 end
 
-local function RAW_FORMAT(id: number, type: ThumbnailType, width: number, height: number, circular: boolean?)
-	return string.format(
-		if circular then CIRCULAR_URL else BASE_URL,
-		type,
-		id,
-        width,
-        height
-	)
-end
-
-local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize, circular: boolean?)
+local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize?, circular: boolean?): string
     local width, height = SPLIT_SIZE(size, DEFUALT_SIZE_NUM, DEFUALT_SIZE_NUM)
     return RAW_FORMAT(id, type, width, height, circular)
 end
@@ -65,8 +63,9 @@ local function CREATE_PLAYER_FORMATTER<sizes>(type: ThumbnailType, defualt_width
     local defualt_height = defualt_height or DEFUALT_SIZE_NUM
     local defualt_width = defualt_width or DEFUALT_SIZE_NUM
 
-    return function(player: Player, size: sizes?, circular: boolean?)
-        return RAW_FORMAT(player.UserId, type, SPLIT_SIZE(size, defualt_width, defualt_height), circular)
+    return function(player: Player, size: (sizes & string)?, circular: boolean?): string
+        local width, height = SPLIT_SIZE(size, defualt_width, defualt_height)
+        return RAW_FORMAT(player.UserId, type, width, height, circular)
     end
 end
 
@@ -74,10 +73,26 @@ local function CREATE_FORMATTER<sizes>(type: ThumbnailType, defualt_width: numbe
     local defualt_height = defualt_height or DEFUALT_SIZE_NUM
     local defualt_width = defualt_width or DEFUALT_SIZE_NUM
 
-    return function(id: number, size: sizes?, circular: boolean?)
-        local width, height = SPLIT_SIZE(size :: any, defualt_width, defualt_height)
+    return function(id: number, size: (sizes & string)?, circular: boolean?): string
+        local width, height = SPLIT_SIZE(size, defualt_width, defualt_height)
         return RAW_FORMAT(id, type, width, height, circular)
     end
+end
+
+local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
+    return if avatar_item_type == ASSET_ENUM then ASSET_STR :: "Asset" else BUNDLE_STR
+end
+
+local function avatar_item_to_thumbnail(
+    avatar_item_type: Enum.AvatarItemType,
+    id: number, 
+    size: ("150x150" | "420x420")?,
+    circular: boolean?
+): string
+    return if avatar_item_type == ASSET_ENUM then
+        return FORMAT_RBXTHUMB_URL(id, ASSET_STR, size, circular)
+    else 
+        return FORMAT_RBXTHUMB_URL(id, BUNDLE_STR, size, circular)
 end
 
 local exports = table.freeze {
@@ -85,6 +100,7 @@ local exports = table.freeze {
         headshot = CREATE_FORMATTER("AvatarHeadShot") :: ThumbnailFormatter<AvatarHeadshotThumbnailSize>,
         bust = CREATE_FORMATTER("AvatarBust") :: ThumbnailFormatter<AvatarBustThumbnailSize>,
         full = CREATE_FORMATTER("Avatar") :: ThumbnailFormatter<FullAvatarThumbnailSize>,
+        item = avatar_item_to_thumbnail,
     },
     player = table.freeze {
         headshot = CREATE_PLAYER_FORMATTER("AvatarHeadShot") :: PlayerThumbnailFormatter<AvatarHeadshotThumbnailSize>,
@@ -99,6 +115,10 @@ local exports = table.freeze {
     experience = CREATE_FORMATTER("GameIcon"):: ThumbnailFormatter<"150x150">,
     gamepass = CREATE_FORMATTER("GamePass") :: ThumbnailFormatter<"150x150">,
     badge = CREATE_FORMATTER("BadgeIcon") :: ThumbnailFormatter<"150x150">,
+    urlformats = table.freeze {
+        circular = CIRCULAR_URL,
+        base = BASE_URL,
+    },
 
     avatar_item_type_to_thumbnail_type = avatar_item_type_to_thumbnail_type,
     format = FORMAT_RBXTHUMB_URL,

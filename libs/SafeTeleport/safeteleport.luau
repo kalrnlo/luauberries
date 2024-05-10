@@ -8,10 +8,14 @@
 
 local teleport_service = game:GetService("TeleportService")
 local retryer = require(script.Parent.retryer)
+local metaize = require(script.Parent.metaize)
 
-local ATTEMPT_LIMIT = 5
-local RETRY_DELAY = 1
-local FLOOD_DELAY = 15
+type SafeTeleportPrototype = { __call: (self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?) -> (boolean, SafeTeleportResult)}
+type SafeTeleport = typeof(setmetatable({} :: {
+    ATTEMPT_LIMIT: number,
+    RETRY_DELAY: number,
+    FLOOD_DELAY: number
+}, {} :: SafeTeleportPrototype))
 
 export type SafeTeleportResult = {
     reserved_server_acess_code: string,
@@ -25,10 +29,16 @@ export type SafeTeleportInfo = {
     job_id: string?,
 }
 
+local base = {
+    local ATTEMPT_LIMIT = 5
+    local RETRY_DELAY = 1
+    local FLOOD_DELAY = 15
+}
+
 local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
 	local success, result = retryer.delay(
-        RETRY_DELAY, 
-        ATTEMPT_LIMIT,
+        base.RETRY_DELAY, 
+        base.ATTEMPT_LIMIT,
         teleport_service.TeleportAsync, 
         teleport_service,  
         place_id, 
@@ -46,20 +56,9 @@ local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Pla
     }
 end
 
-teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_id, opts)
-	if result == Enum.TeleportResult.Flooded then
-		task.wait(FLOOD_DELAY)
-	elseif result == Enum.TeleportResult.Failure then
-		task.wait(RETRY_DELAY)
-	else
-		-- if the teleport is invalid, report the error instead of retrying
-		error(`[SAFE_TELEPORT]: teleport failed\n\tresult_name: {result.Name}\n\terr: {err}`)
-	end
+local function safe_teleport_call(self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
+    if not table.isfrozen(self) then table.freeze(self) end
 
-	SAFE_TELEPORT(place_id, player, opts)
-end)
-
-local function export(place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
     if info then
         local opts = Instance.new("TeleportOptions")
         opts.ReservedServerAccessCode = info.reserved_server_acess_code :: any
@@ -70,5 +69,22 @@ local function export(place_id: number, players_or_player: {Player} | Player, in
         return SAFE_TELEPORT(place_id, players_or_player)
     end
 end
+
+teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_id, opts)
+	if result == Enum.TeleportResult.Flooded then
+		task.wait(base.FLOOD_DELAY)
+	elseif result == Enum.TeleportResult.Failure then
+		task.wait(base.RETRY_DELAY)
+	else
+		-- if the teleport is invalid, report the error instead of retrying
+		error(`[SAFE_TELEPORT]: teleport failed\n\tresult_name: {result.Name}\n\terr: {err}`)
+	end
+
+	SAFE_TELEPORT(place_id, player, opts)
+end)
+
+local export: SafeTeleport = setmetatable(base, metaize {
+    __call = safe_teleport_call
+}) :: any
 
 return export

@@ -7,7 +7,7 @@
 
 -- TODO: when luau gets typefunctions change new_configs type to be a type function that makes every key
 -- in config optional
-local function config_merge<C, CK, CV>(config: C & {[CK]: CV}, new_config: (C & {[CK]: CV?})?)
+local function config_merge<C, CK, CV>(config: C & { [CK]: CV }, new_config: { [CK]: any }?)
 	if new_config then
 		for key, value in config :: any do
 			if (new_config :: any)[key] then
