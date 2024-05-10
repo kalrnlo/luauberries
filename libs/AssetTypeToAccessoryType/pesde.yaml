@@ -1,0 +1,15 @@
+name: kalrnlo/asset_type_to_accessory_type
+version: 0.1.0
+description: utility function for converting an asset type enum to an accessory type enum
+license: MIT
+authors:
+- kalrnlo
+repository: https://github.com/kalrnlo/luau-libs
+exports:
+  lib: 'asset_type_to_accessory_type.luau'
+path_style: !roblox
+  place: {}
+private: false
+realm: shared
+indices:
+  default: https://github.com/daimond113/pesde-index

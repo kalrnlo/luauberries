@@ -123,16 +123,16 @@ local function get_rank(player: Player): number
 	end
 end
 
-local function get_rank_and_role(player: Player)
+local function get_rank_and_role(player: Player): (number, string)
 	local rank = get_rank(player)
 	return rank, role_cache[rank + 1]
 end
 
-local function is_in_group(player: Player)
+local function is_in_group(player: Player): boolean
 	return get_rank(player) ~= 0
 end
 
-local function get_role(player: Player)
+local function get_role(player: Player): string
 	return role_cache[get_rank(player) + 1]
 end
 

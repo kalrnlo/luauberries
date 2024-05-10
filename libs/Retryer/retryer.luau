@@ -3,7 +3,7 @@
 -- retryer
 -- utility module for retrying functions easily
 -- @kalrnlo
--- 07/05/2024
+-- 10/05/2024
 
 local metaize = require(script.Parent.metaize)
 
@@ -66,10 +66,56 @@ local function retry<T..., A...>(max_attempts: number, callback: (T...) -> (A...
 	return table.unpack(results) :: any
 end
 
+local function infretry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+	local results = { pcall(callback, ...) }
+
+	if not results[1] then
+		WAIT_FN(delay)
+
+		repeat
+			results = { pcall(callback, ...) }
+			WAIT_FN(delay)
+		until results[1]
+	end
+	return table.unpack(results) :: any
+end
+
+local function infretry_call<T..., A...>(self: unknown, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+	local results = { pcall(callback, ...) }
+
+	if not results[1] then
+		repeat
+			results = { pcall(callback, ...) }
+		until results[1]
+	end
+	return table.unpack(results) :: any
+end
+
+-- temp until new luau typechecker fixes the issues with using __call with a function that has generics
+local function infretry<T..., A...>(callback: (T...) -> (A...), ...: T...): (boolean, A...)
+	local results = { pcall(callback, ...) }
+
+	if not results[1] then
+		repeat
+			results = { pcall(callback, ...) }
+		until results[1]
+	end
+	return table.unpack(results) :: any
+end
+
+local inf_tbl = table.freeze {
+	delay = infretry_with_delay,
+	create = infretry
+}
+local inf_mt = metaize {
+	__call = infretry_call
+}
+
 local mt = metaize {
 	__call = retry_call,
 }
-local tbl = {
+local tbl = table.freeze {
+	inf = setmetatable(inf_tbl, inf_mt) :: typeof(setmetatable({} :: typeof(inf_tbl), {} :: typeof(inf_mt))),
 	delay = retry_with_delay,
 	create = retry,
 }

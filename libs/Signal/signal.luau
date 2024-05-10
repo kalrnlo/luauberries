@@ -232,7 +232,7 @@ local function Signal_Once<T...>(self: Signal<T...>, Callback: Callback<T...>)
 	return Connection
 end
 
-local function Signal_Wait<T...>(self: Signal<T...>)
+local function Signal_Wait<T...>(self: Signal<T...>): (T...)
 	self.connections[#self.connections + 1] = coroutine.running()
 	return coroutine.yield()
 end

@@ -83,7 +83,7 @@ local function add_existing_tools<T>(
     end
 end
 
-local function localtool_observer(tag: string, callback: ((tool: Tool) -> ()) & ((tool: Tool) -> () -> ()), dont_add_existing: boolean?)
+local function localtool_observer(tag: string, callback: ((tool: Tool) -> ()) & ((tool: Tool) -> () -> ()), dont_add_existing: boolean?): () -> ()
 	if not RunService:IsClient() then
 		error("[Observer] A LocalTool observer is only usable on the client")
 	end
@@ -167,7 +167,7 @@ local function tool_observer(
 	tag: string,
 	callback: ToolObserverCallback,
 	dont_add_existing: boolean?
-)
+): () -> ()
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?
 	local map = {} :: Map<Tool>
@@ -226,7 +226,7 @@ local function tool_observer(
 	end
 end
 
-local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) & ((instance: Instance) -> () -> ()), dont_add_existing: boolean?)
+local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) & ((instance: Instance) -> () -> ()), dont_add_existing: boolean?): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?
@@ -259,7 +259,7 @@ local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) 
 	end
 end
 
-local function observe_player_for_character(player: Player, callback: CharacterObserverCallback)
+local function observe_player_for_character(player: Player, callback: CharacterObserverCallback): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local cleanup: (() -> ())?
@@ -287,7 +287,7 @@ local function observe_player_for_character(player: Player, callback: CharacterO
 	end
 end
 
-local function character_player_observer(callback: CharacterObserverCallback, dont_add_existing: boolean?)
+local function character_player_observer(callback: CharacterObserverCallback, dont_add_existing: boolean?): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?
@@ -331,7 +331,7 @@ local function character_player_observer(callback: CharacterObserverCallback, do
 	end
 end
 
-local function player_observer(callback: ((player: Player) -> ()) & ((player: Player) -> () -> ()), dont_add_existing: boolean?)
+local function player_observer(callback: ((player: Player) -> ()) & ((player: Player) -> () -> ()), dont_add_existing: boolean?): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
 	local add_existing_thread: thread?

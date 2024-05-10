@@ -1,0 +1,6 @@
+{
+	"name": "asset_type_to_accessory_type",
+	"tree": {
+		"$path": "asset_type_to_accessory_type.luau"
+	}
+}

@@ -29,7 +29,8 @@ export type SafeTeleportInfo = {
     job_id: string?,
 }
 
-local base = {
+local EMPTY = table.freeze {}
+local BASE = {
     local ATTEMPT_LIMIT = 5
     local RETRY_DELAY = 1
     local FLOOD_DELAY = 15
@@ -37,8 +38,8 @@ local base = {
 
 local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
 	local success, result = retryer.delay(
-        base.RETRY_DELAY, 
-        base.ATTEMPT_LIMIT,
+        BASE.RETRY_DELAY, 
+        BASE.ATTEMPT_LIMIT,
         teleport_service.TeleportAsync, 
         teleport_service,  
         place_id, 
@@ -46,14 +47,15 @@ local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Pla
         opts
     )
 
-	if not success then
+	if success then
+        return success, table.freeze {
+            reserved_server_acess_code = result.ReservedServerAccessCode,
+            private_server_id = result.PrivateServerId,
+        }
+    else
 		warn(`[SAFE_TELEPORT]: unsucessful teleport\n\tteleport_async_err: {result}`)
+        return success, EMPTY
 	end
-
-    return success, table.freeze {
-        reserved_server_acess_code = result.ReservedServerAccessCode,
-        private_server_id = result.PrivateServerId,
-    }
 end
 
 local function safe_teleport_call(self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
@@ -72,9 +74,9 @@ end
 
 teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_id, opts)
 	if result == Enum.TeleportResult.Flooded then
-		task.wait(base.FLOOD_DELAY)
+		task.wait(BASE.FLOOD_DELAY)
 	elseif result == Enum.TeleportResult.Failure then
-		task.wait(base.RETRY_DELAY)
+		task.wait(BASE.RETRY_DELAY)
 	else
 		-- if the teleport is invalid, report the error instead of retrying
 		error(`[SAFE_TELEPORT]: teleport failed\n\tresult_name: {result.Name}\n\terr: {err}`)
@@ -83,7 +85,7 @@ teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_
 	SAFE_TELEPORT(place_id, player, opts)
 end)
 
-local export: SafeTeleport = setmetatable(base, metaize {
+local export: SafeTeleport = setmetatable(BASE, metaize {
     __call = safe_teleport_call
 }) :: any
 
