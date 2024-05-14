@@ -1,4 +1,5 @@
 --!native
+--!strict
 
 -- retryer
 -- utility module for retrying functions easily
@@ -103,7 +104,7 @@ local function infretry<T..., A...>(callback: (T...) -> (A...), ...: T...): (boo
 	return table.unpack(results) :: any
 end
 
-local inf_tbl = table.freeze {
+local inf_tbl = {
 	delay = infretry_with_delay,
 	create = infretry
 }
@@ -114,12 +115,12 @@ local inf_mt = metaize {
 local mt = metaize {
 	__call = retry_call,
 }
-local tbl = table.freeze {
-	inf = setmetatable(inf_tbl, inf_mt) :: typeof(setmetatable({} :: typeof(inf_tbl), {} :: typeof(inf_mt))),
+local tbl = {
+	inf = table.freeze(setmetatable(inf_tbl, inf_mt)) :: typeof(setmetatable({} :: typeof(inf_tbl), {} :: typeof(inf_mt))),
 	delay = retry_with_delay,
 	create = retry,
 }
 
-local exports = setmetatable(tbl, mt) :: typeof(setmetatable({} :: typeof(tbl), {} :: typeof(mt)))
+local exports = table.freeze(setmetatable(tbl, mt)) :: typeof(setmetatable({} :: typeof(tbl), {} :: typeof(mt)))
 
 return exports
