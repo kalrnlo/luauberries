@@ -8,8 +8,21 @@
 -- @kalrnlo
 -- 10/05/2024
 
+type MapInfo = {
+	case_sensitive: boolean?,
+	min_score: number?,
+}
+
 local unclaimed_peqs = {} :: {{number}}
 local size_hex = 0x10000
+
+local function APPLY_CASE_SENSITIVITY(is_case_sensitive: boolean?, a: string, b: string): (string, string)
+	if is_case_sensitive then
+		return string.lower(a), string.lower(b)
+	else
+		return a, b
+	end
+end
 
 local function GET_BYTES(str: string): { number }
 	return { string.byte(str, 1, #str) }
@@ -71,23 +84,21 @@ local function myers_x(b: string, a: string): number
 		peq = table.create(size_hex, 0)
 	end
 
+	local hsize = math.ceil(#a / 32)
+	local vsize = math.ceil(#b / 32)
+	local phc = table.create(hsize, -1)
+	local mhc = table.create(hsize, 0)
+	local vmin = math.min(32, #b)
 	local a_bytes = GET_BYTES(a)
 	local b_bytes = GET_BYTES(b)
-    local n, m = #a, #b
-    local mhc, phc = {}, {}
-    local hsize, vsize = math.ceil(n / 32), math.ceil(m / 32)
-	local vmin = math.min(32, m)
-
-    -- Initialize mhc and phc
-    for i = 1, hsize do
-        phc[i] = -1
-        mhc[i] = 0
-    end
 
     local j_outside = 1
     for j = 1, vsize - 1 do
-        local mv, pv = 0, -1
-        local start, vlen = (j - 1) * 32, (vmin + (j - 1)) * 32
+		local previous_j = j - 1
+		local vlen = (vmin + previous_j) * 32
+		local start = previous_j * 32
+		local pv = -1
+		local mv = 0
 		j_outside += 1
 
         -- Set the bits for characters in string b
@@ -132,9 +143,10 @@ local function myers_x(b: string, a: string): number
         end
     end
 
-    local mv, pv = 0, -1
 	local start = (j_outside - 1) * 32
-    local vlen = math.min(32, m - start) + start
+    local vlen = math.min(32, #b - start) + start
+	local pv = -1
+	local mv = 0
 
     -- Set the bits for characters in string b
     for k = start + 1, vlen, -start do
@@ -142,7 +154,7 @@ local function myers_x(b: string, a: string): number
         peq[byte] = bit32.bor(peq[byte], bit32.lshift(1, k))
     end
 
-    local score = m
+    local score = #b
 	for index, byte in a_bytes do
 		local index_32floor = (index // 32) + 1
 		local index_32modulo = index % 32
@@ -156,8 +168,8 @@ local function myers_x(b: string, a: string): number
 		local xh = bit32.bor(bit32.bxor(bit32.band(bit32.bor(bit32.bor(eq, mb), pv), pv) + pv, pv), eq, mb)
 		local ph = bit32.bor(mv, bit32.bnot(bit32.bor(xh, pv)))
 		local mh = bit32.band(pv, xh)
-		local m_subbed = m - 1
-		score += bit32.band(bit32.rshift(ph, m_subbed), 1) - bit32.band(bit32.rshift(mh, m_subbed), 1)
+		local b_subbed = #b - 1
+		score += (bit32.band(bit32.rshift(ph, b_subbed), 1) - bit32.band(bit32.rshift(mh, b_subbed), 1))
 		if bit32.bxor(bit32.rshift(ph, 31), pb) == 1 then
 			phc[index_32floor] = bit32.bxor(phc_value, bit32.lshift(1, index_32modulo))
 		end
@@ -184,16 +196,19 @@ local function myers_x(b: string, a: string): number
     return score
 end
 
-local function score(a: string, b: string): number
-	if #a < #b then
-		local temp = b
-		b = a
-		a = temp
+local function score(a: string, b: string, case_sensitive: boolean?): number
+	local a, b = APPLY_CASE_SENSITIVITY(case_sensitive, a, b)
+	local a_len = #a
+	local b_len = #b
+
+	if a_len < b_len then
+		a_len, b_len = b_len, a_len
+		a, b = b, a
 	end
 
-	if #b == 0 then
-		return #a
-	elseif #a <= 32 then
+	if b_len == 0 then
+		return a_len
+	elseif a_len <= 32 then
 		return myers_32(a, b)
 	else
 		return myers_x(a, b)
@@ -204,12 +219,13 @@ local function map_sort(a: { string | number }, b: { string | number }): boolean
 	return (a[1] :: number) < (b[1] :: number)
 end
 
-local function map(str: string, arr: { string }, min_score: number?): { string }
-	local min_score = min_score or 0
+local function map(str: string, arr: { string }, info: MapInfo?): { string }
+	local case_sensitive = info and info.case_sensitive or 0
+	local min_score = info and info.min_score or 0
 	local new_array = {}
 
 	for _, array_string in arr do
-		local score = score(str, array_string)
+		local score = score(str, array_string, case_sensitive)
 
 		if score > min_score then
 			local string_tbl = table.create(2) :: { string | number }
@@ -229,25 +245,29 @@ local function map(str: string, arr: { string }, min_score: number?): { string }
 end
 
 -- equilvelent to fzy.hasMatch
-local function has_match(match_aginst: string, str: string): boolean
-	local match_aginst = string.lower(match_aginst)
-	local str = string.lower(str)
+local function has_match(match_aginst: string, str: string, case_sensitive: boolean?): boolean
+	local match_aginst, str = APPLY_CASE_SENSITIVITY(case_sensitive, match_aginst, str)
 	local char_index: number? = 1
 
 	for _, character in string.split(str) do 
-		char_index = (string.find(match_aginst, character, char_index))
-		if not char_index then return false end
+		char_index = (string.find(match_aginst, character, char_index, true))
+
+		if char_index then
+			char_index += 1
+		else
+			return false
+		end
 	end
 	return true
 end
 
 -- gets the closest string to the provided string in an array
-local function closest(str: string, arr: { string }): (string, number)
+local function closest(str: string, arr: { string }, case_sensitive: boolean?): (string, number)
 	local closest_score = math.huge
 	local closest_string: string
 
 	for _, array_string in arr do
-		local score = score(str, array_string)
+		local score = score(str, array_string, case_sensitive)
 
 		if score < closest_score then
 			closest_string = array_string
