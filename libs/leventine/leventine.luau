@@ -39,11 +39,11 @@ local function myers_32(a: string, b: string): number
 	end
 
 	local a_bytes = GET_BYTES(a)
-    local n, m = #a, #b
-    local lst = bit32.lshift(1, n - 1)
-    local pv, mv, sc = -1, 0, n
+	local n, m = #a, #b
+	local lst = bit32.lshift(1, n - 1)
+	local pv, mv, sc = -1, 0, n
 
-    -- Set the bits for characters in string a
+	-- Set the bits for characters in string a
 	for j, a_byte in a_bytes do
 		peq[a_byte] = bit32.bor(peq[a_byte], bit32.lshift(1, j))
 	end
@@ -51,27 +51,27 @@ local function myers_32(a: string, b: string): number
 	for i, byte in GET_BYTES(b) do
 		local eq = peq[byte]
 		local xv = bit32.bor(eq, mv)
-        local new_eq = bit32.bor(eq, bit32.bxor(bit32.band(eq, pv) + pv, pv))
-        local mv2 = bit32.bor(mv, bit32.bnot(bit32.bor(new_eq, pv)))
-        local pv2 = bit32.band(pv, new_eq)
-        if bit32.band(mv2, lst) ~= 0 then
-            sc += 1
-        end
-        if bit32.band(pv2, lst) ~= 0 then
-            sc -= 1
-        end
+		local new_eq = bit32.bor(eq, bit32.bxor(bit32.band(eq, pv) + pv, pv))
+		local mv2 = bit32.bor(mv, bit32.bnot(bit32.bor(new_eq, pv)))
+		local pv2 = bit32.band(pv, new_eq)
+		if bit32.band(mv2, lst) ~= 0 then
+			sc += 1
+		end
+		if bit32.band(pv2, lst) ~= 0 then
+			sc -= 1
+		end
 		local mv3 = bit32.bor(bit32.lshift(mv2, 1), 1)
-        pv = bit32.bor(bit32.lshift(pv2, 1), bit32.bnot(bit32.bor(xv, mv3)))
-        mv = bit32.band(mv3, xv)
+		pv = bit32.bor(bit32.lshift(pv2, 1), bit32.bnot(bit32.bor(xv, mv3)))
+		mv = bit32.band(mv3, xv)
 	end
 
-    -- Reset the peq array
+	-- Reset the peq array
 	for j, a_byte in a_bytes do
 		peq[a_byte] = 0
 	end
 	unclaimed_peqs[#unclaimed_peqs + 1] = peq
 
-    return sc
+	return sc
 end
 
 local function myers_x(b: string, a: string): number
@@ -92,8 +92,8 @@ local function myers_x(b: string, a: string): number
 	local a_bytes = GET_BYTES(a)
 	local b_bytes = GET_BYTES(b)
 
-    local j_outside = 1
-    for j = 1, vsize - 1 do
+	local j_outside = 1
+	for j = 1, vsize - 1 do
 		local previous_j = j - 1
 		local vlen = (vmin + previous_j) * 32
 		local start = previous_j * 32
@@ -101,13 +101,13 @@ local function myers_x(b: string, a: string): number
 		local mv = 0
 		j_outside += 1
 
-        -- Set the bits for characters in string b
-        for k = start + 1, vlen, -start do
+		-- Set the bits for characters in string b
+		for k = start + 1, vlen, -start do
 			local b_byte = b_bytes[k]
-            peq[b_byte] = bit32.bor(peq[b_byte], bit32.lshift(1, k - start))
-        end
+			peq[b_byte] = bit32.bor(peq[b_byte], bit32.lshift(1, k - start))
+		end
 
-        for index, byte in a_bytes do
+		for index, byte in a_bytes do
 			local index_32floor = (index // 32) + 1
 			local index_32modulo = index % 32
 		
@@ -135,26 +135,26 @@ local function myers_x(b: string, a: string): number
 				bit32.bor(bit32.lshift(ph, 1), pb), 
 				xv
 			)
-        end
+		end
 
-        -- Reset the peq array for the current block
-        for k = start + 1, vlen do
-            peq[b_bytes[k]] = 0
-        end
-    end
+		-- Reset the peq array for the current block
+		for k = start + 1, vlen do
+			peq[b_bytes[k]] = 0
+		end
+	end
 
 	local start = (j_outside - 1) * 32
-    local vlen = math.min(32, #b - start) + start
+	local vlen = math.min(32, #b - start) + start
 	local pv = -1
 	local mv = 0
 
-    -- Set the bits for characters in string b
-    for k = start + 1, vlen, -start do
+	-- Set the bits for characters in string b
+	for k = start + 1, vlen, -start do
 		local byte = b_bytes[k]
-        peq[byte] = bit32.bor(peq[byte], bit32.lshift(1, k))
-    end
+		peq[byte] = bit32.bor(peq[byte], bit32.lshift(1, k))
+	end
 
-    local score = #b
+	local score = #b
 	for index, byte in a_bytes do
 		local index_32floor = (index // 32) + 1
 		local index_32modulo = index % 32
@@ -185,15 +185,15 @@ local function myers_x(b: string, a: string): number
 			bit32.bor(bit32.lshift(ph, 1), pb), 
 			xv
 		)
-    end
+	end
 
-    -- Reset the peq array for the last block
-    for k = start + 1, vlen do
-        peq[b_bytes[k]] = 0
-    end
+	-- Reset the peq array for the last block
+	for k = start + 1, vlen do
+		peq[b_bytes[k]] = 0
+	end
 
 	unclaimed_peqs[#unclaimed_peqs + 1] = peq
-    return score
+	return score
 end
 
 local function score(a: string, b: string, case_sensitive: boolean?): number

@@ -12,64 +12,64 @@ local metaize = require(script.Parent.metaize)
 
 type SafeTeleportPrototype = { __call: (self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?) -> (boolean, SafeTeleportResult)}
 type SafeTeleport = typeof(setmetatable({} :: {
-    ATTEMPT_LIMIT: number,
-    RETRY_DELAY: number,
-    FLOOD_DELAY: number
+	ATTEMPT_LIMIT: number,
+	RETRY_DELAY: number,
+	FLOOD_DELAY: number
 }, {} :: SafeTeleportPrototype))
 
 export type SafeTeleportResult = {
-    reserved_server_acess_code: string,
-    private_server_id: number,
+	reserved_server_acess_code: string,
+	private_server_id: number,
 }
 
 export type SafeTeleportInfo = {
-    reserved_server_acess_code: string?,
-    reserve_server: boolean?,
-    place_id: number,
-    job_id: string?,
+	reserved_server_acess_code: string?,
+	reserve_server: boolean?,
+	place_id: number,
+	job_id: string?,
 }
 
 local EMPTY = table.freeze {}
 local BASE = {
-    local ATTEMPT_LIMIT = 5
-    local RETRY_DELAY = 1
-    local FLOOD_DELAY = 15
+	local ATTEMPT_LIMIT = 5
+	local RETRY_DELAY = 1
+	local FLOOD_DELAY = 15
 }
 
 local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
 	local success, result = retryer.delay(
-        BASE.RETRY_DELAY, 
-        BASE.ATTEMPT_LIMIT,
-        teleport_service.TeleportAsync, 
-        teleport_service,  
-        place_id, 
-        if type(players_or_player) == "table" then players_or_player else table.create(1, players_or_player), 
-        opts
-    )
+		BASE.RETRY_DELAY, 
+		BASE.ATTEMPT_LIMIT,
+		teleport_service.TeleportAsync, 
+		teleport_service,  
+		place_id, 
+		if type(players_or_player) == "table" then players_or_player else table.create(1, players_or_player), 
+		opts
+	)
 
 	if success then
-        return success, table.freeze {
-            reserved_server_acess_code = result.ReservedServerAccessCode,
-            private_server_id = result.PrivateServerId,
-        }
-    else
+		return success, table.freeze {
+			reserved_server_acess_code = result.ReservedServerAccessCode,
+			private_server_id = result.PrivateServerId,
+		}
+	else
 		warn(`[SAFE_TELEPORT]: unsucessful teleport\n\tteleport_async_err: {result}`)
-        return success, EMPTY
+		return success, EMPTY
 	end
 end
 
 local function safe_teleport_call(self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
-    if not table.isfrozen(self) then table.freeze(self) end
+	if not table.isfrozen(self) then table.freeze(self) end
 
-    if info then
-        local opts = Instance.new("TeleportOptions")
-        opts.ReservedServerAccessCode = info.reserved_server_acess_code :: any
-        opts.ShouldReserveServer = info.reserve_server :: any
-        opts.ServerInstanceId = info.job_id :: any
-        return SAFE_TELEPORT(place_id, players_or_player, opts)
-    else
-        return SAFE_TELEPORT(place_id, players_or_player)
-    end
+	if info then
+		local opts = Instance.new("TeleportOptions")
+		opts.ReservedServerAccessCode = info.reserved_server_acess_code :: any
+		opts.ShouldReserveServer = info.reserve_server :: any
+		opts.ServerInstanceId = info.job_id :: any
+		return SAFE_TELEPORT(place_id, players_or_player, opts)
+	else
+		return SAFE_TELEPORT(place_id, players_or_player)
+	end
 end
 
 teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_id, opts)
@@ -86,7 +86,7 @@ teleport_service.TeleportInitFailed:Connect(function(player, result, err, place_
 end)
 
 local export: SafeTeleport = setmetatable(BASE, metaize {
-    __call = safe_teleport_call
+	__call = safe_teleport_call
 }) :: any
 
 return export

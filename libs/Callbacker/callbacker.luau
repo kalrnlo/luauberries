@@ -10,12 +10,12 @@ local metaize = require(script.Parent.metaize)
 type ConnectionPrototype<T...> = { __call: (self: Connection<T...>) -> () }
 type ConnectionData<T...> = { (T...) -> () | { Connection<T...> } }
 export type Connection<T...> = typeof(setmetatable(
-    {} :: ConnectionData<T...>, 
-    {} :: ConnectionPrototype<T...>
+	{} :: ConnectionData<T...>, 
+	{} :: ConnectionPrototype<T...>
 ))
 
 local function connection_call<T...>(self: Connection<T...>)
-    local arr: { Connection<T...> } = self[2] :: any
+	local arr: { Connection<T...> } = self[2] :: any
 
 	if #arr > 1 then
 		local index: number = table.find(arr, self) :: any
@@ -31,23 +31,23 @@ local connection_prototype = metaize {
 }
 
 local function add_callback<T...>(arr: { Connection<T...> }, callback: (T...) -> ()): Connection<T...>
-    local connection_data = table.create(2) :: { (T...) -> () | { Connection<T...> } }
-    connection_data[1] = callback
-    connection_data[2] = arr
+	local connection_data = table.create(2) :: { (T...) -> () | { Connection<T...> } }
+	connection_data[1] = callback
+	connection_data[2] = arr
 
-    local self: Connection<T...> = setmetatable(
-        table.freeze(connection_data),
-        connection_prototype
-    ) :: any
+	local self: Connection<T...> = setmetatable(
+		table.freeze(connection_data),
+		connection_prototype
+	) :: any
 
-    table.insert(arr, self)
-    return self
+	table.insert(arr, self)
+	return self
 end
 
 local function run_callbacks<T...>(arr: { Connection<T...> }, ...: T...)
-    for _, connection in arr do
-        task.spawn(connection[1] :: any, ...)
-    end
+	for _, connection in arr do
+		task.spawn(connection[1] :: any, ...)
+	end
 end
 
 return add_callback, run_callbacks

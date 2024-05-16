@@ -1,6 +1,6 @@
 --!strict
 
--- GetModelOrPartSize
+-- GetPVInstanceSize
 -- A simple module for getting either a model or parts size
 -- @Kalrnlo
 -- 10/05/2024

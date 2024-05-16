@@ -2,7 +2,7 @@
 --!native
 --!strict
 
--- 🐟 Grouper
+-- Grouper
 -- Used for getting the latest group rank or role of a player on the server.
 -- @kalrnlo
 -- 23/04/2024

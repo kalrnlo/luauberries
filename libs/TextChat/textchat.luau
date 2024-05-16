@@ -119,7 +119,7 @@ local function get_color_for_name(name: string): Color3
 	local sub_number = if #name % 2 == 1 then -1 else 0
 	local name_value = 0
 	
-	for index, codepoint in utf8.codes(name) do
+	for index, codepoint in { string.byte(name, 1, #name) } do
 		name_value += if (((#name - index) + 1) - sub_number) % 4 >= 2 then
 				-codepoint
 			else

@@ -23,14 +23,14 @@ end
 local WAIT_FN:(number?) -> number = if task then task.wait else WAIT
 
 local function retry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) }
+	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
 		WAIT_FN(delay)
 		local attempts = 1
 
 		repeat
-			results = { pcall(callback, ...) }
+			results = table.pack(pcall(callback, ...))
 			attempts += 1
 			WAIT_FN(delay)
 		until results[1] or attempts == max_attempts
@@ -39,13 +39,13 @@ local function retry_with_delay<T..., A...>(delay: number, max_attempts: number,
 end
 
 local function retry_call<T..., A...>(self: unknown, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) }
+	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
 		local attempts = 1
 
 		repeat
-			results = { pcall(callback, ...) }
+			results = table.pack(pcall(callback, ...))
 			attempts += 1
 		until results[1] or attempts == max_attempts
 	end
@@ -54,13 +54,13 @@ end
 
 -- temp until new luau typechecker fixes the issues with using __call with a function that has generics
 local function retry<T..., A...>(max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) }
+	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
 		local attempts = 1
 
 		repeat
-			results = { pcall(callback, ...) }
+			results = table.pack(pcall(callback, ...))
 			attempts += 1
 		until results[1] or attempts == max_attempts
 	end
@@ -68,13 +68,13 @@ local function retry<T..., A...>(max_attempts: number, callback: (T...) -> (A...
 end
 
 local function infretry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) }
+	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
 		WAIT_FN(delay)
 
 		repeat
-			results = { pcall(callback, ...) }
+			results = table.pack(pcall(callback, ...))
 			WAIT_FN(delay)
 		until results[1]
 	end
@@ -82,11 +82,11 @@ local function infretry_with_delay<T..., A...>(delay: number, max_attempts: numb
 end
 
 local function infretry_call<T..., A...>(self: unknown, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) }
+	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
 		repeat
-			results = { pcall(callback, ...) }
+			results = table.pack(pcall(callback, ...))
 		until results[1]
 	end
 	return table.unpack(results) :: any
@@ -94,11 +94,11 @@ end
 
 -- temp until new luau typechecker fixes the issues with using __call with a function that has generics
 local function infretry<T..., A...>(callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) }
+	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
 		repeat
-			results = { pcall(callback, ...) }
+			results = table.pack(pcall(callback, ...))
 		until results[1]
 	end
 	return table.unpack(results) :: any
