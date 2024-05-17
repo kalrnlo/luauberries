@@ -9,7 +9,7 @@ local metaize = require(script.Parent.metaize)
 
 type ConnectionPrototype<T...> = { __call: (self: Connection<T...>) -> () }
 type ConnectionData<T...> = { (T...) -> () | { Connection<T...> } }
-export type Connection<T...> = typeof(setmetatable(
+type Connection<T...> = typeof(setmetatable(
 	{} :: ConnectionData<T...>, 
 	{} :: ConnectionPrototype<T...>
 ))

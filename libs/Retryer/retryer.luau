@@ -20,7 +20,9 @@ local function WAIT(seconds: number?): number
 	return clock_time - start_time
 end
 
-local WAIT_FN:(number?) -> number = if task then task.wait else WAIT
+-- they both have the same type but luau infers it as (number?) -> number | (number?) -> number
+-- if the local itself isnt annotated
+local WAIT_FN: (number?) -> number = if task then task.wait else WAIT
 
 local function retry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
@@ -38,7 +40,7 @@ local function retry_with_delay<T..., A...>(delay: number, max_attempts: number,
 	return table.unpack(results) :: any
 end
 
-local function retry_call<T..., A...>(self: unknown, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+local function retry_call<T..., A...>(self: any, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
@@ -81,7 +83,7 @@ local function infretry_with_delay<T..., A...>(delay: number, max_attempts: numb
 	return table.unpack(results) :: any
 end
 
-local function infretry_call<T..., A...>(self: unknown, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+local function infretry_call<T..., A...>(self: any, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
@@ -92,7 +94,6 @@ local function infretry_call<T..., A...>(self: unknown, max_attempts: number, ca
 	return table.unpack(results) :: any
 end
 
--- temp until new luau typechecker fixes the issues with using __call with a function that has generics
 local function infretry<T..., A...>(callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
