@@ -90,9 +90,9 @@ local function avatar_item_to_thumbnail(
 	circular: boolean?
 ): string
 	return if avatar_item_type == ASSET_ENUM then
-		return FORMAT_RBXTHUMB_URL(id, ASSET_STR, size, circular)
+		FORMAT_RBXTHUMB_URL(id, ASSET_STR, size, circular)
 	else 
-		return FORMAT_RBXTHUMB_URL(id, BUNDLE_STR, size, circular)
+		FORMAT_RBXTHUMB_URL(id, BUNDLE_STR, size, circular)
 end
 
 local exports = table.freeze {
