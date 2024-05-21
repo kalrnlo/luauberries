@@ -9,14 +9,13 @@
 
 local group_service = game:GetService("GroupService")
 local players = game:GetService("Players")
-local config_merge = require(script.Parent.configmerge)
 
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
 
 -- {[user_id] = rank | treads_waiting_for_player_rank_to_be_fetched }
 local player_ranks = {} :: { [number]: number | { thread } }
 local role_cache = table.create(256, "Guest")
-local rank_changed_callbacks = {}
+local rank_changed_callbacks = {} :: { { RankChangedCallback } }
 local has_initiated = false
 local config = {
 	rank_refresh_rate = 30,
@@ -72,15 +71,10 @@ local function on_player_added(player: Player)
 				return
 			elseif new_rank and new_rank ~= rank then
 				player_ranks[userid] = new_rank
+
 				for _, callback_data in rank_changed_callbacks do
-					task.spawn()callback_data
+					task.spawn(callback_data[1], player, new_rank, rank)
 				end
-					run_callbacks(
-					rank_changed_callbacks,
-					player,
-					new_rank,
-					rank
-				)
 				rank = new_rank
 			end
 			task.wait(rate)
@@ -90,11 +84,12 @@ local function on_player_added(player: Player)
 	end
 end
 
-local function init(new_config: { rank_refresh_rate: number?, groupid: number? }?)
+local function init(new_config: { rank_refresh_rate: number?, groupid: number })
 	if has_initiated then return end
+	new_config.rank_refresh_rate = new_config.rank_refresh_rate or config.rank_refresh_rate
+	config = new_config :: typeof(config)
 	has_initiated = true
 
-	config_merge(config, new_config)
 	task.spawn(function()
 		for _, player in players:GetPlayers() do
 			task.spawn(on_player_added, player)
@@ -105,8 +100,21 @@ local function init(new_config: { rank_refresh_rate: number?, groupid: number? }
 	players.PlayerAdded:Connect(on_player_added)
 end
 
-local function on_rank_changed(callback: RankChangedCallback)
-	return add_callback(rank_changed_callbacks, callback)
+local function on_rank_changed(callback: RankChangedCallback): () -> ()
+	local data = table.create(1, callback)
+	table.insert(rank_changed_callbacks, data)
+
+	return function()
+		local index: number = table.find(rank_changed_callbacks, data) :: any
+
+		if index ~= 1 then
+			local len = #rank_changed_callbacks
+			rank_changed_callbacks[index] = rank_changed_callbacks[len]
+			rank_changed_callbacks[len] = nil
+		else
+			rank_changed_callbacks[1] = nil
+		end
+	end
 end
 
 local function get_rank(player: Player): number

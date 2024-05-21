@@ -1,9 +1,9 @@
 name: kalrnlo/observer
-version: 0.1.4
+version: 0.1.5
 description: Simple observer library for roblox
 license: MIT
 exports:
-  lib: 'init.luau'
+  lib: './init.luau'
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs

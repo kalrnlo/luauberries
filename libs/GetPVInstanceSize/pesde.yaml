@@ -1,9 +1,9 @@
 name: kalrnlo/getpvinstancesize
-version: 0.1.1
+version: 0.1.2
 description: a simple module for getting the size of a PVInstance
 license: MIT
 exports:
-  lib: 'get_pv_instance_size.luau'
+  lib: './init.luau'
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs

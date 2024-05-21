@@ -1,9 +1,9 @@
 name: kalrnlo/metaize
-version: 0.1.6
+version: 0.1.7
 description: utility function for making classes
 license: MIT
 exports:
-  lib: 'init.luau'
+  lib: './init.luau'
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs

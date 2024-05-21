@@ -31,9 +31,9 @@ export type SafeTeleportInfo = {
 
 local EMPTY = table.freeze {}
 local BASE = {
-	local ATTEMPT_LIMIT = 5
-	local RETRY_DELAY = 1
-	local FLOOD_DELAY = 15
+	ATTEMPT_LIMIT = 5
+	RETRY_DELAY = 1
+	FLOOD_DELAY = 15
 }
 
 local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
@@ -54,12 +54,12 @@ local function SAFE_TELEPORT(place_id: number, players_or_player: {Player} | Pla
 		}
 	else
 		warn(`[SAFE_TELEPORT]: unsucessful teleport\n\tteleport_async_err: {result}`)
-		return success, EMPTY
+		return success, EMPTY :: any
 	end
 end
 
 local function safe_teleport_call(self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
-	if not table.isfrozen(self) then table.freeze(self) end
+	if not table.isfrozen(self :: any) then table.freeze(self) end
 
 	if info then
 		local opts = Instance.new("TeleportOptions")

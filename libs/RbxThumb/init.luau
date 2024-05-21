@@ -25,8 +25,6 @@ type AvatarBustThumbnailSize = "100x100" | "150x15" | "75×75" | "100×100" | "1
 type FullAvatarThumbnailSize = "50×50" | "60×60" | "75×75" | "100×100" | "150×150" | "180×180" | 
 	"352×352" | "420×420"
 
-type 
-
 local BASE_URL = "rbxthumb://type=%s&id=%d&w=%d&h=%d"
 local CIRCULAR_URL = `{BASE_URL}&filters=circular`
 local ASSET_ENUM = Enum.AvatarItemType.Asset
@@ -64,7 +62,7 @@ local function CREATE_PLAYER_FORMATTER<sizes>(type: ThumbnailType, defualt_width
 	local defualt_width = defualt_width or DEFUALT_SIZE_NUM
 
 	return function(player: Player, size: (sizes & string)?, circular: boolean?): string
-		local width, height = SPLIT_SIZE(size, defualt_width, defualt_height)
+		local width, height = SPLIT_SIZE(size :: any, defualt_width, defualt_height)
 		return RAW_FORMAT(player.UserId, type, width, height, circular)
 	end
 end
@@ -74,13 +72,13 @@ local function CREATE_FORMATTER<sizes>(type: ThumbnailType, defualt_width: numbe
 	local defualt_width = defualt_width or DEFUALT_SIZE_NUM
 
 	return function(id: number, size: (sizes & string)?, circular: boolean?): string
-		local width, height = SPLIT_SIZE(size, defualt_width, defualt_height)
+		local width, height = SPLIT_SIZE(size :: any, defualt_width, defualt_height)
 		return RAW_FORMAT(id, type, width, height, circular)
 	end
 end
 
 local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
-	return if avatar_item_type == ASSET_ENUM then ASSET_STR :: "Asset" else BUNDLE_STR
+	return if avatar_item_type == ASSET_ENUM then ASSET_STR :: any else BUNDLE_STR :: any
 end
 
 local function avatar_item_to_thumbnail(
@@ -90,9 +88,9 @@ local function avatar_item_to_thumbnail(
 	circular: boolean?
 ): string
 	return if avatar_item_type == ASSET_ENUM then
-		FORMAT_RBXTHUMB_URL(id, ASSET_STR, size, circular)
+		FORMAT_RBXTHUMB_URL(id, ASSET_STR :: any, size, circular)
 	else 
-		FORMAT_RBXTHUMB_URL(id, BUNDLE_STR, size, circular)
+		FORMAT_RBXTHUMB_URL(id, BUNDLE_STR :: any, size, circular)
 end
 
 local exports = table.freeze {

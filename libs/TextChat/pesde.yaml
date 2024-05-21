@@ -1,13 +1,13 @@
 name: kalrnlo/textchat
 STANDARD_NAME: textchat
-version: 0.1.4
+version: 0.1.5
 description: a utility module for working with robloxs TextChatService
 repository: https://github.com/kalrnlo/luau-libs
 license: MIT
 authors:
 - kalrnlo
 exports:
-  lib: 'init.luau'
+  lib: './init.luau'
 path_style: !roblox
   place: {}
 private: false
