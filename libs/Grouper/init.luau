@@ -9,7 +9,6 @@
 
 local group_service = game:GetService("GroupService")
 local players = game:GetService("Players")
-local add_callback, run_callbacks = require(script.Parent.callbacker)
 local config_merge = require(script.Parent.configmerge)
 
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
@@ -73,7 +72,10 @@ local function on_player_added(player: Player)
 				return
 			elseif new_rank and new_rank ~= rank then
 				player_ranks[userid] = new_rank
-				run_callbacks(
+				for _, callback_data in rank_changed_callbacks do
+					task.spawn()callback_data
+				end
+					run_callbacks(
 					rank_changed_callbacks,
 					player,
 					new_rank,

@@ -3,7 +3,7 @@ version: 0.1.6
 description: utility function for making classes
 license: MIT
 exports:
-  lib: 'metaize.luau'
+  lib: 'init.luau'
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs

@@ -7,7 +7,7 @@ license: MIT
 authors:
 - kalrnlo
 exports:
-  lib: 'textchat.luau'
+  lib: 'init.luau'
 path_style: !roblox
   place: {}
 private: false

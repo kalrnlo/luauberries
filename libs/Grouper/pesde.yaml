@@ -3,7 +3,7 @@ version: 0.1.6
 description: module for easily getting up to date ranks of players in a group on the server
 license: MIT
 exports:
-  lib: 'grouper.luau'
+  lib: 'init.luau'
 authors:
 - kalrnlo
 repository: https://github.com/kalrnlo/luau-libs

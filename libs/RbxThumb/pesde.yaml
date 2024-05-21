@@ -4,7 +4,7 @@ description: module for easily creating roblox thumbnail urls, based on nevermor
 license: MIT
 repository: https://github.com/kalrnlo/luau-libs
 exports:
-  lib: 'rbxthumb.luau'
+  lib: 'init.luau'
 authors:
 - kalrnlo
 path_style: !roblox
