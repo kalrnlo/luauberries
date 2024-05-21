@@ -1,5 +1,5 @@
 name: kalrnlo/leventine
-version: 0.1.2
+version: 0.1.3
 description: a port of fastest-levinstein to luau, with added functions for convenience
 license: MIT
 exports:

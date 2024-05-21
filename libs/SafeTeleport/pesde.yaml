@@ -16,7 +16,7 @@ indices:
 dependencies:
   retryer:
     name: kalrnlo/retryer
-    version: ^0.1.6
+    version: ^0.1.8
     index: default
   metaize:
     name: kalrnlo/metaize

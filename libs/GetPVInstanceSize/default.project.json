@@ -1,6 +1,0 @@
-{
-	"name": "get_pv_instance_size",
-	"tree": {
-		"$path": "get_pv_instance_size.luau"
-	}
-}
