@@ -4,7 +4,7 @@
 -- retryer
 -- utility module for retrying functions easily
 -- @kalrnlo
--- 10/05/2024
+-- 23/05/2024
 
 local metaize = require(script.Parent.metaize)
 
@@ -40,22 +40,8 @@ local function retry_with_delay<T..., A...>(delay: number, max_attempts: number,
 	return table.unpack(results) :: any
 end
 
-local function retry_call<T..., A...>(self: any, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = table.pack(pcall(callback, ...))
-
-	if not results[1] then
-		local attempts = 1
-
-		repeat
-			results = table.pack(pcall(callback, ...))
-			attempts += 1
-		until results[1] or attempts == max_attempts
-	end
-	return table.unpack(results) :: any
-end
-
--- temp until new luau typechecker fixes the issues with using __call with a function that has generics
-local function retry<T..., A...>(max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+-- if self isnt defined as a generic the other generics dont get infered correctly
+local function retry<S, T..., A...>(self: S, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
@@ -83,18 +69,7 @@ local function infretry_with_delay<T..., A...>(delay: number, max_attempts: numb
 	return table.unpack(results) :: any
 end
 
-local function infretry_call<T..., A...>(self: any, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = table.pack(pcall(callback, ...))
-
-	if not results[1] then
-		repeat
-			results = table.pack(pcall(callback, ...))
-		until results[1]
-	end
-	return table.unpack(results) :: any
-end
-
-local function infretry<T..., A...>(callback: (T...) -> (A...), ...: T...): (boolean, A...)
+local function infretry<S, T..., A...>(self: S, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
@@ -107,19 +82,17 @@ end
 
 local inf_tbl = {
 	delay = infretry_with_delay,
-	create = infretry
 }
 local inf_mt = metaize {
-	__call = infretry_call
+	__call = infretry
 }
 
 local mt = metaize {
-	__call = retry_call,
+	__call = retry,
 }
 local tbl = {
 	inf = table.freeze(setmetatable(inf_tbl, inf_mt)) :: typeof(setmetatable({} :: typeof(inf_tbl), {} :: typeof(inf_mt))),
 	delay = retry_with_delay,
-	create = retry,
 }
 
 local exports = table.freeze(setmetatable(tbl, mt)) :: typeof(setmetatable({} :: typeof(tbl), {} :: typeof(mt)))
