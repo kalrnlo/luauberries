@@ -6,7 +6,7 @@
 -- a port of fastest-levinstein to luau, with added functions for convenience
 -- https://github.com/ka-weihe/fastest-levenshtein
 -- @kalrnlo
--- 17/05/2024
+-- 23/05/2024
 
 type MapInfo = {
 	case_sensitive: boolean?,
@@ -137,7 +137,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 		end
 
 		-- Reset the peq array for the current block
-		for k = start + 1, vlen do
+		for k = start + 1, v_len do
 			peq[b_bytes[k]] = 0
 		end
 	end
@@ -166,7 +166,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 		local xv = ( bit32.bor(eq, mv) )
 		local xh = ( bit32.bor(bit32.bxor(bit32.band(bit32.bor(bit32.bor(eq, mb), pv), pv) + pv, pv), eq, mb) )
 		local ph = ( bit32.bor(mv, bit32.bnot(bit32.bor(xh, pv))) )
-		local z = ( bit32.band(pv, xh) )
+		local mh = ( bit32.band(pv, xh) )
 		local b_subbed = b_len - 1
 		score += (bit32.band(bit32.rshift(ph, b_subbed), 1) - bit32.band(bit32.rshift(mh, b_subbed), 1))
 		if bit32.bxor(bit32.rshift(ph, 31), pb) == 1 then
@@ -187,7 +187,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 	end
 
 	-- Reset the peq array for the last block
-	for k = start + 1, vlen do
+	for k = start + 1, v_len do
 		peq[b_bytes[k]] = 0
 	end
 
