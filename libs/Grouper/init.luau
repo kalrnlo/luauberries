@@ -25,8 +25,13 @@ export type ClientConfig = {
 }
 
 export type ServerConfig = {
-	fire_all_rank_changed: FireAllRankChanged?,
-	fire_rank_changed: FireRankChanged?,
+	rank_refresh_rate: number?,
+	fire_all_rank_changed: nil,
+	fire_rank_changed: nil,
+	groupid: number,
+} |  {
+	fire_all_rank_changed: FireAllRankChanged,
+	fire_rank_changed: FireRankChanged,
 	rank_refresh_rate: number?,
 	groupid: number,
 }
