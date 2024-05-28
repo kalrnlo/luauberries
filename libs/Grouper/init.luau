@@ -10,7 +10,7 @@
 -- and end up constantly making api requests as Player:GetRankInGroup() 
 -- only caches its result on the server
 -- @kalrnlo
--- 27/05/2024
+-- 28/05/2024
 
 local GROUP_SERVICE = game:GetService("GroupService")
 local PLAYERS = game:GetService("Players")
@@ -20,7 +20,6 @@ type FireAllRankChanged = (player_whose_rank_changed: Player, rank: number, role
 type ReplicateRankUpdateCallback = (player: Player, rank: number, role: string) -> ()
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
 type Groups = { { Role: string, Rank: number, Id: number } }
-
 
 export type ClientConfig = {
 	connect_rank_changed: (callback: ReplicateRankUpdateCallback) -> ()
@@ -56,12 +55,12 @@ local PLAYER_RANKS = {} :: { [Player]: number }
 
 -- cursed using the first argument to tell if it was sucessful or not
 -- but hey it works so
-local function FETCH_RANK_AND_ROLE(userid: number, groupid: number): (number?, string)
+local function FETCH_RANK_AND_ROLE(userid: number): (number?, string)
 	local success, groups: Groups = pcall(GET_GROUPS_ASYNC, GROUP_SERVICE, userid)
 	
 	if success then
 		for _, group in groups do
-			if group.Id ~= groupid then continue end
+			if group.Id ~= GROUP_ID then continue end
 			local role = group.Role
 			local rank = group.Rank
 			ROLE_CACHE[rank + 1] = role
@@ -97,7 +96,7 @@ local function on_player_added(player: Player)
 
 	local userid = player.UserId
 	local start = os.clock()
-	local rank, role = FETCH_RANK_AND_ROLE(userid, GROUP_ID)
+	local rank, role = FETCH_RANK_AND_ROLE(userid)
 	local rank = rank or 0
 
 	if player and player:IsDescendantOf(PLAYERS) then
@@ -119,7 +118,7 @@ local function on_player_added(player: Player)
 		end
 
 		while player and PLAYER_RANKS[player] do
-			local new_rank, new_role = FETCH_RANK_AND_ROLE(userid, GROUP_ID)
+			local new_rank, new_role = FETCH_RANK_AND_ROLE(userid)
 
 			if not player or PLAYER_RANKS[player] then 
 				return
