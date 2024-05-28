@@ -19,6 +19,8 @@ type FireRankChanged = (send_to_player: Player, player_whose_rank_changed: Playe
 type FireAllRankChanged = (player_whose_rank_changed: Player, rank: number, role: string) -> ()
 type ReplicateRankUpdateCallback = (player: Player, rank: number, role: string) -> ()
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
+type Groups = { { Role: string, Rank: number, Id: number } }
+
 
 export type ClientConfig = {
 	connect_rank_changed: (callback: ReplicateRankUpdateCallback) -> ()
@@ -55,12 +57,12 @@ local PLAYER_RANKS = {} :: { [Player]: number }
 -- cursed using the first argument to tell if it was sucessful or not
 -- but hey it works so
 local function FETCH_RANK_AND_ROLE(userid: number, groupid: number): (number?, string)
-	local success, groups = pcall(GET_GROUPS_ASYNC, GROUP_SERVICE, userid)
+	local success, groups: Groups = pcall(GET_GROUPS_ASYNC, GROUP_SERVICE, userid)
 	
 	if success then
 		for _, group in groups do
 			if group.Id ~= groupid then continue end
-			local role = group.role
+			local role = group.Role
 			local rank = group.Rank
 			ROLE_CACHE[rank + 1] = role
 			return rank, role
@@ -147,6 +149,7 @@ local function client_init(config: ClientConfig)
 	INITIATED = true
 
 	config.connect_rank_changed(function(player, rank, role)
+		print(`[GROUPER] client recieved rank data \n\tname: {player.Name}\n\tuserid: {player.UserId}\n\trank: {rank}\n\trole: {role}`)
 		local threads_waiting = THREADS_WAITING_FOR_PLAYERS[player]
 		local old_rank = PLAYER_RANKS[player]
 
