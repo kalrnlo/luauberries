@@ -120,10 +120,11 @@ local function on_player_added(player: Player)
 		while player and PLAYER_RANKS[player] do
 			local new_rank, new_role = FETCH_RANK_AND_ROLE(userid)
 
-			if not player or PLAYER_RANKS[player] then 
+			if not player or not PLAYER_RANKS[player] then
 				return
 			end
 
+			print(new_rank, new_role)
 			if new_rank and new_rank ~= rank then
 				PLAYER_RANKS[player] = new_rank
 
@@ -148,7 +149,7 @@ local function client_init(config: ClientConfig)
 	INITIATED = true
 
 	config.connect_rank_changed(function(player, rank, role)
-		print(`[GROUPER] client recieved rank data \n\tname: {player.Name}\n\tuserid: {player.UserId}\n\trank: {rank}\n\trole: {role}`)
+		-- print(`[GROUPER] client recieved rank data \n\tname: {player.Name}\n\tuserid: {player.UserId}\n\trank: {rank}\n\trole: {role}`)
 		local threads_waiting = THREADS_WAITING_FOR_PLAYERS[player]
 		local old_rank = PLAYER_RANKS[player]
 
