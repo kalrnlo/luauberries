@@ -124,7 +124,6 @@ local function on_player_added(player: Player)
 				return
 			end
 
-			print(new_rank, new_role)
 			if new_rank and new_rank ~= rank then
 				PLAYER_RANKS[player] = new_rank
 
