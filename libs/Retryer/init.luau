@@ -55,7 +55,7 @@ local function retry<S, T..., A...>(self: S, max_attempts: number, callback: (T.
 	return table.unpack(results) :: any
 end
 
-local function infretry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+local function infretry_with_delay<T..., A...>(delay: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
@@ -69,7 +69,7 @@ local function infretry_with_delay<T..., A...>(delay: number, max_attempts: numb
 	return table.unpack(results) :: any
 end
 
-local function infretry<S, T..., A...>(self: S, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+local function infretry<S, T..., A...>(self: S, callback: (T...) -> (A...), ...: T...): (boolean, A...)
 	local results = table.pack(pcall(callback, ...))
 
 	if not results[1] then
