@@ -75,7 +75,6 @@ get_rank_and_role(player)
 Returns the current rank and role for the given player in the group.
 - player: the player to get the rank and role of
 
-
 ```lua
 on_rank_changed(callback)
 ```
@@ -105,10 +104,3 @@ init(new_config)
 ```
 Initates grouper starting rank tracking
 - new_config: an optional config with the following optional fields, groupid, and rank_refresh_rate
-
-#### properties
-
-```lua
-config
-```
-The current config grouper is using
