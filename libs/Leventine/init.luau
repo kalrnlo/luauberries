@@ -14,10 +14,10 @@ type MapInfo = {
 }
 
 local DEFAULT_MIN_SCORE = -math.huge
+local PEQ = table.create(0x10000, 0)
 -- no fast call for these, so they have to be set as locals
 local bit32_rshift = bit32.rshift
 local bit32_lshift = bit32.lshift
-local PEQ = table.create(0x10000)
 
 local function APPLY_CASE_SENSITIVITY(is_case_sensitive: boolean?, a: string, b: string): (string, string)
 	if is_case_sensitive then
