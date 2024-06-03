@@ -13,12 +13,11 @@ type MapInfo = {
 	min_score: number?,
 }
 
-local UNCLAIMED_PEQS = {} :: { { number } }
 local DEFAULT_MIN_SCORE = -math.huge
--- no fast call for these, so they ahve to be set as locals
+-- no fast call for these, so they have to be set as locals
 local bit32_rshift = bit32.rshift
 local bit32_lshift = bit32.lshift
-local PEQ_SIZE = 0x10000
+local PEQ = table.create(0x10000)
 
 local function APPLY_CASE_SENSITIVITY(is_case_sensitive: boolean?, a: string, b: string): (string, string)
 	if is_case_sensitive then
@@ -32,34 +31,21 @@ local function GET_BYTES(str: string, len: number): { number }
 	return { string.byte(str, 1, len) }
 end
 
-local function GET_PEQ(): { number }
-	local peq_index = #UNCLAIMED_PEQS
-	local peq = UNCLAIMED_PEQS[peq_index]
-
-	if peq then
-		UNCLAIMED_PEQS[peq_index] = nil
-		return peq
-	else
-		return table.create(PEQ_SIZE, 0)
-	end
-end
-
 local function myers_32(a: string, b: string, a_len: number, b_len: number): number
 	local lst = ( bit32_lshift(1, a_len - 1) )
 	local a_bytes = ( GET_BYTES(a, a_len) )
 	local b_bytes = ( GET_BYTES(b, b_len) )
-	local peq = ( GET_PEQ() )
 	local sc = a_len
 	local pv = -1
 	local mv = 0
 
 	-- Set the bits for characters in string a
 	for j, a_byte in a_bytes do
-		peq[a_byte] = bit32.bor(peq[a_byte], bit32_lshift(1, j))
+		PEQ[a_byte] = bit32.bor(PEQ[a_byte], bit32_lshift(1, j))
 	end
 	
 	for i, byte in b_bytes do
-		local eq = peq[byte]
+		local eq = PEQ[byte]
 		local xv = ( bit32.bor(eq, mv) )
 		local new_eq = ( bit32.bor(eq, bit32.bxor(bit32.band(eq, pv) + pv, pv)) )
 		local mv2 = ( bit32.bor(mv, bit32.bnot(bit32.bor(new_eq, pv))) )
@@ -75,11 +61,10 @@ local function myers_32(a: string, b: string, a_len: number, b_len: number): num
 		mv = ( bit32.band(mv3, xv) )
 	end
 
-	-- Reset the peq array
+	-- Reset the PEQ array
 	for j, a_byte in a_bytes do
-		peq[a_byte] = 0
+		PEQ[a_byte] = 0
 	end
-	table.insert(UNCLAIMED_PEQS, peq)
 
 	return sc
 end
@@ -92,7 +77,6 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 	local a_bytes = ( GET_BYTES(a, a_len) )
 	local b_bytes = ( GET_BYTES(b, b_len) )
 	local v_min = ( math.min(32, b_len) )
-	local peq = ( GET_PEQ() )
 	local j_outside = 1
 
 	for j = 1, v_size - 1 do
@@ -106,7 +90,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 		-- Set the bits for characters in string b
 		for k = start + 1, v_len, -start do
 			local b_byte = b_bytes[k]
-			peq[b_byte] = bit32.bor(peq[b_byte], bit32_lshift(1, k - start))
+			PEQ[b_byte] = bit32.bor(PEQ[b_byte], bit32_lshift(1, k - start))
 		end
 
 		for index, byte in a_bytes do
@@ -115,7 +99,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 		
 			local phc_value = phc[index_32floor]
 			local mhc_value = mhc[index_32floor]
-			local eq = peq[byte]
+			local eq = PEQ[byte]
 			local pb = ( bit32.band(bit32_rshift(phc_value, index_32modulo), 1) )
 			local mb = ( bit32.band(bit32_rshift(mhc_value, index_32modulo), 1) )
 			local xv = ( bit32.bor(eq, mv) )
@@ -139,9 +123,9 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 			) )
 		end
 
-		-- Reset the peq array for the current block
+		-- Reset the PEQ array for the current block
 		for k = start + 1, v_len do
-			peq[b_bytes[k]] = 0
+			PEQ[b_bytes[k]] = 0
 		end
 	end
 
@@ -153,7 +137,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 	-- Set the bits for characters in string b
 	for k = start + 1, v_len, -start do
 		local byte = b_bytes[k]
-		peq[byte] = bit32.bor(peq[byte], bit32_lshift(1, k))
+		PEQ[byte] = bit32.bor(PEQ[byte], bit32_lshift(1, k))
 	end
 
 	local score = b_len
@@ -163,7 +147,7 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 	
 		local phc_value = phc[index_32floor]
 		local mhc_value = mhc[index_32floor]
-		local eq = peq[byte]
+		local eq = PEQ[byte]
 		local pb = ( bit32.band(bit32_rshift(phc_value, index_32modulo), 1) )
 		local mb = ( bit32.band(bit32_rshift(mhc_value, index_32modulo), 1) )
 		local xv = ( bit32.bor(eq, mv) )
@@ -189,12 +173,11 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 		))
 	end
 
-	-- Reset the peq array for the last block
+	-- Reset the PEQ array for the last block
 	for k = start + 1, v_len do
-		peq[b_bytes[k]] = 0
+		PEQ[b_bytes[k]] = 0
 	end
 
-	table.insert(UNCLAIMED_PEQS, peq)
 	return score
 end
 
