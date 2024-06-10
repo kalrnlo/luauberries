@@ -6,11 +6,11 @@
 -- @kalrnlo
 -- 23/05/2024
 
-local metaize = require(script.Parent.metaize)
+local pack = table.pack
 
 local function WAIT(seconds: number?): number
 	local start_time = os.clock()
-	local end_time = start_time + (seconds or 1)
+	local end_time = start_time + (seconds or .5)
 	local clock_time: number
 
 	repeat
@@ -25,14 +25,14 @@ end
 local WAIT_FN: (number?) -> number = if task then task.wait else WAIT
 
 local function retry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = table.pack(pcall(callback, ...))
+	local results = pack(pcall(callback, ...))
 
 	if not results[1] then
 		WAIT_FN(delay)
 		local attempts = 1
 
 		repeat
-			results = table.pack(pcall(callback, ...))
+			results = pack(pcall(callback, ...))
 			attempts += 1
 			WAIT_FN(delay)
 		until results[1] or attempts == max_attempts
@@ -42,13 +42,13 @@ end
 
 -- if self isnt defined as a generic the other generics dont get infered correctly
 local function retry<S, T..., A...>(self: S, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = table.pack(pcall(callback, ...))
+	local results = pack(pcall(callback, ...))
 
 	if not results[1] then
 		local attempts = 1
 
 		repeat
-			results = table.pack(pcall(callback, ...))
+			results = pack(pcall(callback, ...))
 			attempts += 1
 		until results[1] or attempts == max_attempts
 	end
@@ -56,13 +56,13 @@ local function retry<S, T..., A...>(self: S, max_attempts: number, callback: (T.
 end
 
 local function infretry_with_delay<T..., A...>(delay: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = table.pack(pcall(callback, ...))
+	local results = pack(pcall(callback, ...))
 
 	if not results[1] then
 		WAIT_FN(delay)
 
 		repeat
-			results = table.pack(pcall(callback, ...))
+			results = pack(pcall(callback, ...))
 			WAIT_FN(delay)
 		until results[1]
 	end
@@ -70,11 +70,14 @@ local function infretry_with_delay<T..., A...>(delay: number, callback: (T...) -
 end
 
 local function infretry<S, T..., A...>(self: S, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = table.pack(pcall(callback, ...))
+	local results = pack(pcall(callback, ...))
 
 	if not results[1] then
+                WAIT_FN()
+
 		repeat
-			results = table.pack(pcall(callback, ...))
+			results = pack(pcall(callback, ...))
+                        WAIT_FN()
 		until results[1]
 	end
 	return table.unpack(results) :: any
@@ -83,18 +86,20 @@ end
 local inf_tbl = {
 	delay = infretry_with_delay,
 }
-local inf_mt = metaize {
+local inf_mt = {
 	__call = infretry
 }
+inf_mt.__index = inf_mt
 
-local mt = metaize {
+local mt = {
 	__call = retry,
 }
+mt.__index = mt
 local tbl = {
 	inf = table.freeze(setmetatable(inf_tbl, inf_mt)) :: typeof(setmetatable({} :: typeof(inf_tbl), {} :: typeof(inf_mt))),
 	delay = retry_with_delay,
 }
 
-local exports = table.freeze(setmetatable(tbl, mt)) :: typeof(setmetatable({} :: typeof(tbl), {} :: typeof(mt)))
+local exports = table.freeze(setmetatable(tbl, mt)) :: typeof(setmetatable(tbl, mt))
 
 return exports
