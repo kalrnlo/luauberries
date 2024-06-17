@@ -77,20 +77,20 @@ local unkeyed_ratelimit_mt = {
 unkeyed_ratelimit_mt.__index = unkeyed_ratelimit_mt
 table.freeze(unkeyed_ratelimit_mt)
 
+local function create_keyed<T>(self: unknown, limit: number, interval: number): Ratelimit<T>
+	return table.freeze(setmetatable({
+		interval = interval,
+		count_map = {},
+		limit = limit,
+	}, keyed_ratelimit_mt))
+end
+
 local function create_keyless(limit: number, interval: number): KeylessRatelimit
 	return setmetatable({
 		interval = interval,
 		limit = limit,
 		count = 0,
 	}, unkeyed_ratelimit_mt)
-end
-
-local function create_keyed<T>(self: unknown, limit: number, interval: number): Ratelimit<T>
-	return setmetatable(table.freeze({
-		interval = interval,
-		count_map = {},
-		limit = limit,
-	}), keyed_ratelimit_mt)
 end
 
 local tbl = {
