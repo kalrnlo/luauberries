@@ -7,9 +7,7 @@
 -- infact this signal is so anti-ordering that it uses swap removal
 -- based on roblox's signal-lua and LemonSignal.
 -- @Kalrnlo
--- 23/04/2024
-
-local Metaize = require(script.Parent.metaize)
+-- 17/06/2024
 
 type Sender<values...> = typeof(setmetatable({} :: {Signal<values...>}, {} :: SenderPrototype<values...>))
 
@@ -90,9 +88,11 @@ local function Connection_Call<T...>(self: Connection<T...>)
 	end
 end
 
-local ConnectionPrototype = Metaize {
+local ConnectionPrototype = {
 	__call = Connection_Call,
 }
+ConnectionPrototype.__index = ConnectionPrototype
+table.freeze(ConnectionPrototype)
 
 --------------------------------------------------------------------------------
 -- Sender
@@ -191,21 +191,29 @@ local function Sender_Call<T...>(self: Sender<T...>, ...: T)
 	RunConnections(self[1].connections, ...)
 end
 
-local ReuseValueSenderPrototype = Metaize {
+local ReuseValueSenderPrototype = {
 	__call = ReuseValueSender_Call,
 }
+ReuseValueSenderPrototype.__index = ReuseValueSenderPrototype
+table.freeze(ReuseValueSenderPrototype)
 
-local ReuseSenderPrototype = Metaize {
+local ReuseSenderPrototype = {
 	__call = ReuseSender_Call,
 }
+ReuseSenderPrototype.__index = ReuseSenderPrototype
+table.freeze(ReuseSenderPrototype)
 
-local ValueSenderPrototype = Metaize {
+local ValueSenderPrototype = {
 	__call = ValueSender_Call,
 }
+ValueSenderPrototype.__index = ValueSenderPrototype
+table.freeze(ValueSenderPrototype)
 
-local SenderPrototype = Metaize {
+local SenderPrototype = {
 	__call = Sender_Call,
 }
+SenderPrototype.__index = SenderPrototype
+table.freeze(SenderPrototype)
 
 --------------------------------------------------------------------------------
 -- Signal
@@ -237,11 +245,13 @@ local function Signal_Wait<T...>(self: Signal<T...>): (T...)
 	return coroutine.yield()
 end
 
-local SignalPrototype = Metaize {
+local SignalPrototype = {
 	subscribe = Signal_Subscribe,
 	once = Signal_Once,
 	wait = Signal_Wait,
 }
+SignalPrototype.__index = SignalPrototype
+table.freeze(SignalPrototype)
 
 local function CreateValueSignal<Value>(Value: Value?, ReuseThreads: boolean?, PreAllocateThreads: number?): (ValueSignal<Value>, (NewValue: Value) -> ())
 	if ReuseThreads then

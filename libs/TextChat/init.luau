@@ -116,17 +116,18 @@ local function remove_player_from_channel(player: Player, channel: TextChannel)
 end
 
 local function get_color_for_name(name: string): Color3
-	local sub_number = if #name % 2 == 1 then -1 else 0
+	local name_len = #name
+	local sub_number = if name_len % 2 == 1 then -1 else 0
 	local name_value = 0
 	
-	for index, codepoint in { string.byte(name, 1, #name) } do
-		name_value += if (((#name - index) + 1) - sub_number) % 4 >= 2 then
+	for index, codepoint in { string.byte(name, 1, name_len) } do
+		name_value += if (((name_len - index) + 1) - sub_number) % 4 >= 2 then
 				-codepoint
 			else
 				codepoint
 	end
 	
-	return CHAT_COLORS[(name_value % color_amount) + 1]
+	return CHAT_COLORS[(name_value % COLOR_COUNT) + 1]
 end
 
 local function set_player_mute(player: Player, ismuted: boolean, channel: TextChannel?)
@@ -135,7 +136,7 @@ local function set_player_mute(player: Player, ismuted: boolean, channel: TextCh
 			local source = channel:FindFirstChild(player.Name)
 
 			if source then
-				source.IsMuted = ismuted
+				(source :: any).IsMuted = ismuted
 			end
 		else
 			for _, source: any in PLAYER_SOURCES[player.UserId] do
@@ -150,7 +151,7 @@ local function is_player_muted(player: Player, channel: TextChannel?): boolean
 		if channel then
 			local source = channel:FindFirstChild(player.Name)
 
-			return if source then source.IsMuted else false
+			return if source then (source :: any).IsMuted else false
 		else
 			local sources = PLAYER_SOURCES[player.UserId]
 			local muted_count = 0
@@ -163,6 +164,8 @@ local function is_player_muted(player: Player, channel: TextChannel?): boolean
 
 			return #sources == muted_count
 		end
+	else
+		return false
 	end
 end
 
@@ -177,7 +180,7 @@ local function get_chat_prefix(
 		if is_verified then VERIFIED_CHAT_PREFIX_FORMAT else CHAT_PREFIX_FORMAT, 
 		get_color_for_name(name):ToHex(),
 		if include_name then `{display}(@{name})` else display,
-		prefix or defualt_message_prefix
+		prefix or DEFUALT_CHAT_PREFIX
 	)
 end
 
