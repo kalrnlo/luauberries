@@ -38,7 +38,7 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 			page_info.item_index = 0
 			page_info.page += 1
 
-			for item_index, item in pages:GetCurrentPage() do
+			for item_index, item in page do
 				page_info.item_index += 1
 				local result = f(page_info, item)
 	
