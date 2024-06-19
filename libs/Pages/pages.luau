@@ -12,7 +12,7 @@ export type PageInfo = {
 	page: number,
 }
 
-local function iter(pages: Pages, f: (info: PageInfo, item: any) -> ("continue" | "break")?)
+local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?)
 	local page = pages:GetCurrentPage()
 	local page_info = {
 		page_len = #page,
@@ -50,7 +50,7 @@ local function iter(pages: Pages, f: (info: PageInfo, item: any) -> ("continue" 
 	end
 end
 
-local function toarray(pages: Pages): { { any } }
+local function toarray(pages: Pages): { { { [any]: any } } }
 	local contents = { pages:GetCurrentPage() }
 
 	if not pages.IsFinished then
