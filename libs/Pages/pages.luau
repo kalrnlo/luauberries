@@ -15,6 +15,7 @@ export type PageInfo = {
 local function iter(pages: Pages): () -> (PageInfo, any)
 	local page = pages:GetCurrentPage()
 	local page_len = #page
+	local one_page_over = page_len + 1
 	local item_index = 0
 	local page_num = 1
 	local page_info = {
@@ -35,13 +36,15 @@ local function iter(pages: Pages): () -> (PageInfo, any)
         -- as thats good because then the loop wont run again when were done iterating
 		return function()
             item_index += 1
-            local is_at_end_of_page = page_len == item_index
+			-- detecting if its one over, so we dont skip the last item
+            local is_at_end_of_page = one_page_over == item_index
 
             if not (pages.IsFinished and is_at_end_of_page) then
 			    if is_at_end_of_page then
 				    pages:AdvanceToNextPageAsync()
 				    page = pages:GetCurrentPage()
 				    page_len = #page
+					one_page_over = page_len + 1
 				    item_index = 1
 				    page_num += 1
 
