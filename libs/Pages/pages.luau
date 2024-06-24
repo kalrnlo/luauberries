@@ -79,6 +79,7 @@ local to_array_mt = {
 	__call = toarray
 }
 to_array_mt.__index = to_array_mt
+table.freeze(to_array_mt)
 
 local exports = table.freeze {
 	toarray = table.freeze(setmetatable({ flat = to_flat_array }, to_array_mt)),
