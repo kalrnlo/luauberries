@@ -3,7 +3,7 @@
 Module for easily retrying functions
 
 #### example
-```lua
+```luau
 local retryer = require("@kalrnlo/retryer")
 
 local function foo(n: number)

@@ -3,7 +3,7 @@
 A pure Luau signal implementation, based on LemonSignal & robloxs signal-lua. With thread reuse as an option that can be used with the constructors.
 
 #### example
-```lua
+```luau
 local signal = require("@kalrnlo/Signal")
 
 local regular_signal, fire = signal.create()

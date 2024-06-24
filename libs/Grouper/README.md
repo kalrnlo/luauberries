@@ -3,7 +3,7 @@
 A module for getting accurate group ranks for players on the server, and detecting rank changes
 
 #### example
-```lua
+```luau
 local text_chat_service = game:GetService("TextChatService")
 local players = game:GetService("Players")
 local grouper = require("@kalrnlo/grouper")
