@@ -4,7 +4,7 @@
 -- retryer
 -- utility module for retrying functions easily
 -- @kalrnlo
--- 23/05/2024
+-- 24/06/2024
 
 local function WAIT(seconds: number?): number
 	local start_time = os.clock()
@@ -97,10 +97,11 @@ local mt = {
 mt.__index = mt
 
 local tbl = {
-	inf = table.freeze(setmetatable(inf_tbl :: any, table.freeze(inf_mt))) :: typeof(setmetatable(inf_tbl, inf_mt)),
+	inf = table.freeze(setmetatable(inf_tbl :: any, table.freeze(inf_mt))),
 	delay = retry_with_delay,
 }
 
-local exports = table.freeze(setmetatable(tbl, table.freeze(mt)))
-
-return exports 
+return table.freeze(setmetatable(tbl :: any, table.freeze(mt))) :: typeof(setmetatable({
+	inf = setmetatable({ delay = infretry_with_delay }, { __call = infretry }),
+	delay = retry_with_delay,
+}, { __call = retry }))
