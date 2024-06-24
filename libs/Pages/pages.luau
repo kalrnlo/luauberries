@@ -12,7 +12,12 @@ export type PageInfo = {
 	page: number,
 }
 
+local function advance_to_next_page_err(err: string)
+	warn(`[PAGES] an error occured while trying to advance to the next page\n\tadvance-next-page-err: {err}`)
+end
+
 local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?)
+	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local page = pages:GetCurrentPage()
 	local page_info = {
 		page_len = #page,
@@ -31,45 +36,67 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 
 	if not pages.IsFinished then
 		repeat
-			pages:AdvanceToNextPageAsync()
-
-			local page = pages:GetCurrentPage()
-			page_info.page_len = #page
-			page_info.item_index = 0
-			page_info.page += 1
-
-			for item_index, item in page do
-				page_info.item_index += 1
-				local result = f(page_info, item)
+			-- ive had issues with MemoryStoreHashMapPages erroring occasionally with this,
+			-- because it didnt correctly set IsFinished to true when the hashmap had litterally 0 entries in it
+			-- so its like litterally impossible for there to be another page
+			local success, err = pcall(advance_to_next_page, pages)
+			
+			if success then
+				local page = pages:GetCurrentPage()
+				page_info.page_len = #page
+				page_info.item_index = 0
+				page_info.page += 1
 	
-				if result == "break" then
-					return
+				for item_index, item in page do
+					page_info.item_index += 1
+					local result = f(page_info, item)
+		
+					if result == "break" then
+						return
+					end
 				end
+			else
+				advance_to_next_page_err(err :: any)
+				return
 			end
 		until pages.IsFinished
 	end
 end
 
-local function toarray(self: unknown, pages: Pages): { { [any]: any } }
+local function toarray(self: unknown, pages: Pages): { { { [any]: any } } }
+	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local contents = { pages:GetCurrentPage() }
 
 	if not pages.IsFinished then
 		repeat
-			pages:AdvanceToNextPageAsync()
-			table.insert(contents, pages:GetCurrentPage())
+			local success, err = pcall(advance_to_next_page, pages)
+
+			if success then
+				table.insert(contents, pages:GetCurrentPage())
+			else
+				advance_to_next_page_err(err :: any)
+				break
+			end
 		until pages.IsFinished
 	end
 	return contents
 end
 
-local function to_flat_array(pages: Pages): { [any]: any }
+local function to_flat_array(pages: Pages): { { [any]: any } }
+	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local contents = pages:GetCurrentPage()
 
 	if not pages.IsFinished then
 		repeat
-			pages:AdvanceToNextPageAsync()
-			local current_page = pages:GetCurrentPage()
-			table.move(current_page, 1, #current_page, #contents + 1, contents)
+			local success, err = pcall(advance_to_next_page, pages)
+
+			if success then
+				local current_page = pages:GetCurrentPage()
+				table.move(current_page, 1, #current_page, #contents + 1, contents)
+			else
+				advance_to_next_page_err(err :: any)
+				break
+			end
 		until pages.IsFinished
 	end
 	return contents
@@ -81,12 +108,10 @@ local to_array_mt = {
 to_array_mt.__index = to_array_mt
 table.freeze(to_array_mt)
 
-local exports = table.freeze {
+return table.freeze {
 	toarray = table.freeze(setmetatable({ flat = to_flat_array }, to_array_mt)),
 	iter = iter,
 } :: {
 	toarray: typeof(setmetatable({ flat = to_flat_array }, { __call = toarray })),
 	iter: typeof(iter)
 }
-
-return exports
