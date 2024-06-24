@@ -50,7 +50,7 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 	end
 end
 
-local function toarray(self: unknown, pages: Pages): { { { [any]: any } } }
+local function toarray(self: unknown, pages: Pages): { { [any]: any } }
 	local contents = { pages:GetCurrentPage() }
 
 	if not pages.IsFinished then
@@ -62,7 +62,7 @@ local function toarray(self: unknown, pages: Pages): { { { [any]: any } } }
 	return contents
 end
 
-local function to_flat_array(pages: Pages): { { [any]: any } }
+local function to_flat_array(pages: Pages): { [any]: any }
 	local contents = pages:GetCurrentPage()
 
 	if not pages.IsFinished then
