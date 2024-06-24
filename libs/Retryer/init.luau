@@ -22,15 +22,15 @@ end
 -- if the local itself isnt annotated
 local WAIT_FN: (number?) -> number = if task then task.wait else WAIT
 
-local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, callback: (A...) -> (R...), ...: A...): (boolean, R...)
-	local results = { pcall(callback, ...) } :: any
+local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
+	local results = { pcall(f, ...) } :: any
 
 	if not results[1] then
 		WAIT_FN(delay)
 		local attempts = 1
 
 		repeat
-			results = { pcall(callback, ...) } :: any
+			results = { pcall(f, ...) } :: any
 			attempts += 1
 			WAIT_FN(delay)
 		until results[1] or attempts == max_attempts
