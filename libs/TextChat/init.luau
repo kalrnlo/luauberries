@@ -5,6 +5,7 @@
 -- @Kalrnlo
 -- 10/05/2024
 
+local RunService = game:GetService("RunService")
 local text_chat_service = game:GetService("TextChatService")
 local players = game:GetService("Players")
 
@@ -30,15 +31,7 @@ local COLOR_COUNT = #CHAT_COLORS
 
 local function on_descendant_added(descendant: Instance)
 	if descendant:IsA("TextSource") then
-		local threads_waiting = PLAYERS_CHAT_LOADED[descendant.UserId]
 		local sources = PLAYER_SOURCES[descendant.UserId]
-
-		if type(threads_waiting) == "table" then
-			PLAYERS_CHAT_LOADED[descendant.UserId] = true
-			for _, thread in threads_waiting do
-				task.spawn(thread, true)
-			end
-		end
 
 		if sources then
 			table.insert(sources, descendant)
@@ -61,21 +54,6 @@ local function on_descendant_removed(descendant: Instance)
 		end
 	end
 end
-
-task.spawn(function()
-	text_chat_service.DescendantRemoving:Connect(on_descendant_removed)
-	players.PlayerRemoving:Connect(function(player)
-		PLAYERS_CHAT_LOADED[player.UserId] = nil
-		PLAYER_SOURCES[player.UserId] = nil
-	end)
-	task.spawn(function()
-		for _, descendant in text_chat_service:GetDescendants() do
-			on_descendant_added(descendant)
-		end
-	end)
-
-	text_chat_service.DescendantAdded:Connect(on_descendant_added)
-end)
 
 local function wait_for_player_chat_loaded(player: Player): boolean
 	if text_chat_service:CanUserChatAsync(player.UserId) then
@@ -196,6 +174,36 @@ end
 
 local function get_color_for_player(player: Player): Color3
 	return get_color_for_name(player.Name)
+end
+
+if RunService:IsServer() then
+
+	text_chat_service.DescendantRemoving:Connect(on_descendant_removed)
+	text_chat_service.DescendantAdded:Connect(on_descendant_added)
+	players.PlayerRemoving:Connect(function(player)
+		PLAYERS_CHAT_LOADED[player.UserId] = nil
+		PLAYER_SOURCES[player.UserId] = nil
+	end)
+	task.spawn(function()
+		for _, descendant in text_chat_service:GetDescendants() do
+			on_descendant_added(descendant)
+		end
+	end)
+
+	RunService.PostSimulation:Connect(function()
+		for userid in PLAYER_SOURCES do
+			local waiting_threads = PLAYERS_CHAT_LOADED[userid]
+
+			if type(waiting_threads) == "table" then
+				PLAYERS_CHAT_LOADED[userid] = true
+
+				for _, thread in waiting_threads do
+					task.spawn(thread, true)
+				end
+			end
+		end
+	end)
+	
 end
 
 local exports = table.freeze {
