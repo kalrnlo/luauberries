@@ -84,10 +84,11 @@ local mt = {
 }
 mt.__index = mt
 
-local export: typeof(setmetatable(tbl, mt)) = table.freeze(setmetatable(tbl :: any, table.freeze(mt)))
 -- calling this here so that if somebody calls seed() before the variable is set it doesnt come up nil
 SET_SEED()
 
-return export
+return table.freeze(setmetatable(tbl :: any, table.freeze(mt))) :: typeof(setmetatable(tbl, {} :: {
+	__call: (self: unknown, min: number?, max: number?, seed: number?) -> number
+}))
 
 

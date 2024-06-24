@@ -4,7 +4,7 @@
 -- retryer
 -- utility module for retrying functions easily
 -- @kalrnlo
--- 24/06/2024
+-- 23/05/2024
 
 local function WAIT(seconds: number?): number
 	local start_time = os.clock()
@@ -22,7 +22,7 @@ end
 -- if the local itself isnt annotated
 local WAIT_FN: (number?) -> number = if task then task.wait else WAIT
 
-local function retry_with_delay<T..., A...>(delay: number, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
+local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, callback: (A...) -> (R...), ...: A...): (boolean, R...)
 	local results = { pcall(callback, ...) } :: any
 
 	if not results[1] then
@@ -39,14 +39,14 @@ local function retry_with_delay<T..., A...>(delay: number, max_attempts: number,
 end
 
 -- if self isnt defined as a generic the other generics dont get infered correctly
-local function retry<S, T..., A...>(self: S, max_attempts: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) } :: any
+local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
+	local results = { pcall(f, ...) } :: any
 
 	if not results[1] then
 		local attempts = 1
 
 		repeat
-			results = { pcall(callback, ...) } :: any
+			results = { pcall(f, ...) } :: any
 			attempts += 1
 		until results[1] or attempts == max_attempts
 	end
@@ -54,28 +54,28 @@ local function retry<S, T..., A...>(self: S, max_attempts: number, callback: (T.
 	return table.unpack(results) :: any
 end
 
-local function infretry_with_delay<T..., A...>(delay: number, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) } :: any
+local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
+	local results = { pcall(f, ...) } :: any
 
 	if not results[1] then
 		WAIT_FN(delay)
 
 		repeat
-			results = { pcall(callback, ...) } :: any
+			results = { pcall(f, ...) } :: any
 			WAIT_FN(delay)
 		until results[1]
 	end
 	return table.unpack(results) :: any
 end
 
-local function infretry<S, T..., A...>(self: S, callback: (T...) -> (A...), ...: T...): (boolean, A...)
-	local results = { pcall(callback, ...) } :: any
+local function infretry<S, A..., R...>(self: S, f: (A...) -> (R...), ...: A...): (boolean, R...)
+	local results = { pcall(f, ...) } :: any
 
 	if not results[1] then
 		WAIT_FN()
 
 		repeat
-			results = { pcall(callback, ...) } :: any
+			results = { pcall(f, ...) } :: any
 			WAIT_FN()
 		until results[1]
 	end

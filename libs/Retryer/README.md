@@ -17,5 +17,4 @@ local added = retryer.delay(10, 20, foo, 1)
 local other_added = retryer(20, foo, 1)
 other_added -= 3
 
-
 ```
