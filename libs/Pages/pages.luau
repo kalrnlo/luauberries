@@ -3,7 +3,7 @@
 -- pagesutil
 -- utility for dealing with roblox page instancs easily
 -- @kalrnlo
--- 19/06/2024
+-- 23/06/2024
 
 export type PagesArray<T> = { { T } }
 export type PageInfo = {
@@ -50,7 +50,7 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 	end
 end
 
-local function toarray(pages: Pages): { { { [any]: any } } }
+local function toarray(self: unknown, pages: Pages): { { { [any]: any } } }
 	local contents = { pages:GetCurrentPage() }
 
 	if not pages.IsFinished then
@@ -62,9 +62,30 @@ local function toarray(pages: Pages): { { { [any]: any } } }
 	return contents
 end
 
+local function to_flat_array(pages: Pages): { { [any]: any } }
+	local contents = pages:GetCurrentPage()
+
+	if not pages.IsFinished then
+		repeat
+			pages:AdvanceToNextPageAsync()
+			local current_page = pages:GetCurrentPage()
+			table.move(current_page, 1, #current_page, #contents + 1, contents)
+		until pages.IsFinished
+	end
+	return contents
+end
+
+local to_array_mt = {
+	__call = toarray
+}
+to_array_mt.__index = to_array_mt
+
 local exports = table.freeze {
-	toarray = toarray,
+	toarray = table.freeze(setmetatable({ flat = to_flat_array }, to_array_mt)),
 	iter = iter,
+} :: {
+	toarray: typeof(setmetatable({ flat = to_flat_array }, { __call = toarray })),
+	iter: typeof(iter)
 }
 
 return exports
