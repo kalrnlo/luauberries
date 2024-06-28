@@ -35,7 +35,7 @@ local function retry_with_delay<A..., R...>(delay: number, max_attempts: number,
 			WAIT_FN(delay)
 		until results[1] or attempts == max_attempts
 	end
-	return table.unpack(results) :: any
+	return table.unpack(results)
 end
 
 -- if self isnt defined as a generic the other generics dont get infered correctly
@@ -51,7 +51,7 @@ local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> 
 		until results[1] or attempts == max_attempts
 	end
 
-	return table.unpack(results) :: any
+	return table.unpack(results)
 end
 
 local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
@@ -65,7 +65,7 @@ local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...
 			WAIT_FN(delay)
 		until results[1]
 	end
-	return table.unpack(results) :: any
+	return table.unpack(results)
 end
 
 local function infretry<S, A..., R...>(self: S, f: (A...) -> (R...), ...: A...): (boolean, R...)
@@ -79,7 +79,7 @@ local function infretry<S, A..., R...>(self: S, f: (A...) -> (R...), ...: A...):
 			WAIT_FN()
 		until results[1]
 	end
-	return table.unpack(results) :: any
+	return table.unpack(results)
 end
 
 local inf_tbl = {
