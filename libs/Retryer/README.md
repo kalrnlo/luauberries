@@ -11,10 +11,10 @@ local function foo(n: number)
 end
 
 -- delay between retrys, max retrys, function to retry, function args
-local added = retryer.delay(10, 20, foo, 1)
+local success, added = retryer.delay(10, 20, foo, 1)
 
 -- max retrys, function to retry, function args
-local other_added = retryer(20, foo, 1)
+local success, other_added = retryer(20, foo, 1)
 other_added -= 3
 
 ```
