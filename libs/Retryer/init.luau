@@ -21,6 +21,7 @@ end
 -- they both have the same type but luau infers it as (number?) -> number | (number?) -> number
 -- if the local itself isnt annotated
 local WAIT_FN: (number?) -> number = if task then task.wait elseif wait then wait else WAIT
+local pcall = pcall
 
 local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
 	local results: any = { pcall(f, ...) }
@@ -57,7 +58,7 @@ local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> 
 	return success, unpack(results, 2)
 end
 
-local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
+local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...), ...: A...): (R...)
 	local results: any = { pcall(f, ...) }
 	local success = results[1]
 
@@ -70,10 +71,10 @@ local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...
 			WAIT_FN(delay)
 		until success
 	end
-	return success, unpack(results, 2)
+	return unpack(results, 2)
 end
 
-local function infretry<S, A..., R...>(self: S, f: (A...) -> (R...), ...: A...): (boolean, R...)
+local function infretry<A..., R...>(f: (A...) -> (R...), ...: A...): (R...)
 	local results: any = { pcall(f, ...) }
 	local success = results[1]
 
@@ -86,17 +87,8 @@ local function infretry<S, A..., R...>(self: S, f: (A...) -> (R...), ...: A...):
 			WAIT_FN()
 		until success
 	end
-	return success, unpack(results, 2)
+	return unpack(results, 2)
 end
-
-local inf_tbl = {
-	delay = infretry_with_delay,
-}
-
-local inf_mt = {
-	__call = infretry
-}
-inf_mt.__index = inf_mt
 
 local mt = {
 	__call = retry,
@@ -104,11 +96,13 @@ local mt = {
 mt.__index = mt
 
 local tbl = {
-	inf = table.freeze(setmetatable(inf_tbl :: any, table.freeze(inf_mt))),
+	infdelay = infretry_with_delay,
 	delay = retry_with_delay,
+	inf = infretry,
 }
 
 return table.freeze(setmetatable(tbl :: any, table.freeze(mt))) :: typeof(setmetatable({
-	inf = setmetatable({ delay = infretry_with_delay }, { __call = infretry }),
+	infdelay = infretry_with_delay,
 	delay = retry_with_delay,
+	inf = infretry,
 }, { __call = retry }))
