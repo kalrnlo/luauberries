@@ -8,12 +8,12 @@ type BaseAnalyticsInfo = {
 	custom_fields: { [string]: string }?
 }
 
-type AnalyticsOnboardingFunnelStepInfo = BaseAnalyticsInfo & {
+export type AnalyticsOnboardingFunnelStepInfo = BaseAnalyticsInfo & {
 	step_name: string?,
 	step: number,
 }
 
-type AnalyticsProgressionInfo = BaseAnalyticsInfo & {
+export type AnalyticsProgressionInfo = BaseAnalyticsInfo & {
 	status: Enum.AnalyticsProgressionType,
 	level_name: string,
 	path_name: string,
@@ -21,7 +21,7 @@ type AnalyticsProgressionInfo = BaseAnalyticsInfo & {
 	step: number?,
 }
 
-type AnalyticsEconomyInfo = BaseAnalyticsInfo & {
+export type AnalyticsEconomyInfo = BaseAnalyticsInfo & {
 	transaction_type: Enum.AnalyticsEconomyTransactionType,
 	flow_type: Enum.AnalyticsEconomyFlowType,
 	ending_balance: number,
@@ -30,8 +30,7 @@ type AnalyticsEconomyInfo = BaseAnalyticsInfo & {
 	item_sku: string?,
 }
 
-
-type AnalyticsFunnelStepInfo = BaseAnalyticsInfo & {
+export type AnalyticsFunnelStepInfo = BaseAnalyticsInfo & {
 	funnel_name: string,
 	sessionid: string?,
 	step_name: string?,
@@ -39,10 +38,12 @@ type AnalyticsFunnelStepInfo = BaseAnalyticsInfo & {
 }
 
 local CUSTOM_FIELDS = {
-	[1] = Enum.AnalyticsCustomFieldKeys.CustomField01,
-	[2] = Enum.AnalyticsCustomFieldKeys.CustomField02,
-	[3] = Enum.AnalyticsCustomFieldKeys.CustomField03,
+	Enum.AnalyticsCustomFieldKeys.CustomField01,
+	Enum.AnalyticsCustomFieldKeys.CustomField02,
+	Enum.AnalyticsCustomFieldKeys.CustomField03,
 }
+local MAX_CUSTOM_FIELDS = #CUSTOM_FIELDS
+local TOO_MANY_ENTRIES_ERR = `[LOG_ANALYTICS] custom field dictionary cannot have more than {MAX_CUSTOM_FIELDS} entries`
 
 @native
 local function DICT_TO_CUSTOM_FIELDS(info: BaseAnalyticsInfo): { [Enum.AnalyticsCustomFieldKeys]: string }?
@@ -53,8 +54,8 @@ local function DICT_TO_CUSTOM_FIELDS(info: BaseAnalyticsInfo): { [Enum.Analytics
 		local index = 1
 
 		for key, value in custom_fields do
-			if index == 3 then
-				error("[ANALYTICS] custom field dictionary cannot have more than 3 entries")
+			if index == MAX_CUSTOM_FIELDS then
+				error(TOO_MANY_ENTRIES_ERR)
 			else
 				return_tbl[CUSTOM_FIELDS[index]] = `{key} - {value}`
 				index += 1
