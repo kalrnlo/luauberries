@@ -69,7 +69,7 @@ end
 
 local function log_economy(player: Player, info: AnalyticsEconomyInfo)
 	AnalyticsService:LogEconomyEvent(
-		player, info.flow_type, info.currency_type, info.ending_balance, 
+		player, info.flow_type, info.currency_type, info.amount, info.ending_balance, 
 		info.transaction_type :: any, info.item_sku, DICT_TO_CUSTOM_FIELDS(info)
 	)
 end
