@@ -3,8 +3,7 @@
 -- simple utility function for running a function on character added for a player
 -- and also if the player already has a character
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
+@checked
 local function safe_character_added(
     player: Player,
     f: (character: Model & { Humanoid: Humanoid? }) -> ()

@@ -21,8 +21,8 @@ end
 -- they both have the same type but luau infers it as (number?) -> number | (number?) -> number
 -- if the local itself isnt annotated
 local WAIT_FN: (number?) -> number = if task then task.wait elseif wait then wait else WAIT
-local pcall = pcall
 
+@checked
 local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
 	local results: any = { pcall(f, ...) }
 	local success = results[1]
@@ -42,6 +42,7 @@ local function retry_with_delay<A..., R...>(delay: number, max_attempts: number,
 end
 
 -- if self isnt defined as a generic the other generics dont get infered correctly
+@checked
 local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
 	local results: any = { pcall(f, ...) }
 	local success = results[1]
@@ -58,6 +59,7 @@ local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> 
 	return success, unpack(results, 2)
 end
 
+@checked
 local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...), ...: A...): (R...)
 	local results: any = { pcall(f, ...) }
 	local success = results[1]
@@ -74,6 +76,7 @@ local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...
 	return unpack(results, 2)
 end
 
+@checked
 local function infretry<A..., R...>(f: (A...) -> (R...), ...: A...): (R...)
 	local results: any = { pcall(f, ...) }
 	local success = results[1]

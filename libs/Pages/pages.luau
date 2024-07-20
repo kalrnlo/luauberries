@@ -16,6 +16,7 @@ local function advance_to_next_page_err(err: string)
 	warn(`[PAGES] an error occured while trying to advance to the next page\n\tadvance-next-page-err: {err}`)
 end
 
+@checked
 local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?)
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local page = pages:GetCurrentPage()
@@ -63,6 +64,7 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 	end
 end
 
+@checked
 local function toarray(pages: Pages): { { [any]: any } }
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local contents = pages:GetCurrentPage()

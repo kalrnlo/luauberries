@@ -52,6 +52,7 @@ local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_h
 	end
 end
 
+@checked
 local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize?, circular: boolean?): string
 	local width, height = SPLIT_SIZE(size, DEFUALT_SIZE_NUM, DEFUALT_SIZE_NUM)
 	return RAW_FORMAT(id, type, width, height, circular)
@@ -77,10 +78,12 @@ local function CREATE_FORMATTER<sizes>(type: ThumbnailType, defualt_width: numbe
 	end
 end
 
+@checked
 local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
 	return if avatar_item_type == ASSET_ENUM then ASSET_STR :: any else BUNDLE_STR :: any
 end
 
+@checked
 local function avatar_item_to_thumbnail(
 	avatar_item_type: Enum.AvatarItemType,
 	id: number, 

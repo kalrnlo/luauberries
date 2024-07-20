@@ -138,6 +138,7 @@ local function on_player_added(player: Player)
 	end
 end
 
+@checked
 local function client_init(config: ClientConfig)
 	if IS_SERVER then
 		error("[GROUPER] Can only call ClientInit on the client")
@@ -170,6 +171,7 @@ local function client_init(config: ClientConfig)
 	PLAYERS.PlayerRemoving:Connect(on_player_removing)
 end
 
+@checked
 local function server_init(config: ServerConfig)
 	if not IS_SERVER then
 		error("[GROUPER] Can only call ServerInit on the server")
@@ -195,6 +197,7 @@ local function server_init(config: ServerConfig)
 	PLAYERS.PlayerAdded:Connect(on_player_added)
 end
 
+@checked
 local function on_rank_changed(callback: RankChangedCallback): () -> ()
 	local data = { callback }
 	table.insert(RANK_CHANGED_CALLBACKS, data)
@@ -214,6 +217,7 @@ end
 
 -- having this yield, as in studio the rank isnt gotten immediatly like in-game
 -- so this ends up returning 0
+@checked
 local function get_rank(player: Player): number
 	local rank = PLAYER_RANKS[player]
 
@@ -233,15 +237,18 @@ local function get_rank(player: Player): number
 	end
 end
 
+@checked
 local function get_rank_and_role(player: Player): (number, string)
 	local rank = get_rank(player)
 	return rank, ROLE_CACHE[rank + 1]
 end
 
+@checked
 local function is_in_group(player: Player): boolean
 	return get_rank(player) ~= 0
 end
 
+@checked
 local function get_role(player: Player): string
 	return ROLE_CACHE[get_rank(player) + 1]
 end
