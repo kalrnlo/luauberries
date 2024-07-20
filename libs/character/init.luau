@@ -37,4 +37,11 @@ function character.added(player: Player, f: (Character: Character) -> ()): RBXSc
 	return player.CharacterAdded:Connect(f :: any)
 end
 
+-- this function exists so u dont have to do
+-- local character = (player.Character :: any) :: character.Character?
+@checked
+function character.get(player: Player): Character?
+	return player.Character :: any
+end
+
 return table.freeze(character)
