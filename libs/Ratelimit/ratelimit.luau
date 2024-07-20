@@ -19,14 +19,14 @@ export type Ratelimit<K> = typeof(setmetatable({} :: {
 local ratelimit_mt = ({} :: any) :: RatelimitPrototype<any>
 local delay = task.delay
 
-function ratelimit_mt.__call<K>(ratelimit: Ratelimit<K>, key)
+function ratelimit_mt.__call(ratelimit, key)
 	if key then
 		local count_map = ratelimit.count_map
 		local count = count_map[key]
 
 		if not count then
 			count = 0
-			delay(ratelimit.interval, function(count_map: { [K]: number }, key: K)
+			delay(ratelimit.interval, function(count_map: { [any]: number }, key: any)
 				count_map[key] = nil
 			end, count_map, key)
 		end
@@ -41,7 +41,7 @@ function ratelimit_mt.__call<K>(ratelimit: Ratelimit<K>, key)
 		local count = ratelimit.count
 
 		if count == 0 then
-			delay(ratelimit.interval, function(ratelimit: Ratelimit<K>)
+			delay(ratelimit.interval, function(ratelimit: Ratelimit<any>)
 				ratelimit.count = 0
 			end, ratelimit)
 		end
