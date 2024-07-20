@@ -19,7 +19,7 @@ type SafeTeleport = typeof(setmetatable({} :: {
 
 export type SafeTeleportResult = {
     reserved_server_access_code: string,
-    private_server_id: number,
+    private_server_id: string,
 }
 
 export type SafeTeleportInfo = {
@@ -31,7 +31,7 @@ export type SafeTeleportInfo = {
 
 local failed_teleport_result: SafeTeleportResult = table.freeze {
     reserved_server_access_code = "",
-    private_server_id = 0,
+    private_server_id = "0",
 }
 local self = {
     ATTEMPT_LIMIT = 5,
@@ -55,7 +55,7 @@ local function safe_teleport(place_id: number, players_or_player: {Player} | Pla
 	if success then
         return success, table.freeze {
             reserved_server_access_code = result.ReservedServerAccessCode,
-            private_server_id = tonumber(result.PrivateServerId) :: number,
+            private_server_id = result.PrivateServerId,
         }
     else
 		warn(`[SAFE_TELEPORT]: unsucessful teleport\n\tteleport_async_err: {result}`)
