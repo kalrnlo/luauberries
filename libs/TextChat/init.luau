@@ -109,7 +109,7 @@ local function get_color_for_name(name: string): Color3
 	return CHAT_COLORS[(name_value % COLOR_COUNT) + 1]
 end
 
-@checked
+@checked 
 local function set_player_mute(player: Player, ismuted: boolean, channel: TextChannel?)
 	if wait_for_player_chat_loaded(player) then
 		if channel then
