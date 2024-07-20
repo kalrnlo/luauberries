@@ -3,8 +3,6 @@
 
 -- url
 -- utility functions for encoding and decoding urls
--- @kalrnlo
--- 06/06/2024
 
 -- these dont have fast calls
 local string_format = string.format
@@ -21,6 +19,7 @@ end
 
 -- i just wanted to do this because i find it funny,
 -- sure its a bit less readable but its not thaaaat bad
+@checked
 local function encode_url(url: string): string
 	return (
 		string_gsub(
@@ -33,6 +32,7 @@ local function encode_url(url: string): string
 	)
 end
 
+@checked
 local function queryify(tbl: { [string]: string }): string
 	local query_strings = {} :: { string }
 
@@ -44,11 +44,13 @@ end
 
 -- modified from:
 -- https://devforum.roblox.com/t/233570/2
+@checked
 local function decode_url(url: string): string
 	return (string_gsub(url, "%%(%x%x)", code_to_char))
 end
 
 -- modified from: https://stackoverflow.com/questions/28916182/parse-parameters-out-of-url-in-lua
+@checked
 local function read_query(url: string): { [string]: string }
 	local query_tbl = {} :: { [string]: string }
 
@@ -58,11 +60,9 @@ local function read_query(url: string): { [string]: string }
 	return query_tbl
 end
 
-local exports = table.freeze {
+return table.freeze {
 	read_query = read_query,
 	queryify = queryify,
     decode = decode_url,
     encode = encode_url,
 }
-
-return exports
