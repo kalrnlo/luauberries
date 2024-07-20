@@ -6,12 +6,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
-local safe_character_added = require(ReplicatedStorage.packages.safe_character_added)
+local character = require("libs/character")
 
 export type ZoneType = "WHITELIST" | "BLACKLIST"
 
 type BaseZone = {
-	callback: (character: Model, player: Player) -> (),
+	callback: (character: character.Character, player: Player) -> (),
 	blacklist: { PlayerZoneInfo },
 	size_halved_x: number,
 	size_halved_y: number,
@@ -22,9 +22,9 @@ type BaseZone = {
 }
 
 type PlayerZoneInfo = {
+	character: character.Character,
 	rootpart: BasePart,
 	position: Vector3,
-	character: Model,
 	player: Player,
 }
 
@@ -43,13 +43,9 @@ export type BlacklistZone = BaseZone & {
 export type Zone = WhitelistZone | BlacklistZone
 
 type BaseZoneInfo = {
-	callback: (character: Model, player: Player) -> (),
+	callback: (character: character.Character, player: Player) -> (),
 	cframe: CFrame,
 	size: Vector3,
-}
-
-export type ZoneInfo<Type = ZoneType> = BaseZoneInfo & {
-	type: Type?,
 }
 
 local POINT_TO_OBJECT_SPACE = CFrame.identity.PointToObjectSpace
@@ -115,7 +111,7 @@ local function insert(zone: Zone, player: Player)
 	end
 end
 
-local function create(info: ZoneInfo): Zone
+local function create(info: BaseZoneInfo & { type: ZoneType? }): Zone
 	local size = info.size - Vector3.one
 	local size_halved = size / 2
 	local zone = {
@@ -172,10 +168,10 @@ do
 	end)
 
 	Players.PlayerAdded:Connect(function(player)
-		player.CharacterRemoving:Connect(function(character)
+		character.removing(player, function(character)
 			FIND_AND_REMOVE_ZONE_INFO(PLAYER_ZONE_INFO, player)
 		end)
-		safe_character_added(player, function(character)
+		character.added(player, function(character)
 			local rootpart: BasePart = character.PrimaryPart :: any
 			local player_zone_info = {
 				position = rootpart.CFrame.Position,
@@ -198,16 +194,16 @@ do
 				end
 			end
 		end)
+	end)
 
-		Players.PlayerRemoving:Connect(function(player)
-			for _, zone in WHITELIST_ZONES do
-				FIND_AND_REMOVE(zone.whitelisted, player)
-			end
+	Players.PlayerRemoving:Connect(function(player)
+		for _, zone in WHITELIST_ZONES do
+			FIND_AND_REMOVE(zone.whitelisted, player)
+		end
 
-			for _, zone in BLACKLIST_ZONES do
-				FIND_AND_REMOVE(zone.blacklisted, player)
-			end
-		end)
+		for _, zone in BLACKLIST_ZONES do
+			FIND_AND_REMOVE(zone.blacklisted, player)
+		end
 	end)
 end
 
