@@ -1,13 +1,10 @@
---!strict
 
--- TextChatUtil
+-- textchat
 -- simple utility module for TextChatService
--- @Kalrnlo
--- 10/05/2024
 
+local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
-local text_chat_service = game:GetService("TextChatService")
-local players = game:GetService("Players")
+local Players = game:GetService("Players")
 
 local VERIFIED_CHAT_PREFIX_FORMAT = "<font color=\"#%*\">\u{E000}%*</font>%*`"
 local CHAT_PREFIX_FORMAT = "<font color=\"#%*\">%*</font>%*`"
@@ -56,7 +53,7 @@ local function on_descendant_removed(descendant: Instance)
 end
 
 local function wait_for_player_chat_loaded(player: Player): boolean
-	if text_chat_service:CanUserChatAsync(player.UserId) then
+	if TextChatService:CanUserChatAsync(player.UserId) then
 		local has_player_loaded: true | {thread} = PLAYERS_CHAT_LOADED[player.UserId]
 	
 		if has_player_loaded == true then
@@ -64,7 +61,7 @@ local function wait_for_player_chat_loaded(player: Player): boolean
 		elseif has_player_loaded then
 			table.insert(has_player_loaded, coroutine.running())
 			return coroutine.yield()
-		elseif player and player:IsDescendantOf(players) then
+		elseif player and player:IsDescendantOf(Players) then
 			PLAYERS_CHAT_LOADED[player.UserId] = { coroutine.running() }
 			return coroutine.yield()
 		end
@@ -73,16 +70,19 @@ local function wait_for_player_chat_loaded(player: Player): boolean
 	return false
 end
 
+@checked
 local function add_player_to_channel(player: Player, channel: TextChannel): (boolean, TextSource)
 	if wait_for_player_chat_loaded(player) then
-		-- ignore type error in luau lsp, its wrong
-		local source, success = channel:AddUserAsync(player.UserId)
+		-- doing this because otherwise i get a type error, even tho this is like the actual type for it according to docs
+		local add_user_async = channel.AddUserAsync :: (self: TextChannel, user: number) -> (TextSource, boolean)
+		local source, success = add_user_async(channel, player.UserId)
 		return success, source
 	else
 		return false, nil :: any
 	end
 end
 
+@checked
 local function remove_player_from_channel(player: Player, channel: TextChannel)
 	if wait_for_player_chat_loaded(player) then
 		local source = channel:FindFirstChild(player.Name)
@@ -93,6 +93,7 @@ local function remove_player_from_channel(player: Player, channel: TextChannel)
 	end
 end
 
+@checked
 local function get_color_for_name(name: string): Color3
 	local name_len = #name
 	local sub_number = if name_len % 2 == 1 then -1 else 0
@@ -108,6 +109,7 @@ local function get_color_for_name(name: string): Color3
 	return CHAT_COLORS[(name_value % COLOR_COUNT) + 1]
 end
 
+@checked
 local function set_player_mute(player: Player, ismuted: boolean, channel: TextChannel?)
 	if wait_for_player_chat_loaded(player) then
 		if channel then
@@ -124,6 +126,7 @@ local function set_player_mute(player: Player, ismuted: boolean, channel: TextCh
 	end
 end
 
+@checked
 local function is_player_muted(player: Player, channel: TextChannel?): boolean
 	if wait_for_player_chat_loaded(player) then
 		if channel then
@@ -147,6 +150,7 @@ local function is_player_muted(player: Player, channel: TextChannel?): boolean
 	end
 end
 
+@checked
 local function get_chat_prefix(
 	display: string,
 	name: string,
@@ -162,6 +166,7 @@ local function get_chat_prefix(
 	)
 end
 
+@checked
 local function get_chat_prefix_for_player(player: Player, include_name: boolean?, prefix: string?): string
 	return get_chat_prefix(
 		player.DisplayName,
@@ -172,20 +177,21 @@ local function get_chat_prefix_for_player(player: Player, include_name: boolean?
 	)
 end
 
+@checked
 local function get_color_for_player(player: Player): Color3
 	return get_color_for_name(player.Name)
 end
 
 if RunService:IsServer() then
 
-	text_chat_service.DescendantRemoving:Connect(on_descendant_removed)
-	text_chat_service.DescendantAdded:Connect(on_descendant_added)
-	players.PlayerRemoving:Connect(function(player)
+	TextChatService.DescendantRemoving:Connect(on_descendant_removed)
+	TextChatService.DescendantAdded:Connect(on_descendant_added)
+	Players.PlayerRemoving:Connect(function(player)
 		PLAYERS_CHAT_LOADED[player.UserId] = nil
 		PLAYER_SOURCES[player.UserId] = nil
 	end)
 	task.spawn(function()
-		for _, descendant in text_chat_service:GetDescendants() do
+		for _, descendant in TextChatService:GetDescendants() do
 			on_descendant_added(descendant)
 		end
 	end)
@@ -206,23 +212,13 @@ if RunService:IsServer() then
 	
 end
 
-local exports = table.freeze {
-	channel = table.freeze {
-		remove = remove_player_from_channel,
-		add = add_player_to_channel,
-	},
-	prefix = table.freeze {
-		player = get_chat_prefix_for_player,
-		create = get_chat_prefix,
-	},
-	color = table.freeze {
-		player = get_color_for_player,
-		name = get_color_for_name,
-	},
-	mute = table.freeze {
-		set = set_player_mute,
-		is = is_player_muted,
-	},
-}
-
-return exports
+return table.freeze({
+	get_prefix_for_player = get_chat_prefix_for_player,
+	remove_from_channel = remove_player_from_channel,
+	get_color_for_player = get_color_for_player,
+	add_to_channel = add_player_to_channel,
+	get_color = get_color_for_name,
+	get_prefix = get_chat_prefix,
+	set_mute = set_player_mute,
+	is_muted = is_player_muted,
+})
