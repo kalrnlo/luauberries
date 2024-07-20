@@ -1,6 +1,6 @@
 
 local task = require("@lune/task")
-local race = require("race")
+local race = (require)("race")
 
 local result = race({
 	function() 
