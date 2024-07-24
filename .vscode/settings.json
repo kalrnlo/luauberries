@@ -1,7 +1,12 @@
 {
   "luau-lsp.completion.autocompleteEnd": true,
-  "luau-lsp.require.mode": "relativeToWorkspaceRoot",
+  "luau-lsp.require.mode": "relativeToFile",
   "luau-lsp.require.directoryAliases": {
     "@lune/": "~/.lune/.typedefs/0.8.3/"
+  },
+  "luau-lsp.completion.imports.requireStyle": "alwaysAbsolute",
+  "luau-lsp.completion.imports.separateGroupsWithLine": false,
+  "luau-lsp.fflags.override": {
+    "DebugLuauDeferredConstraintResolution": "true"
   }
 }
