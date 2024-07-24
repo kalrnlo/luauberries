@@ -1,0 +1,1 @@
+import{_ as e,c as r,o as t}from"./chunks/framework.BCsSUL46.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/observer.md","filePath":"docs/observer.md"}'),o={name:"docs/observer.md"};function s(a,c,n,d,p,_){return t(),r("div")}const f=e(o,[["render",s]]);export{m as __pageData,f as default};

@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as n}from"./chunks/framework.BCsSUL46.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/leventine.md","filePath":"docs/leventine.md"}'),a={name:"docs/leventine.md"};function o(s,c,r,i,d,l){return n(),t("div")}const m=e(a,[["render",o]]);export{_ as __pageData,m as default};

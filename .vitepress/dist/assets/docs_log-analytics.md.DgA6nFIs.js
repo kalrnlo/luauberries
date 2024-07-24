@@ -1,0 +1,1 @@
+import{_ as t,c as a,o as e}from"./chunks/framework.BCsSUL46.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/log-analytics.md","filePath":"docs/log-analytics.md"}'),o={name:"docs/log-analytics.md"};function s(c,n,r,l,i,d){return e(),a("div")}const m=t(o,[["render",s]]);export{_ as __pageData,m as default};

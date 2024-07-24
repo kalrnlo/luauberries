@@ -1,0 +1,1 @@
+import{_ as e,c as r,o as t}from"./chunks/framework.BCsSUL46.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/grouper.md","filePath":"docs/grouper.md"}'),o={name:"docs/grouper.md"};function a(s,c,n,p,d,_){return t(),r("div")}const f=e(o,[["render",a]]);export{m as __pageData,f as default};
