@@ -11,6 +11,7 @@ export type Character = Model & {
     },
     HumanoidRootPart: BasePart,
     BodyColors: BodyColors,
+	PrimaryPart: BasePart,
     Animate: LocalScript,
     Head: BasePart,
 }
