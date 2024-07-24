@@ -1,1 +1,0 @@
-import{_ as e,c as t,o as a}from"./chunks/framework.BCsSUL46.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/safe-teleport.md","filePath":"docs/safe-teleport.md"}'),o={name:"docs/safe-teleport.md"};function s(r,c,n,p,d,f){return a(),t("div")}const i=e(o,[["render",s]]);export{_ as __pageData,i as default};

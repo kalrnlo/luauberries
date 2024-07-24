@@ -1,1 +1,0 @@
-import{_ as e,c as t,o as s}from"./chunks/framework.BCsSUL46.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/is-empty.md","filePath":"docs/is-empty.md"}'),a={name:"docs/is-empty.md"};function o(c,r,n,p,i,d){return s(),t("div")}const f=e(a,[["render",o]]);export{_ as __pageData,f as default};
