@@ -5,7 +5,9 @@ export default defineConfig({
 	title: "rbxlibs",
 	description: "A collection of libraries & utilitys for luau and roblox",
 	appearance: "force-auto",
+	lastUpdated: true,
 	cleanUrls: true,
+	lang: 'en-US',
 
 	markdown: {
 	theme: {
@@ -26,25 +28,24 @@ export default defineConfig({
 	sidebar: [
 		{
 			text: 'Libraries',
-				items: [
-					{ text: 'Character', link: '/character' },
-					{ text: 'Grouper', link: '/grouper' },
-					{ text: 'IsEmpty', link: '/is-empty' },
-					{ text: 'Leventine', link: '/leventine' },
-					{ text: 'Linked List', link: '/linked-list' },
-					{ text: 'Log Analytics', link: '/log-analytics' },
-					{ text: 'Observer', link: '/observer' },
-					{ text: 'Player Zone', link: '/player-zone' },
-					{ text: 'Race', link: '/race' },
-					{ text: 'Random', link: '/Random' },
-					{ text: 'Ratelimit', link: '/Ratelimit' },
-					{ text: 'RbxThumb', link: '/rbx-thumb' },
-					{ text: 'Retryer', link: '/retryer' },
-					{ text: 'Safe Teleport', link: '/safe-teleport' },
-					{ text: 'Signal', link: '/signal' },
-					{ text: 'Text Chat', link: '/text-chat' },
-					{ text: 'Url', link: '/url' },
-		 			]
+			items: [
+				{ text: 'Character', link: '/character' },
+				{ text: 'Grouper', link: '/grouper' },
+				{ text: 'IsEmpty', link: '/is-empty' },
+				{ text: 'Leventine', link: '/leventine' },
+				{ text: 'Linked List', link: '/linked-list' },
+				{ text: 'Log Analytics', link: '/log-analytics' },
+				{ text: 'Observer', link: '/observer' },
+				{ text: 'Player Zone', link: '/player-zone' },
+				{ text: 'Race', link: '/race' },
+				{ text: 'Random', link: '/Random' },
+				{ text: 'Ratelimit', link: '/Ratelimit' },
+				{ text: 'RbxThumb', link: '/rbx-thumb' },
+				{ text: 'Retryer', link: '/retryer' },
+				{ text: 'Safe Teleport', link: '/safe-teleport' },
+				{ text: 'Text Chat', link: '/text-chat' },
+				{ text: 'Url', link: '/url' },
+		 	]
 		}
 	],
 	}
