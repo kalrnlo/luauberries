@@ -2,18 +2,18 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "rbxlibs",
-  description: "A collection of libraries & utilitys for luau and roblox",
-  appearance: "force-auto",
-  //cleanUrls: true,
+	title: "rbxlibs",
+	description: "A collection of libraries & utilitys for luau and roblox",
+	appearance: "force-auto",
+	cleanUrls: true,
 
-  markdown: {
+	markdown: {
 	theme: {
 		light: "catppuccin-latte",
 		dark: "catppuccin-frappe"
 	}
-  },
-  themeConfig: {
+	},
+	themeConfig: {
 	// https://vitepress.dev/reference/default-theme-config
 	socialLinks: [
 		{ icon: 'github', link: 'https://github.com/kalrnlo/rbxtheme' },
@@ -45,8 +45,8 @@ export default defineConfig({
 					{ text: 'Signal', link: '/signal' },
 					{ text: 'Text Chat', link: '/text-chat' },
 					{ text: 'Url', link: '/url' },
-	   			]
+		 			]
 		}
 	],
-  }
+	}
 })
