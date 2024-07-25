@@ -6,10 +6,6 @@ hero:
 	name: rbxlibs
 	text: A collection of libraries for luau and roblox
 	tagline: Select a library below to get started.
-	actions:
-		- theme: alt
-			text: View on GitHub
-			link: https://github.com/kalrnlo/rbxlibs
 
 features:
 	- icon: 🧑‍🦲
