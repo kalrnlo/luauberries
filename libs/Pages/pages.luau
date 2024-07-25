@@ -2,8 +2,6 @@
 
 -- pagesutil
 -- utility for dealing with roblox page instancs easily
--- @kalrnlo
--- 23/06/2024
 
 export type PagesArray<T> = { { T } }
 export type PageInfo = {
