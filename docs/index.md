@@ -40,10 +40,6 @@ features:
     title: Race
     details: n/a
     link: /race
-  - icon: 📡
-    title: Signal
-    details: A signal implementation without connection objects.
-    link: /signal
   - icon: 🎲
     title: Random
     details: A pure luau version of roblox's Random object
