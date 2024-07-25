@@ -19,26 +19,12 @@ export type Node<V> = typeof(setmetatable({} :: {
 	value: V,
 }, {} :: NodePrototype<V>))
 
-type LinkedListPrototype<V> = {
-	reverse_iter: (self: LinkedList<V>) -> () -> (number, Node<V>),
-	iter: (self: LinkedList<V>) -> () -> (number, Node<V>),
-	unshift: (self: LinkedList<V>, value: V) -> Node<V>,
-	remove: (self: LinkedList<V>, node: Node<V>) -> V,
-	push: (self: LinkedList<V>, value: V) -> Node<V>,
-	shift: (self: LinkedList<V>) -> Node<V>?,
-	pop: (self: LinkedList<V>) -> Node<V>?,
-	clear: (self: LinkedList<V>) -> (),
 
-	__iter: (self: LinkedList<V>) -> () -> (number, Node<V>),
-	__len: (self: LinkedList<V>) -> number,
-	__index: LinkedListPrototype<V>
-}
-
-export type LinkedList<V> = typeof(setmetatable({} :: {
+export type LinkedList<V> = {
 	front: Node<V>?,
 	back: Node<V>?,
 	len: number,
-}, {} :: LinkedListPrototype<V>))
+}
 
 local function remove_node<V>(list: LinkedList<V>, node: Node<V>): V
 	local prev_node = node.prev
@@ -59,26 +45,25 @@ local function remove_node<V>(list: LinkedList<V>, node: Node<V>): V
 	return node.value
 end
 
-local node_mt = {
+local node_mt = table.freeze({
 	__call = function<V>(node: Node<V>): V
 		return node.value
 	end,
-}
-node_mt.__index = node_mt
-table.freeze(node_mt)
+})
 
 local function create_node<V>(value: V): Node<V>
 	return setmetatable({
 		value = value,
 		next = nil,
 		prev = nil
-	}, node_mt)
+	}, node_mt) :: any
 end
 
-local linkedlist = {} :: LinkedListPrototype<any>
-(linkedlist :: any).__index = linkedlist
+local linkedlist = {
+	remove = remove_node
+}
 
-function linkedlist.push(list, value)
+function linkedlist.push<V>(list: LinkedList<V>, value)
 	local node = create_node(value)
 	local back = list.back
 
@@ -95,7 +80,7 @@ function linkedlist.push(list, value)
 	return node
 end
 
-function linkedlist.unshift(list, value)
+function linkedlist.unshift<V>(list: LinkedList<V>, value: V): Node<V>
 	local node = create_node(value)
 	local front = list.front
 
@@ -111,7 +96,7 @@ function linkedlist.unshift(list, value)
 	return node
 end
 
-function linkedlist.shift(list)
+function linkedlist.shift<V>(list: LinkedList<V>): Node<V>?
 	local node = list.front
 
 	if node then
@@ -122,7 +107,7 @@ function linkedlist.shift(list)
 	end
 end
 
-function linkedlist.pop(list)
+function linkedlist.pop<V>(list: LinkedList<V>): Node<V>?
 	local node = list.back
 
 	if node then
@@ -133,7 +118,7 @@ function linkedlist.pop(list)
 	end
 end
 
-function linkedlist.iter(list)
+function linkedlist.iter<V>(list: LinkedList<V>): () -> (number, Node<V>)
 	local node = list.front
 	local index = 0
 
@@ -149,7 +134,7 @@ function linkedlist.iter(list)
 	end
 end
 
-function linkedlist.reverse_iter(list)
+function linkedlist.reverse_iter<V>(list: LinkedList<V>): () -> (number, Node<V>)
 	local node = list.back
 	local index = list.len + 1
 
@@ -165,26 +150,20 @@ function linkedlist.reverse_iter(list)
 	end
 end
 
-function linkedlist.clear(list)
+function linkedlist.clear<V>(list: LinkedList<V>)
 	list.front = nil
 	list.back = nil
 	list.len = 0
 end
 
-function linkedlist.__len(list)
-	return list.len
-end
+local list_mt = {
+	__call = function<S, V>(self: S): LinkedList<V>
+		return {
+			front = nil,
+			back = nil,
+			len = 0,
+		}
+	end
+}
 
-linkedlist.__iter = linkedlist.iter
-table.freeze(linkedlist)
-
-@checked
-local function create<V>(): LinkedList<V>
-	return setmetatable({
-		front = nil,
-		back = nil,
-		len = 0,
-	}, linkedlist)
-end
-
-return create
+return table.freeze(setmetatable(linkedlist, table.freeze(list_mt)))
