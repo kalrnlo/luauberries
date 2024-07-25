@@ -5,7 +5,7 @@ export default defineConfig({
   title: "rbxlibs",
   description: "A collection of libraries & utilitys for luau and roblox",
   appearance: "force-auto",
-  cleanUrls: true,
+  //cleanUrls: true,
 
   markdown: {
 	theme: {
@@ -20,8 +20,7 @@ export default defineConfig({
 		{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 	],
 	nav: [
-		{ text: 'Home', link: 'kalrnlo.github.io/rbxlibs' },
-		{ text: 'API', link: '/markdown-examples' },
+		{ text: 'Home', link: 'https://kalrnlo.github.io/rbxlibs' },
 		{ text: 'Donate', link: 'https://buymeacoffee.com/kalrnlo' },
 	],
 
@@ -29,7 +28,7 @@ export default defineConfig({
 		{
 			text: 'Libraries',
 				items: [
-					{ text: 'Character', link: '/character' },
+					{ text: 'Character', link: './character' },
 					{ text: 'Grouper', link: '/grouper' },
 					{ text: 'IsEmpty', link: '/is-empty' },
 					{ text: 'Leventine', link: '/leventine' },
