@@ -5,6 +5,7 @@ export default defineConfig({
 	title: "rbxlibs",
 	description: "A collection of libraries & utilitys for luau and roblox",
 	appearance: "force-auto",
+	base: "/rbxlibs/",
 	cleanUrls: true,
 
 	markdown: {
