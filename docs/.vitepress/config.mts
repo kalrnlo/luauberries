@@ -20,7 +20,7 @@ export default defineConfig({
 		{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 	],
 	nav: [
-		{ text: 'Home', link: '/' },
+		{ text: 'Home', link: 'kalrnlo.github.io/rbxlibs' },
 		{ text: 'API', link: '/markdown-examples' },
 		{ text: 'Donate', link: 'https://buymeacoffee.com/kalrnlo' },
 	],

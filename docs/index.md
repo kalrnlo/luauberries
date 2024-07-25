@@ -7,9 +7,6 @@ hero:
 	text: A collection of libraries for luau and roblox
 	tagline: Select a library below to get started.
 	actions:
-		- theme: brand
-			text: Install
-			link: /installing
 		- theme: alt
 			text: View on GitHub
 			link: https://github.com/kalrnlo/rbxlibs
