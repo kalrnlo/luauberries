@@ -17,11 +17,10 @@ export default defineConfig({
 	themeConfig: {
 	// https://vitepress.dev/reference/default-theme-config
 	socialLinks: [
-		{ icon: 'github', link: 'https://github.com/kalrnlo/rbxtheme' },
+		{ icon: 'github', link: 'https://github.com/kalrnlo/rbxlibs' },
 		{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 	],
 	nav: [
-		{ text: 'Home', link: '/' },
 		{ text: 'Donate', link: 'https://buymeacoffee.com/kalrnlo' },
 	],
 
@@ -29,7 +28,7 @@ export default defineConfig({
 		{
 			text: 'Libraries',
 				items: [
-					{ text: 'Character', link: './character' },
+					{ text: 'Character', link: '/character' },
 					{ text: 'Grouper', link: '/grouper' },
 					{ text: 'IsEmpty', link: '/is-empty' },
 					{ text: 'Leventine', link: '/leventine' },
