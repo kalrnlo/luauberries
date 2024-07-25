@@ -46,7 +46,7 @@ features:
     link: /signal
   - icon: 🎲
     title: Random
-    details: A pure luau version of roblox's ``Random`` object
+    details: A pure luau version of roblox's Random object
     link: /random
   - icon: 🚦
     title: Ratelimit
@@ -62,11 +62,11 @@ features:
     link: /retryer
   - icon: 🛸
     title: Safe Teleport
-    details: A typed version of roblox's safe teleport function on the ``TeleportAsync`` docs
+    details: A typed version of roblox's safe teleport function on the TeleportAsync docs
     link: /safe-teleport
   - icon: 💬
     title: Text Chat
-    details: A utility that makes it easier to work with ``TextChatService``
+    details: A utility that makes it easier to work with TextChatService
     link: /text-chat
   - icon: 🔗
     title: Url
