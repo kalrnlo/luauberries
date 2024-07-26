@@ -9,7 +9,7 @@ local race = require("race")
 local result = race({
 	function(str: string) 
 		task.wait(5)
-		return `{str}! i never return 🥲`
+		return `{str}! i never return ;c`
 	end,
 	function(str: string)
 		task.wait(3)
