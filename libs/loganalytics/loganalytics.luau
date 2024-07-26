@@ -67,7 +67,6 @@ local function DICT_TO_CUSTOM_FIELDS(info: BaseAnalyticsInfo): { [Enum.Analytics
 	end
 end
 
-@checked
 local function log_economy(player: Player, info: AnalyticsEconomyInfo)
 	AnalyticsService:LogEconomyEvent(
 		player, info.flow_type, info.currency_type, info.amount, info.ending_balance, 
@@ -75,7 +74,6 @@ local function log_economy(player: Player, info: AnalyticsEconomyInfo)
 	)
 end
 
-@checked
 local function log_funnel_step(player: Player, info: AnalyticsFunnelStepInfo)
 	AnalyticsService:LogFunnelStepEvent(
 		player, info.funnel_name, info.sessionid, info.step, 
@@ -83,14 +81,12 @@ local function log_funnel_step(player: Player, info: AnalyticsFunnelStepInfo)
 	)
 end
 
-@checked
 local function log_onboarding_funnel_step(player: Player, info: AnalyticsOnboardingFunnelStepInfo)
 	AnalyticsService:LogOnboardingFunnelStepEvent(
 		player, info.step, info.step_name, DICT_TO_CUSTOM_FIELDS(info)
 	)
 end
 
-@checked
 local function log_progression(player: Player, info: AnalyticsProgressionInfo)
 	AnalyticsService:LogProgressionEvent(
 		player, info.path_name, info.status, info.level,

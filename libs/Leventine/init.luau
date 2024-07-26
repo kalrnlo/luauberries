@@ -181,7 +181,6 @@ local function myers_x(b: string, a: string, a_len: number, b_len: number): numb
 	return score
 end
 
-@checked
 local function score(a: string, b: string, case_sensitive: boolean?): number
 	local a, b = APPLY_CASE_SENSITIVITY(case_sensitive, a, b)
 	local a_len = #a
@@ -205,7 +204,6 @@ local function map_sort(a: { string | number }, b: { string | number }): boolean
 	return (a[1] :: number) < (b[1] :: number)
 end
 
-@checked
 local function map(str: string, arr: { string }, info: MapInfo?): { string }
 	local min_score = info and info.min_score or DEFAULT_MIN_SCORE
 	local case_sensitive = info and info.case_sensitive or false
@@ -228,7 +226,6 @@ local function map(str: string, arr: { string }, info: MapInfo?): { string }
 end
 
 -- equilvelent to fzy.hasMatch
-@checked
 local function has_match(match_aginst: string, str: string, case_sensitive: boolean?): boolean
 	local match_aginst, str = APPLY_CASE_SENSITIVITY(case_sensitive, match_aginst, str)
 	local char_index: number? = 1
@@ -246,7 +243,6 @@ local function has_match(match_aginst: string, str: string, case_sensitive: bool
 end
 
 -- gets the closest string to the provided string in an array
-@checked
 local function closest(str: string, arr: { string }, case_sensitive: boolean?): (string, number)
 	local closest_score = math.huge
 	local closest_string: string
@@ -262,11 +258,9 @@ local function closest(str: string, arr: { string }, case_sensitive: boolean?): 
 	return closest_string, closest_score
 end
 
-local exports = table.freeze {
+return table.freeze {
 	has_match = has_match,
 	closest = closest,
 	score = score,
 	map = map,
 }
-
-return exports

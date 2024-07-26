@@ -1,10 +1,7 @@
---!strict
 
--- Safe Teleport
+-- safe teleport
 -- modified version of robloxs safe teleport function on the docs for TeleportAsync with types
 -- and api improvements
--- @kalrnlo
--- 07/05/2024
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")

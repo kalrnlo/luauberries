@@ -73,7 +73,6 @@ local function FIND_AND_REMOVE<V>(tbl: { V }, v: V)
 	end
 end
 
-@checked
 local function remove(zone: Zone, player: Player)
 	FIND_AND_REMOVE_ZONE_INFO(zone.blacklist, player)
 	FIND_AND_REMOVE(
@@ -82,7 +81,6 @@ local function remove(zone: Zone, player: Player)
 	)
 end
 
-@checked
 local function insert(zone: Zone, player: Player)
 	local whitelisted = zone.whitelisted :: any
 	local blacklisted = zone.blacklisted :: any

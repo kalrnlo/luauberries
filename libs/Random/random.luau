@@ -1,11 +1,8 @@
 --!optimize 2
 --!native
---!strict
 
 -- random
 -- functional version of the roblox random class, thats 80% in luau
--- @kalrnlo
--- 23/05/2024
 
 local math_randomseed = math.randomseed
 local math_random = math.random
@@ -13,19 +10,16 @@ local ZERO_VEC = Vector3.zero
 local NEG_PI = -math.pi
 local SEED: number
 
-@checked
 local function SET_SEED(seed: number?)
 	SEED = seed or os.clock()
 	math_randomseed(SEED)
 end
 
-@checked
 local function int(min: number?, max: number?, seed: number?): number
 	SET_SEED(seed)
 	return math_random(min or NEG_PI, max or math.pi)
 end
 
-@checked
 local function float(min: number?, max: number?, seed: number?): number
 	SET_SEED(seed)
 	local real_min = min or math_random()
@@ -36,7 +30,6 @@ local function float(min: number?, max: number?, seed: number?): number
 	return real_min + (math_random() * (real_max - real_min))
 end
 
-@checked
 local function vector(min: Vector3?, max: Vector3?, seed: number?): Vector3
 	local max = max or Vector3.new(
 		float(0, nil, seed),
@@ -52,7 +45,6 @@ local function vector(min: Vector3?, max: Vector3?, seed: number?): Vector3
 	).Unit
 end
 
-@checked
 local function shuffle<V>(arr: { V }, seed: number?): { V }
 	local new_arr = table.clone(arr)
 	local len = #new_arr
@@ -65,12 +57,10 @@ local function shuffle<V>(arr: { V }, seed: number?): { V }
 	return new_arr
 end
 
-@checked
 local function index<V>(arr: { V }, seed: number?): V
 	return arr[int(1, #arr, seed)]
 end
 
-@checked
 local function get_seed(): number
 	return SEED
 end

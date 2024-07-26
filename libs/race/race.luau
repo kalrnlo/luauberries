@@ -44,7 +44,6 @@ local function callback_handler<A..., R...>(
 	task.spawn(main_thread, unpack(results))
 end
 
-@checked
 local function race<A..., R...>(callbacks: { (A...) -> R... }, ...: A...): R...
 	local threads = table.create(#callbacks) :: { thread }
 	local main_thread = coroutine.running()

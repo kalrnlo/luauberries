@@ -70,7 +70,6 @@ local function wait_for_player_chat_loaded(player: Player): boolean
 	return false
 end
 
-@checked
 local function add_player_to_channel(player: Player, channel: TextChannel): (boolean, TextSource)
 	if wait_for_player_chat_loaded(player) then
 		-- doing this because otherwise i get a type error, even tho this is like the actual type for it according to docs
@@ -82,7 +81,6 @@ local function add_player_to_channel(player: Player, channel: TextChannel): (boo
 	end
 end
 
-@checked
 local function remove_player_from_channel(player: Player, channel: TextChannel)
 	if wait_for_player_chat_loaded(player) then
 		local source = channel:FindFirstChild(player.Name)
@@ -93,7 +91,6 @@ local function remove_player_from_channel(player: Player, channel: TextChannel)
 	end
 end
 
-@checked
 local function get_color_for_name(name: string): Color3
 	local name_len = #name
 	local sub_number = if name_len % 2 == 1 then -1 else 0
@@ -109,7 +106,6 @@ local function get_color_for_name(name: string): Color3
 	return CHAT_COLORS[(name_value % COLOR_COUNT) + 1]
 end
 
-@checked 
 local function set_player_mute(player: Player, ismuted: boolean, channel: TextChannel?)
 	if wait_for_player_chat_loaded(player) then
 		if channel then
@@ -126,7 +122,6 @@ local function set_player_mute(player: Player, ismuted: boolean, channel: TextCh
 	end
 end
 
-@checked
 local function is_player_muted(player: Player, channel: TextChannel?): boolean
 	if wait_for_player_chat_loaded(player) then
 		if channel then
@@ -150,7 +145,6 @@ local function is_player_muted(player: Player, channel: TextChannel?): boolean
 	end
 end
 
-@checked
 local function get_chat_prefix(
 	display: string,
 	name: string,
@@ -166,7 +160,6 @@ local function get_chat_prefix(
 	)
 end
 
-@checked
 local function get_chat_prefix_for_player(player: Player, include_name: boolean?, prefix: string?): string
 	return get_chat_prefix(
 		player.DisplayName,
@@ -177,7 +170,6 @@ local function get_chat_prefix_for_player(player: Player, include_name: boolean?
 	)
 end
 
-@checked
 local function get_color_for_player(player: Player): Color3
 	return get_color_for_name(player.Name)
 end

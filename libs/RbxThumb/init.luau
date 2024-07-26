@@ -1,10 +1,7 @@
---!strict
 
 -- rbxthumb
 -- module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
 -- although with types 
--- @kalrnlo
--- 10/05/2024
 
 type PlayerThumbnailFormatter<sizes> = (player: Player, size: (sizes & string)?, circular: boolean?) -> string
 type ThumbnailFormatter<sizes> = (id: number, size: (sizes & string)?, circular: boolean?) -> string
@@ -78,12 +75,10 @@ local function CREATE_FORMATTER<sizes>(type: ThumbnailType, defualt_width: numbe
 	end
 end
 
-@checked
 local function avatar_item_type_to_thumbnail_type(avatar_item_type: Enum.AvatarItemType): "Asset" | "BundleThumbnail"
 	return if avatar_item_type == ASSET_ENUM then ASSET_STR :: any else BUNDLE_STR :: any
 end
 
-@checked
 local function avatar_item_to_thumbnail(
 	avatar_item_type: Enum.AvatarItemType,
 	id: number, 

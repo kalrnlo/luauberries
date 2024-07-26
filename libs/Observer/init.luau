@@ -83,7 +83,6 @@ local function add_existing_tools<T>(
 	end
 end
 
-@checked
 local function localtool_observer(tag: string, callback: ((tool: Tool) -> ()) & ((tool: Tool) -> () -> ()), dont_add_existing: boolean?): () -> ()
 	if not RunService:IsClient() then
 		error("[Observer] A LocalTool observer is only usable on the client")
@@ -164,7 +163,6 @@ local function observe_tool(
 	end
 end
 
-@checked
 local function tool_observer(
 	tag: string,
 	callback: ToolObserverCallback,
@@ -228,7 +226,6 @@ local function tool_observer(
 	end
 end
 
-@checked
 local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) & ((instance: Instance) -> () -> ()), dont_add_existing: boolean?): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
@@ -262,7 +259,6 @@ local function tag_observer(tag: string, callback: ((instance: Instance) -> ()) 
 	end
 end
 
-@checked
 local function observe_player_for_character(player: Player, callback: CharacterObserverCallback): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
@@ -291,7 +287,6 @@ local function observe_player_for_character(player: Player, callback: CharacterO
 	end
 end
 
-@checked
 local function character_player_observer(callback: CharacterObserverCallback, dont_add_existing: boolean?): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
@@ -336,7 +331,6 @@ local function character_player_observer(callback: CharacterObserverCallback, do
 	end
 end
 
-@checked
 local function player_observer(callback: ((player: Player) -> ()) & ((player: Player) -> () -> ()), dont_add_existing: boolean?): () -> ()
 	local remove_connection: RBXScriptConnection
 	local add_connection: RBXScriptConnection
