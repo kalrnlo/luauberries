@@ -15,7 +15,7 @@ features:
     details: A module for getting accurate group ranks for players on the server, and detecting rank changes
     link: /grouper
   - title: Leventine
-    details: A fast levensteine distance library for luau
+    details: A fast levenstein distance library for luau
     link: /leventine
   - title: Linked list
     details: A doubly-linked list implementation in luau
