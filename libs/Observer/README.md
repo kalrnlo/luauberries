@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/observer)
+# [Documentation](https://libs.luau.lol/observer)
