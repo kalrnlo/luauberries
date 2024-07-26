@@ -1,6 +1,6 @@
 # Pages
 
-Utility for dealing with roblox page instancs easily
+Utility for dealing with roblox [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instances easily
 
 ```luau
 
@@ -10,8 +10,8 @@ Utility for dealing with roblox page instancs easily
 
 ### `iter`
 
-Iterates through the pages instance until complete, or the callback returns "break"
+Iterates through the [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instance until finished, or the callback returns "break"
 
 ### `toarray`
 
-Converts the pages instance into a flat array
+Converts the [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instance into a flat array
