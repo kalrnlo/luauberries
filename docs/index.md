@@ -5,67 +5,54 @@ layout: home
 hero:
   name: rbxlibs
   text: A collection of libraries for luau and roblox
-  tagline: Select a library below to get started.
 
 features:
-  - icon: 🧑‍🦲
-    title: Character
+  - title: Character
     details: A module for having types for characters easily.
     link: /character
-  - icon: 🐟
-    title: Grouper
+  - title: Grouper
     details: A module for getting accurate group ranks for players on the server, and detecting rank changes
     link: /grouper
-  - icon: 🍊
-    title: Leventine
-    details: n/a
+  - title: Leventine
+    details: A fast levensteine distance library for luau
     link: /leventine
-  - icon: 🖇️
-    title: Linked list
-    details: n/a
+  - title: Linked list
+    details: A doubly-linked list implementation in luau
     link: /linked-list
-  - icon: 📊
-    title: Log Analytics
+  - title: Log Analytics
     details: A wrapper around roblox's AnalyticsService with a better api
     link: /log-analytics
-  - icon: 👁️
-    title: Observer
+  - title: Observer
     details: n/a
     link: /observer
-  - icon: 🪐
-    title: Player Zone
+  - title: Player Zone
     details: n/a
     link: /player-zone
-  - icon: 🏁
-    title: Race
-    details: n/a
+  - title: Race
+    details: Runs several functions at once, and returns the result of the function that completes first
     link: /race
-  - icon: 🎲
-    title: Random
+  - title: Random
     details: A pure luau version of roblox's Random object
     link: /random
-  - icon: 🚦
-    title: Ratelimit
+  - title: Ratelimit
     details: n/a
     link: /ratelimit
-  - icon: 🖼️
-    title: RbxThumb
+  - title: RbxThumb
     details: A utility for making roblox thumbnail urls
     link: /rbx-thumb
-  - icon: 🔁
-    title: Retryer
+  - title: Retryer
     details: A simple utility for easily retrying functions
     link: /retryer
-  - icon: 🛸
-    title: Safe Teleport
-    details: A typed version of roblox's safe teleport function on the TeleportAsync docs
+  - title: Safe Teleport
+    details: A teleport async wrapper that makes teleporting simple
     link: /safe-teleport
-  - icon: 💬
-    title: Text Chat
+  - title: Text Chat
     details: A utility that makes it easier to work with TextChatService
     link: /text-chat
-  - icon: 🔗
-    title: Url
+  - title: Url
     details: n/a
     link: /url
+  - title: Is Empty
+    details: Checks if a given table is empty
+    link: /is-empty
 ---
