@@ -8,13 +8,18 @@ export default defineConfig({
 	cleanUrls: true,
 	lang: 'en-US',
 
+	head: [
+		['link', { rel: 'icon', href: './assets/rbxlibs_logo.svg' }]
+	],
+
 	markdown: {
-	theme: {
-		light: "catppuccin-latte",
-		dark: "catppuccin-frappe"
-	}
+		theme: {
+			light: "catppuccin-latte",
+			dark: "catppuccin-frappe"
+		}
 	},
 	themeConfig: {
+		logo: "./assets/rbxlibs_logo_small.svg",
 		editLink: {
 			pattern: 'https://github.com/kalrnlo/rbxlibs/edit/main/docs/:path'
 		},
@@ -22,37 +27,37 @@ export default defineConfig({
 			provider: 'local'
 		},
 
-	// https://vitepress.dev/reference/default-theme-config
-	socialLinks: [
-		{ icon: 'github', link: 'https://github.com/kalrnlo/rbxlibs' },
-		{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
-	],
-	nav: [
-		{ text: 'Donate', link: 'https://buymeacoffee.com/kalrnlo' },
-	],
+		// https://vitepress.dev/reference/default-theme-config
+		socialLinks: [
+			{ icon: 'github', link: 'https://github.com/kalrnlo/rbxlibs' },
+			{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
+		],
+		nav: [
+			{ text: 'Donate', link: 'https://buymeacoffee.com/kalrnlo' },
+		],
 
-	sidebar: [
-		{
-			text: 'Libraries',
-			items: [
-				{ text: 'Character', link: '/character' },
-				{ text: 'Grouper', link: '/grouper' },
-				{ text: 'Is Empty', link: '/is-empty' },
-				{ text: 'Leventine', link: '/leventine' },
-				{ text: 'Linked List', link: '/linked-list' },
-				{ text: 'Log Analytics', link: '/log-analytics' },
-				{ text: 'Observer', link: '/observer' },
-				{ text: 'Player Zone', link: '/player-zone' },
-				{ text: 'Race', link: '/race' },
-				{ text: 'Random', link: '/random' },
-				{ text: 'Ratelimit', link: '/ratelimit' },
-				{ text: 'RbxThumb', link: '/rbx-thumb' },
-				{ text: 'Retryer', link: '/retryer' },
-				{ text: 'Safe Teleport', link: '/safe-teleport' },
-				{ text: 'Text Chat', link: '/text-chat' },
-				{ text: 'Url', link: '/url' },
-		 	]
-		}
-	],
+		sidebar: [
+			{
+				text: 'Libraries',
+				items: [
+					{ text: 'Character', link: '/character' },
+					{ text: 'Grouper', link: '/grouper' },
+					{ text: 'Is Empty', link: '/is-empty' },
+					{ text: 'Leventine', link: '/leventine' },
+					{ text: 'Linked List', link: '/linked-list' },
+					{ text: 'Log Analytics', link: '/log-analytics' },
+					{ text: 'Observer', link: '/observer' },
+					{ text: 'Player Zone', link: '/player-zone' },
+					{ text: 'Race', link: '/race' },
+					{ text: 'Random', link: '/random' },
+					{ text: 'Ratelimit', link: '/ratelimit' },
+					{ text: 'RbxThumb', link: '/rbx-thumb' },
+					{ text: 'Retryer', link: '/retryer' },
+					{ text: 'Safe Teleport', link: '/safe-teleport' },
+					{ text: 'Text Chat', link: '/text-chat' },
+					{ text: 'Url', link: '/url' },
+				]
+			}
+		],
 	}
 })
