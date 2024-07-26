@@ -35,7 +35,7 @@ local function queryify(tbl: { [string]: string }): string
 	local query_strings = {} :: { string }
 
 	for key, value in tbl do
-		table.insert(query_strings, `{key}={value}`)
+		table.insert(query_strings, `{encode(key)}={encode(value)}`)
 	end
 	return `?{table.concat(query_strings, "&")}`
 end
