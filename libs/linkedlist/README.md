@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/linked-list)
+# [Documentation](https://libs.luau.lol/linked-list)
