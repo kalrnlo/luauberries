@@ -27,7 +27,7 @@ features:
     details: n/a
     link: /observer
   - title: Player Zone
-    details: n/a
+    details: A fast module for detecting players in rectangular zones
     link: /player-zone
   - title: Race
     details: Runs several functions at once, and returns the result of the function that completes first
@@ -42,7 +42,7 @@ features:
     details: A utility for making roblox thumbnail urls
     link: /rbx-thumb
   - title: Retryer
-    details: A simple utility for easily retrying functions
+    details: A utility for easily retrying functions
     link: /retryer
   - title: Safe Teleport
     details: A teleport async wrapper that makes teleporting simple
