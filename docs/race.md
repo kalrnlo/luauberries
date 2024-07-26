@@ -1,9 +1,7 @@
-### Race
+# Race
 
-utility function for getting the return from the first function
-in an array to return
+Runs several functions at once, and returns the result of the function that completes first
 
-#### example
 ```luau
 local task = require("@lune/task")
 local race = require("race")
@@ -20,5 +18,4 @@ local result = race({
 })
 
 print(result) -- "i return!"
-
 ```

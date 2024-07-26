@@ -1,8 +1,10 @@
-### Grouper
+# Grouper
 
 A module for getting accurate group ranks for players on the server, and detecting rank changes
 
-#### example
+> [!WARNING]
+> The docs for this library are outdated, but are mostly correct
+
 ```luau
 local text_chat_service = game:GetService("TextChatService")
 local players = game:GetService("Players")
@@ -23,7 +25,7 @@ local group_channels = {
 	[4] = create_text_channel("barista"),
 }
 
-grouper.init({
+grouper.init.server({
 	-- how often in seconds grouper should check to see if a players rank has changed
 	rank_refresh_rate = 60,
 	-- the groupid for the group grouper checks ranks for

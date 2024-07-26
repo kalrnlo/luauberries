@@ -1,1 +1,4 @@
-lol
+# Text Chat
+
+> [!INFO]
+> The docs for this library are incomplete

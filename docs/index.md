@@ -26,7 +26,7 @@ features:
     link: /linked-list
   - icon: 📊
     title: Log Analytics
-    details: a wrapper around roblox's AnalyticsService with a better api
+    details: A wrapper around roblox's AnalyticsService with a better api
     link: /log-analytics
   - icon: 👁️
     title: Observer
@@ -50,11 +50,11 @@ features:
     link: /ratelimit
   - icon: 🖼️
     title: RbxThumb
-    details: a utility for making roblox thumbnail urls
+    details: A utility for making roblox thumbnail urls
     link: /rbx-thumb
   - icon: 🔁
     title: Retryer
-    details: a simple utility for easily retrying functions
+    details: A simple utility for easily retrying functions
     link: /retryer
   - icon: 🛸
     title: Safe Teleport
