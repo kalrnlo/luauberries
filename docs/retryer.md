@@ -17,7 +17,6 @@ retryer.inf(10, StarterGui.SetCore, "ResetButtonCallback", false)
 Retrys a function x times, based on how many retries its allowed to make
 
 ```luau
--- max retrys, function to retry, function args
 local success, added = retryer(20, function(n: number)
     return n + 3
 end, 1)
@@ -35,7 +34,6 @@ Retrys a function x times, based on how many retries its allowed to make.
 With a delay in between thats provided as the first argument
 
 ```luau
--- delay between retrys, max retrys, function to retry, function args
 local success, added = retryer.delay(20, 10, function(n: number)
     return n + 3
 end, 1)
@@ -56,7 +54,6 @@ end
 Works like [`__call`](#call), except that it infinitely retries until it succeeds
 
 ```luau
--- function to retry, function args
 local added = retryer.inf(function(n: number)
     return n + 3
 end, 1)
