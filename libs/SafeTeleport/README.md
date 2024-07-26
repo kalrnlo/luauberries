@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/safe-teleport)
+# [Documentation](https://libs.luau.lol/safe-teleport)
