@@ -5,6 +5,7 @@ layout: home
 hero:
   name: rbxlibs
   text: A collection of libraries for luau and roblox
+  tagline:
 
 features:
   - title: Character
