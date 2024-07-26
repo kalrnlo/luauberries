@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
 	title: "rbxlibs",
-	description: "A collection of libraries & utilitys for luau and roblox",
+	description: "A collection of libraries for luau and roblox",
 	lastUpdated: true,
 	cleanUrls: true,
 	lang: 'en-US',
