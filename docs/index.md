@@ -54,7 +54,7 @@ features:
     details: Utility that makes it easier to work with TextChatService
     link: /text-chat
   - title: Url
-    details: A small utility, with basic functions handling url querys, and encoding/decoding urls
+    details: Small utility with basic functions handling url querys, and encoding/decoding urls
     link: /url
   - title: Is Empty
     details: Checks if a given table is empty
