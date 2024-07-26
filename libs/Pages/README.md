@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/pages)
+# [Documentation](https://libs.luau.lol/pages)
