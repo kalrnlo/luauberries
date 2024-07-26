@@ -18,11 +18,11 @@ export type Character = Model & {
 
 local character = {}
 
-function character.removing(player: Player, f: (Character: Character) -> ()): RBXScriptConnection
+function character.removing(player: Player, f: (character: Character) -> ()): RBXScriptConnection
 	return player.CharacterRemoving:Connect(f :: any)
 end
 
-function character.added(player: Player, f: (Character: Character) -> ()): RBXScriptConnection
+function character.added(player: Player, f: (character: Character) -> ()): RBXScriptConnection
 	local character = player.Character :: any
 
 	if character then
