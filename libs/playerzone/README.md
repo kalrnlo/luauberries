@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/player-zone)
+# [Documentation](https://libs.luau.lol/player-zone)
