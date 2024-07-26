@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/random)
+# [Documentation](https://libs.luau.lol/random)
