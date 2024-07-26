@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/ratelimit)
+# [Documentation](https://libs.luau.lol/ratelimit)
