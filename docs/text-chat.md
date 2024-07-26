@@ -1,4 +1,4 @@
 # Text Chat
 
-> [!INFO]
+> [!NOTE]
 > The docs for this library are incomplete

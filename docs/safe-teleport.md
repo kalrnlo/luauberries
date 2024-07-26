@@ -2,5 +2,5 @@
 
 A teleport async wrapper that makes teleporting simple
 
-> [!INFO]
+> [!NOTE]
 > The docs for this library are incomplete

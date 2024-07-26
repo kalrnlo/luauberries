@@ -1,3 +1,6 @@
-# Linked List
+# Leventine
 
-A doubly-linked list implementation in luau
+A fast levensteine distance library for luau
+
+> [!NOTE]
+> The docs for this library are incomplete
