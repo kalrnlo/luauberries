@@ -9,7 +9,7 @@ export default defineConfig({
 	lang: 'en-US',
 
 	head: [
-		['link', { rel: 'icon', href: './assets/rbxlibs_logo.svg' }]
+		['link', { rel: 'icon', href: '/rbxlibs_logo.svg' }]
 	],
 
 	markdown: {
@@ -19,7 +19,7 @@ export default defineConfig({
 		}
 	},
 	themeConfig: {
-		logo: "./assets/rbxlibs_logo_small.svg",
+		logo: "/rbxlibs_logo_small.svg",
 		editLink: {
 			pattern: 'https://github.com/kalrnlo/rbxlibs/edit/main/docs/:path'
 		},
