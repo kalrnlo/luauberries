@@ -57,7 +57,7 @@ Works like [`__call`](#call), except that it infinitely retries until it succeed
 
 ```luau
 -- function to retry, function args
-local added = retryer(function(n: number)
+local added = retryer.inf(function(n: number)
     return n + 3
 end, 1)
 
