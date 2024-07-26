@@ -48,7 +48,7 @@ end
 ```
 
 > [!DANGER]
-> The infinite methods can infinitely yield so its reccomened to not use them unless you have to
+> The infinite methods can infinitely yield so its reccomended to not use them unless you have to
 > such as with [`StarterGui:SetCore()`](https://create.roblox.com/docs/reference/engine/classes/StarterGui#SetCore)
 
 ### `inf`
