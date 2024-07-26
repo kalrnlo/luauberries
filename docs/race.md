@@ -7,15 +7,15 @@ local task = require("@lune/task")
 local race = require("race")
 
 local result = race({
-	function() 
+	function(str: string) 
 		task.wait(5)
-		return "i never return!"
+		return `{str}! i never return 🥲`
 	end,
-	function()
+	function(str: string)
 		task.wait(3)
-		return "i return!"
+		return `{str}! i return!`
 	end
-})
+}, "yay")
 
-print(result) -- "i return!"
+print(result) -- "yay! i return!"
 ```
