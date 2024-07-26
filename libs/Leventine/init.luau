@@ -1,14 +1,11 @@
 --!optimize 2
 --!native
---!strict
 
 -- levintine
 -- a port of fastest-levinstein to luau, with added functions for convenience
 -- https://github.com/ka-weihe/fastest-levenshtein
--- @kalrnlo
--- 17/05/2024
 
-type MapInfo = {
+export type MapInfo = {
 	case_sensitive: boolean?,
 	min_score: number?,
 }
@@ -204,12 +201,12 @@ local function map_sort(a: { string | number }, b: { string | number }): boolean
 	return (a[1] :: number) < (b[1] :: number)
 end
 
-local function map(str: string, arr: { string }, info: MapInfo?): { string }
+local function map(str: string, t: { string }, info: MapInfo?): { string }
 	local min_score = info and info.min_score or DEFAULT_MIN_SCORE
 	local case_sensitive = info and info.case_sensitive or false
 	local new_array = {}
 
-	for _, array_string in arr do
+	for _, array_string in t do
 		local score = ( score(str, array_string, case_sensitive) )
 
 		if score > min_score then
@@ -243,15 +240,15 @@ local function has_match(match_aginst: string, str: string, case_sensitive: bool
 end
 
 -- gets the closest string to the provided string in an array
-local function closest(str: string, arr: { string }, case_sensitive: boolean?): (string, number)
+local function closest(str: string, t: { string }, case_sensitive: boolean?): (string, number)
 	local closest_score = math.huge
 	local closest_string: string
 
-	for _, array_string in arr do
-		local score = ( score(str, array_string, case_sensitive) )
+	for _, tbl_string in t do
+		local score = ( score(str, tbl_string, case_sensitive) )
 
 		if score < closest_score then
-			closest_string = array_string
+			closest_string = tbl_string
 			closest_score = score
 		end
 	end
