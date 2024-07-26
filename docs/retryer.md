@@ -23,7 +23,7 @@ local success, added = retryer(20, function(n: number)
 end, 1)
 
 if success then
-    other_added -= 3
+    added -= 3
 else
     print("add failure!")
 end
@@ -41,7 +41,7 @@ local success, added = retryer.delay(20, 10, function(n: number)
 end, 1)
 
 if success then
-    other_added -= 3
+    added -= 3
 else
     print("delayed add failure!")
 end
@@ -61,7 +61,7 @@ local added = retryer(function(n: number)
     return n + 3
 end, 1)
 
-other_added -= 3
+added -= 3
 ```
 
 ### `infdelay`
