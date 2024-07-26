@@ -1,6 +1,6 @@
 # Url
 
-Small utility with basic functions handling url querys, and encoding/decoding urls
+Small utility with basic functions handling url querys and encoding/decoding urls
 
 ```luau
 local Players = game:GetService("Players")
