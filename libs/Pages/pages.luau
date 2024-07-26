@@ -10,11 +10,8 @@ export type PageInfo = {
 	page: number,
 }
 
-local function advance_to_next_page_err(err: string)
-	warn(`[PAGES] an error occured while trying to advance to the next page\n\tadvance-next-page-err: {err}`)
-end
+local advance_to_next_page_err_format = "[PAGES] an error occured while trying to advance to the next page\n\tadvance-next-page-err: %s"
 
-@checked
 local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?)
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local page = pages:GetCurrentPage()
@@ -55,14 +52,13 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 					end
 				end
 			else
-				advance_to_next_page_err(err :: any)
+				warn(string.format(advance_to_next_page_err_format, err))
 				return
 			end
 		until pages.IsFinished
 	end
 end
 
-@checked
 local function toarray(pages: Pages): { { [any]: any } }
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local contents = pages:GetCurrentPage()
@@ -75,7 +71,7 @@ local function toarray(pages: Pages): { { [any]: any } }
 				local current_page = pages:GetCurrentPage()
 				table.move(current_page, 1, #current_page, #contents + 1, contents)
 			else
-				advance_to_next_page_err(err :: any)
+				warn(string.format(advance_to_next_page_err_format, err))
 				break
 			end
 		until pages.IsFinished
