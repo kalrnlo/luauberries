@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/text-chat)
+# [Documentation](https://libs.luau.lol/text-chat)
