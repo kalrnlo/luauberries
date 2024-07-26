@@ -47,6 +47,7 @@ export default defineConfig({
 					{ text: 'Linked List', link: '/linked-list' },
 					{ text: 'Log Analytics', link: '/log-analytics' },
 					{ text: 'Observer', link: '/observer' },
+					{ text: 'Pages', link: '/pages' },
 					{ text: 'Player Zone', link: '/player-zone' },
 					{ text: 'Race', link: '/race' },
 					{ text: 'Random', link: '/random' },

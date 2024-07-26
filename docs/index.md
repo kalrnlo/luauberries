@@ -9,29 +9,32 @@ hero:
 
 features:
   - title: Character
-    details: A module for having types for characters easily.
+    details: Module for having types for characters easily.
     link: /character
   - title: Grouper
-    details: A module for getting accurate group ranks for players on the server, and detecting rank changes
+    details: Module for getting accurate group ranks for players on the server, and detecting rank changes
     link: /grouper
   - title: Leventine
-    details: A fast levenstein distance library for luau
+    details: Fast levenstein distance library for luau
     link: /leventine
   - title: Linked list
-    details: A doubly-linked list implementation in luau
+    details: Doubly-linked list implementation in luau
     link: /linked-list
   - title: Log Analytics
-    details: A wrapper around roblox's AnalyticsService with a better api
+    details: Wrapper around roblox's AnalyticsService with a better api
     link: /log-analytics
   - title: Observer
     details: n/a
     link: /observer
   - title: Player Zone
-    details: A fast module for detecting players in rectangular zones
+    details: Fast module for detecting players in rectangular zones
     link: /player-zone
   - title: Race
     details: Runs several functions at once, and returns the result of the function that completes first
     link: /race
+  - title: Pages
+    details: Utility for dealing with roblox page instancs easily
+    link: /pages
   - title: Random
     details: A pure luau version of roblox's Random object
     link: /random
@@ -39,16 +42,16 @@ features:
     details: n/a
     link: /ratelimit
   - title: RbxThumb
-    details: A utility for making roblox thumbnail urls
+    details: Utility for making roblox thumbnail urls
     link: /rbx-thumb
   - title: Retryer
-    details: A utility for easily retrying functions
+    details: Utility for easily retrying functions
     link: /retryer
   - title: Safe Teleport
-    details: A teleport async wrapper that makes teleporting simple
+    details: TeleportAsync wrapper that makes teleporting simple
     link: /safe-teleport
   - title: Text Chat
-    details: A utility that makes it easier to work with TextChatService
+    details: Utility that makes it easier to work with TextChatService
     link: /text-chat
   - title: Url
     details: A small utility, with basic functions handling url querys, and encoding/decoding urls
