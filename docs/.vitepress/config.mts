@@ -4,7 +4,6 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
 	title: "rbxlibs",
 	description: "A collection of libraries & utilitys for luau and roblox",
-	appearance: "force-auto",
 	lastUpdated: true,
 	cleanUrls: true,
 	lang: 'en-US',
@@ -16,6 +15,13 @@ export default defineConfig({
 	}
 	},
 	themeConfig: {
+		editLink: {
+			pattern: 'https://github.com/kalrnlo/rbxlibs/edit/main/docs/:path'
+		},
+		search: {
+			provider: 'local'
+		},
+
 	// https://vitepress.dev/reference/default-theme-config
 	socialLinks: [
 		{ icon: 'github', link: 'https://github.com/kalrnlo/rbxlibs' },
