@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/leventine)
+# [Documentation](https://libs.luau.lol/leventine)
