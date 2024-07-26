@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/grouper)
+# [Documentation](https://libs.luau.lol/grouper)
