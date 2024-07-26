@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/rbx-thumb)
+# [Documentation](https://libs.luau.lol/rbx-thumb)
