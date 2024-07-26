@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/log-analytics)
+# [Documentation](https://libs.luau.lol/log-analytics)
