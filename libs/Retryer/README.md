@@ -1,1 +1,1 @@
-# [Documentation](libs.luau.lol/retryer)
+# [Documentation](https://libs.luau.lol/retryer)
