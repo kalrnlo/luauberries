@@ -32,9 +32,9 @@ features:
   - title: Race
     details: Runs several functions at once, and returns the result of the function that completes first
     link: /race
-  - title: Pages
+  - title: Pages Util
     details: Utility for dealing with roblox page instancs easily
-    link: /pages
+    link: /pages-util
   - title: Random
     details: A pure luau version of roblox's Random object
     link: /random
