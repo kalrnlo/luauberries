@@ -3,7 +3,6 @@
 -- pagesutil
 -- utility for dealing with roblox page instancs easily
 
-export type PagesArray<T> = { { T } }
 export type PageInfo = {
 	item_index: number,
 	page_len: number,
