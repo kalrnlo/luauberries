@@ -1,6 +1,6 @@
 # Retryer
 
-A utility for easily retrying functions
+Utility for easily retrying functions
 
 ```luau
 local StarterGui = game:GetService("StarterGui")
