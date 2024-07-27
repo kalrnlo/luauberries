@@ -36,7 +36,7 @@ features:
     details: Utility for dealing with roblox page instancs easily
     link: /pages-util
   - title: Random
-    details: A pure luau version of roblox's Random object
+    details: Pure luau version of roblox's Random object
     link: /random
   - title: Ratelimit
     details: n/a
