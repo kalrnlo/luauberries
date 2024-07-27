@@ -6,7 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
-local character = require("libs/character")
+local character = require("../character")
 
 export type ZoneType = "WHITELIST" | "BLACKLIST"
 
