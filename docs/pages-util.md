@@ -46,10 +46,11 @@ params.SearchKeyword = "mrrp"
 local pages = AvatarEditorService:SearchCatalog(params)
 
 pagesutil.iter(pages, function(page_info, asset_info)
+	local index = page_info.item_index
 	local name = asset_info.Name
 
 	if string.find(name, ":3",  1, true) then
-		print(`{name} on page {page_info.page} at index {page_info.item_index}, is such a :3 item!!`)
+		print(`:3 {name} on page {page_info.page} at index {index}`)
 	end
 	return
 end)
