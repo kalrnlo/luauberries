@@ -11,15 +11,27 @@ Fast module for detecting players in rectangular zones
 
 ## Types
 
+### `BaseZone`
+```luau
+type BaseZone = {
+
+}
+```
+*
+
 ### `WhitelistZone`
 ```luau
-
+type WhitelistZone = BaseZone & {
+	
+}
 ```
 *
 
 ### `BlacklistZone`
 ```luau
-
+type BlacklistZone = BaseZone & {
+	
+}
 ```
 * 
 
