@@ -43,7 +43,7 @@ check_limit("meow")
 
 ### `count`
 
-The count for when the ratelimit object has its [`__call`](#__call) metamethod invoked without the key argument 
+The count for when the ratelimit object has its [`__call`](#call) metamethod invoked without the key argument 
 
 ```luau
 type count = number
