@@ -1,6 +1,9 @@
 # Player Zone
 
-A fast module for detecting players in rectangular zones
+Fast module for detecting players in rectangular zones
+
+> [!NOTE]
+> The docs for this library are incomplete
 
 ```luau
 
@@ -12,11 +15,35 @@ A fast module for detecting players in rectangular zones
 ```luau
 
 ```
+*
+
+### `BlacklistZone`
+```luau
+
+```
 * 
+
+### `Zone`
+```luau
+type Zone = BlacklistZone | WhitelistZone
+```
 
 ## Methods
 
+### `create`
 
+```luau
 
-> [!NOTE]
-> The docs for this library are incomplete
+```
+
+### `add`
+
+```luau
+
+```
+
+### `remove`
+
+```luau
+
+```
