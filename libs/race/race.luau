@@ -34,7 +34,7 @@ local function callback_handler<A..., R...>(
 
 	for _, thread in threads do
 		if thread ~= callback_thread then
-			local success, error = coroutine.close(thread)
+			local success = coroutine.close(thread)
 
 			if not success then
 				warn(debug.traceback(thread, "[RACE] an error occured whilst trying to cancel thread"))
