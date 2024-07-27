@@ -1,6 +1,6 @@
 # Pages Util
 
-Utility for dealing with roblox [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instances easily
+Utility for dealing with roblox [pages](https://create.roblox.com/docs/reference/engine/classes/Pages) instances easily
 
 ```luau
 local AvatarEditorService = game:GetService("AvatarEditorService")
@@ -47,7 +47,7 @@ type PageInfo = {
 
 ### `iter`
 
-Iterates through the [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instance until complete and calls the given callback for each entry. `iter` will also stop iterating if the callback returns "break". So that you don't have to
+Iterates through the [pages](https://create.roblox.com/docs/reference/engine/classes/Pages) instance until complete and calls the given callback for each entry. `iter` will also stop iterating if the callback returns "break". So that you don't have to
 waste api calls for advancing through every single page.
 
 ```luau
@@ -65,6 +65,7 @@ pagesutil.iter(pages, function(page_info, asset_info)
 
 	if string.find(name, ":3",  1, true) then
 		print(`:3 {name} on page {page_info.page} at index {index}`)
+		return "break"
 	end
 	return
 end)
@@ -72,7 +73,7 @@ end)
 
 ### `toarray`
 
-Converts the [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instance into a flat array
+Converts the [pages](https://create.roblox.com/docs/reference/engine/classes/Pages) instance into a flat array
 
 ```luau
 local AvatarEditorService = game:GetService("AvatarEditorService")
