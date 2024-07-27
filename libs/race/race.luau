@@ -19,12 +19,11 @@ local task = (function()
 					return thread
 				end
 			end,
-			cancel = function(thread: thread)
-				coroutine.close(thread)
-			end,
 		} :: any)
 	end
 end)()
+
+local warn: <T...>(T...) -> () = warn or print
 
 local function callback_handler<A..., R...>(
 	f: (A...) -> R..., threads: { thread }, 
@@ -35,7 +34,11 @@ local function callback_handler<A..., R...>(
 
 	for _, thread in threads do
 		if thread ~= callback_thread then
-			task.cancel(thread)
+			local success, error = coroutine.close(thread)
+
+			if not success then
+				warn(debug.traceback(thread, "[RACE] an error occured whilst trying to cancel thread"))
+			end
 		end
 	end
 	
