@@ -30,7 +30,7 @@ local function callback_handler<A..., R...>(
 	main_thread: thread, ...: A...
 )
 	local callback_thread = coroutine.running()
-	local results = { f() }
+	local results = { f(...) }
 
 	for _, thread in threads do
 		if thread ~= callback_thread then
