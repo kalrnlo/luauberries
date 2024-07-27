@@ -29,6 +29,20 @@ if success then
 end
 ```
 
+## Types
+
+### `PageInfo`
+```luau
+type PageInfo = {
+	item_index: number,
+	page_len: number,
+	page: number,
+}
+```
+* `item_index` - the index of the current item on the current page
+* `page_len` - the total amount of indexs on the current page
+* `page` - the current page being iterated through
+
 ## Methods
 
 ### `iter`
