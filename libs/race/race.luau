@@ -52,7 +52,7 @@ local function race<A..., R...>(callbacks: { (A...) -> R... }, ...: A...): R...
 	local main_thread = coroutine.running()
 
 	for index, f in callbacks do
-		threads[index] = task.spawn(callback_handler, f, threads, main_thread)
+		threads[index] = task.spawn(callback_handler, f, threads, main_thread, ...)
 	end
 
 	return coroutine.yield()
