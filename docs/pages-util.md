@@ -27,15 +27,14 @@ if success then
 		return
 	end)
 end
-
 ```
 
 ## Methods
 
 ### `iter`
 
-Iterates through the [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instance until complete and calls the given callback for each entry.
-`iter` will also stop iterating if the callback returns "break"
+Iterates through the [`pages`](https://create.roblox.com/docs/reference/engine/classes/Pages) instance until complete and calls the given callback for each entry. `iter` will also stop iterating if the callback returns "break". So that you don't have to
+waste api calls for advancing through every single page.
 
 ```luau
 local AvatarEditorService = game:GetService("AvatarEditorService")
