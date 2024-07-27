@@ -45,13 +45,13 @@ end)
 
 ### `encode`
 
-Encodes the given string using [percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding), so that reserved characters properly encoded with "%" and two hexadecimal characters.
+Encodes the given string using [percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding), so that reserved characters except for spaces properly encode with `%` and two hexadecimal characters. Spaces by defualt are encoded as `+`, but can be specified to be encoded as `%20` with the second arg.
 
 ```luau
 local content = "Je suis allé au cinéma." -- French for "I went to the movies"
 local encoded = url.encode(content)
 
-print(encoded) -- "Je%20suis%20all%C3%A9%20au%20cinema%2E"
+print(encoded) -- "Je+suis+all%C3%A9+au+cin%C3%A9ma."
 ```
 
 ### `decode`
