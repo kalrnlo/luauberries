@@ -17,7 +17,17 @@ export type Ratelimit<K> = typeof(setmetatable({} :: {
 }, {} :: RatelimitPrototype<K>))
 
 local ratelimit_mt = ({} :: any) :: RatelimitPrototype<any>
-local delay = task.delay
+local delay = (function()
+	if task then
+		return task.delay
+	elseif string.find(_VERSION, "lune") then
+		return (require)("@lune/task").delay
+	else
+		return function()
+			
+		end :: any
+	end
+end)()
 
 function ratelimit_mt.__call(ratelimit, key)
 	if key then
