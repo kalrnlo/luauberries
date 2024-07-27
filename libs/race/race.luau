@@ -2,24 +2,22 @@
 -- race
 -- a function for getting the first return out of a vararg of functions
 
-local task = (function()
+local spawn = (function()
 	if task then
-		return task
+		return task.spawn
 	elseif string.find(_VERSION, "lune") then
-		return (require)("@lune/task")
+		return (require)("@lune/task").spawn
 	else
-		return table.freeze({
-			spawn = function<A..., R...>(thread_or_func: thread | (A...) -> R..., ...: A...): thread
-				if type(thread_or_func) == "thread" then
-					coroutine.resume(thread_or_func, ...)
-					return thread_or_func
-				else
-					local thread = coroutine.create(thread_or_func)
-					coroutine.resume(thread, ...)
-					return thread
-				end
-			end,
-		} :: any)
+		return function<A..., R...>(thread_or_func: thread | (A...) -> R..., ...: A...): thread
+			if type(thread_or_func) == "thread" then
+				coroutine.resume(thread_or_func, ...)
+				return thread_or_func
+			else
+				local thread = coroutine.create(thread_or_func)
+				coroutine.resume(thread, ...)
+				return thread
+			end
+		end
 	end
 end)()
 
@@ -44,7 +42,7 @@ local function callback_handler<A..., R...>(
 	
 	-- threads dont gc on their own, even if dead
 	table.clear(threads)
-	task.spawn(main_thread, unpack(results))
+	spawn(main_thread, unpack(results))
 end
 
 local function race<A..., R...>(callbacks: { (A...) -> R... }, ...: A...): R...
@@ -52,7 +50,7 @@ local function race<A..., R...>(callbacks: { (A...) -> R... }, ...: A...): R...
 	local main_thread = coroutine.running()
 
 	for index, f in callbacks do
-		threads[index] = task.spawn(callback_handler, f, threads, main_thread, ...)
+		threads[index] = spawn(callback_handler, f, threads, main_thread, ...)
 	end
 
 	return coroutine.yield()
