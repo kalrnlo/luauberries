@@ -39,7 +39,7 @@ features:
     details: Pure luau version of roblox's Random object
     link: /random
   - title: Ratelimit
-    details: n/a
+    details: Object for handling ratelimits intuitively
     link: /ratelimit
   - title: RbxThumb
     details: Utility for making roblox thumbnail urls

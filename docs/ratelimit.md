@@ -1,6 +1,6 @@
 # Ratelimit
 
-Object for handling ratelimits intuitively, can be used without a Ratelimits many keys in a very intuitive interface. Ratelimits can also be used without any keys
+Object for handling ratelimits intuitively
 
 ```luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
