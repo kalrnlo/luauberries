@@ -6,7 +6,4 @@
   },
   "luau-lsp.completion.imports.requireStyle": "alwaysAbsolute",
   "luau-lsp.completion.imports.separateGroupsWithLine": false,
-  "luau-lsp.fflags.override": {
-    "DebugLuauDeferredConstraintResolution": "true"
-  }
 }
