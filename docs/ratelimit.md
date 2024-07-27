@@ -17,21 +17,6 @@ event.OnClientEvent:Connect(function(player, ...)
 end)
 ```
 
-## Type
-
-```luau
-type Ratelimit<K> = {
-	@metatable { 
-		__call: (self: Ratelimit<K>, key: K?) -> boolean 
-	}
-
-	count_map: { [K]: number },
-	interval: number,
-	limit: number,
-	count: number,
-}
-```
-
 ## Constructor
 
 Creates a new ratelimit object, with [`limit`](#limit) being the amount of times a key can be called every [`interval`](#interval) seconds.
