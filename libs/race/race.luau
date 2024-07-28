@@ -5,7 +5,7 @@
 local spawn = (function()
 	if task then
 		return task.spawn
-	elseif string.find(_VERSION, "lune") then
+	elseif string.find(_VERSION, "Lune") then
 		return (require)("@lune/task").spawn
 	else
 		return function<A..., R...>(thread_or_func: thread | (A...) -> R..., ...: A...): thread

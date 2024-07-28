@@ -19,7 +19,7 @@ local COUNT = newproxy()
 local DELAY = (function()
 	if task then
 		return task.delay
-	elseif string.find(_VERSION, "lune") then
+	elseif string.find(_VERSION, "Lune") then
 		return (require)("@lune/task").delay
 	else
 		return function()
