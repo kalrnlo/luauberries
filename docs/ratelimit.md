@@ -32,7 +32,7 @@ local check_limit = ratelimit(10, 60)
 
 ### `__call`
 
-Checks if a given key's count or [`count`](#count) has exceeded the [`limit`](#limit) within the current [`interval`](#interval)
+Checks if a given key's count has exceeded the [`limit`](#limit) within the current [`interval`](#interval)
 
 > [!NOTE]
 > The `key` arg isn't required, as ratelimit will use a default key instead
