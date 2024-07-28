@@ -23,5 +23,6 @@ jobs:
       run: |
         find libs -name "*test.luau" | while read -r file; do
           echo "Running test: $file"
+          lune --help
           lune run "$file"
         done
