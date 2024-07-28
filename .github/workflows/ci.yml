@@ -7,22 +7,24 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  run-tests:
     runs-on: ubuntu-latest
-    
+        
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Install Lune
-      run: |
-        curl -L https://github.com/lune-org/lune/releases/latest/download/lune-linux -o lune
-        chmod +x lune
-        sudo mv lune /usr/local/bin/
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Run Tests
-      run: |
-        find libs -name "*test.luau" | while read -r file; do
-          echo "Running test: $file"
-          lune --help
-          lune run "$file"
-        done
+      - name: Setup Foreman
+        uses: Roblox/setup-foreman@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Toolchain
+        run: foreman install
+
+      - name: Run Tests
+        run: |
+          find libs -name "*test.luau" | while read -r file; do
+            echo "Running tests for library $file"
+            lune "$file"
+          done
