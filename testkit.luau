@@ -85,7 +85,7 @@ local function convert_units(unit: string, value: number): (number, string)
     return value, prefix_colors[order](prefixes[order] .. unit)
 end
 
-local WALL = color.gray "│"
+local WALL = color.white("│")
 
 --------------------------------------------------------------------------------
 -- Testing
