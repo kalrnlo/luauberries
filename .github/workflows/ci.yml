@@ -20,7 +20,7 @@ jobs:
   
             - name: macOS aarch64
               runner-os: macos-14
-    name: CI - ${{ matrix.name }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.runner-os }}
         
     steps:
