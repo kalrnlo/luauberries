@@ -6,7 +6,7 @@ local TEST, CASE, CHECK, FINISH = testkit.test()
 TEST("ratelimit", function()
 	do CASE "create ratelimit"
 		local check_limit = ratelimit(10, 60)
-                local ratelimit_count = getfenv(check_limit.__call)
+                local ratelimit_count = getfenv(0)
                 print(ratelimit_count)
 
 		check_limit("meow")
