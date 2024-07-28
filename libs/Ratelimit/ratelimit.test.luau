@@ -20,15 +20,16 @@ TEST("ratelimit", function()
 	 	check_limit()
 	 	CHECK(function()
 			for key, count in check_limit.count_map do
-      	return type(key) == "userdata" and count == 1
-      end
-    end)
+      			return type(key) == "userdata" and count == 1
+      		end
+			return false
+    	end)
 	end
 
 	do CASE "call with key"
 		local check_limit = ratelimit(10, 60)
 
-    check_limit("meow")
+    	check_limit("meow")
 		CHECK(testkit.deq(check_limit :: any, {
 			count_map = { meow = 1 },
 			interval = 60,
