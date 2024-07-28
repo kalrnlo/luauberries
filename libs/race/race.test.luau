@@ -1,4 +1,4 @@
-local testkit = require("../testkit")
+local testkit = require("../../testkit")
 local task = require("@lune/task")
 local race = require("race")
 
@@ -21,4 +21,4 @@ TEST("RACE", function()
 	CHECK(result == "yay! i return!")
 end)
 
-return FINISH
+if not FINISH() then error(nil, 0) end

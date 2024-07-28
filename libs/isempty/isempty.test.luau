@@ -1,3 +1,5 @@
+assert("meow")
+
 local testkit = require("../../testkit")
 local isempty = require("isempty")
 
@@ -9,8 +11,8 @@ TEST("isempty", function()
 	end
 
 	do CASE("filled table")
-		CHECK(isempty({ meow = "mrrp" }) == false)
+		CHECK(isempty({ meow = "mrrp" }) == true)
 	end
 end)
 
-return FINISH
+if not FINISH() then error(nil, 0) end

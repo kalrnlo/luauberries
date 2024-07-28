@@ -26,4 +26,4 @@ TEST("ratelimit", function()
 	end
 end)
 
-return FINISH
+if not FINISH() then error(nil, 0) end
