@@ -18,9 +18,6 @@ jobs:
             - name: Linux x86_64
               runner-os: ubuntu-latest
   
-            - name: macOS x86_64
-              runner-os: macos-13
-  
             - name: macOS aarch64
               runner-os: macos-14
     name: CI - ${{ matrix.name }}
