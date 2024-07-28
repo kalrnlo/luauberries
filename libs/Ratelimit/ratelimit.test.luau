@@ -7,7 +7,7 @@ TEST("ratelimit", function()
 	do CASE "create ratelimit"
 		local check_limit = ratelimit(10, 60)
 
-		CHECK(testkit.seq(check_limit :: any, {
+		CHECK(testkit.deq(check_limit :: any, {
 			count_map = {},
 			interval = 60,
 			limit = 10,
