@@ -34,20 +34,15 @@ local check_limit = ratelimit(10, 60)
 
 Checks if a given key's count or [`count`](#count) has exceeded the [`limit`](#limit) within the current [`interval`](#interval)
 
+> [!NOTE]
+> The `key` arg isn't required, as ratelimit will use a default key instead
+
 ```luau
 local check_limit = ratelimit(10, 60)
 check_limit("meow")
 ```
 
 ## Properties
-
-### `count`
-
-The count for when the ratelimit object has its [`__call`](#call) metamethod invoked without the key argument 
-
-```luau
-type count = number
-```
 
 ### `count_map`
 
