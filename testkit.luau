@@ -115,7 +115,7 @@ local test: Test?
 local tests: { Test } = {}
 
 local function output_test_result(test: Test)
-    print(color.white(test.name))
+    print(color.white_underline(test.name))
 
     for _, case in test.cases do
         local status = ({
@@ -127,12 +127,12 @@ local function output_test_result(test: Test)
 
         local line = case.result == FAIL and color.red(`{case.line}:`) or ""
 
-        print(`{status}{WALL} {line}{color.gray(case.name)}`)
+        print(`{status}{WALL} {line}{color.white(case.name)}`)
     end
 
     if test.error then
-        print(color.gray "error: " .. color.red(test.error.message))  
-        print(color.gray "trace: " .. color.red(test.error.trace))
+        print(color.white "error: " .. color.red(test.error.message))  
+        print(color.white "trace: " .. color.red(test.error.trace))
     else
         print()
     end
@@ -221,7 +221,7 @@ local function FINISH(): boolean
         output_test_result(test)
     end
 
-    print(color.gray(string.format(
+    print(color.white(string.format(
         `{passed_cases}/{total_cases} test cases passed in %.3f ms.`,
         duration*1e3
     )))
