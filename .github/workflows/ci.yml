@@ -8,7 +8,23 @@ on:
 
 jobs:
   run-tests:
-    runs-on: ubuntu-latest
+    strategy:
+        fail-fast: false
+        matrix:
+          include:
+            - name: Windows x86_64
+              runner-os: windows-latest
+  
+            - name: Linux x86_64
+              runner-os: ubuntu-latest
+  
+            - name: macOS x86_64
+              runner-os: macos-13
+  
+            - name: macOS aarch64
+              runner-os: macos-14
+    name: CI - ${{ matrix.name }}
+    runs-on: ${{ matrix.runner-os }}
         
     steps:
       - name: Checkout repository
@@ -23,7 +39,8 @@ jobs:
         run: foreman install
 
       - name: Run Tests
+        shell: bash
         run: |
           find libs -name "*test.luau" | while read -r file; do
-            lune run "$file"
+            lune run $file
           done
