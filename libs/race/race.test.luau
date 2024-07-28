@@ -13,7 +13,6 @@ TEST("RACE", function()
 			return `{str}! i never return ;c`
 		end,
 		function(str: string)
-			task.wait(3)
 			return `{str}! i return!`
 		end
 	}, "yay")
