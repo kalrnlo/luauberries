@@ -9,14 +9,13 @@ type RatelimitPrototype<K> = {
 	__call: (ratelimit: Ratelimit<K>, key: K?) -> boolean
 }
 
-local COUNT = newproxy()
-
 export type Ratelimit<K> = typeof(setmetatable({} :: {
-	count_map: { [( K | typeof(COUNT) )]: number },
+	count_map: { [K]: number },
 	interval: number,
 	limit: number,
 }, {} :: RatelimitPrototype<K>))
 
+local COUNT = newproxy()
 local DELAY = (function()
 	if task then
 		return task.delay
@@ -32,14 +31,14 @@ end)()
 local ratelimit_mt = ({} :: any) :: RatelimitPrototype<any>
 
 function ratelimit_mt.__call(ratelimit, key)
-        local key = key or COUNT
-        local count_map = ratelimit.count_map
+	local key = key or COUNT
+    local count_map = ratelimit.count_map
 	local count = count_map[key]
 
 	if not count then
 		count = 0
 		DELAY(ratelimit.interval, function(count_map: { [any]: number }, key: any)
-		        count_map[key] = nil
+			count_map[key] = nil
 		end, count_map, key)
 	end
 
