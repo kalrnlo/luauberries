@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Lune
+      run: |
+        curl -L https://github.com/lune-org/lune/releases/latest/download/lune-linux -o lune
+        chmod +x lune
+        sudo mv lune /usr/local/bin/
+
+    - name: Run Tests
+      run: |
+        find libs -name "*test.luau" | while read -r file; do
+          echo "Running test: $file"
+          lune "$file"
+        done
