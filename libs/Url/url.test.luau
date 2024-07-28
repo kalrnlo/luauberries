@@ -1,4 +1,4 @@
-local testkit = require("../testkit")
+local testkit = require("../../testkit")
 local url = require("url")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
@@ -37,4 +37,4 @@ TEST("url", function()
 	end
 end)
 
-if not FINISH() then error(nil, 0) end
+return FINISH

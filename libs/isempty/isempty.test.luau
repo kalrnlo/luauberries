@@ -1,4 +1,4 @@
-local testkit = require("../testkit")
+local testkit = require("../../testkit")
 local isempty = require("isempty")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
@@ -13,4 +13,4 @@ TEST("isempty", function()
 	end
 end)
 
-if not FINISH() then error(nil, 0) end
+return FINISH
