@@ -44,13 +44,19 @@ TEST("leventine", function()
 		
 	end
 
-	do CASE("has_match")
+	do CASE("has_match_false")
 		
 	end
 
-	do CASE("has_match_sensitive")
+	do CASE("has_match_sensitive_false")
+		
+	end
+
+	do CASE("has_match_true")
+		
+	end
+
+	do CASE("has_match_sensitive_true")
 		
 	end
 end)
-
-if not FINISH() then error(nil, 0) end

@@ -36,5 +36,3 @@ TEST("url", function()
 		CHECK(tbl.meow == "mrrp" and tbl.mrrp == "meow")
 	end
 end)
-
-if not FINISH() then error(nil, 0) end

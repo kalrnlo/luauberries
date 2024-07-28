@@ -20,5 +20,3 @@ TEST("RACE", function()
 		
 	CHECK(result == "yay! i return!")
 end)
-
-if not FINISH() then error(nil, 0) end
