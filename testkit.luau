@@ -115,7 +115,7 @@ local test: Test?
 local tests: { Test } = {}
 
 local function output_test_result(test: Test)
-    print(color.white_underline(test.name))
+    print(color.white_underline(string.lower(test.name)))
 
     for _, case in test.cases do
         local status = ({
