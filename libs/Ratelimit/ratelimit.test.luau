@@ -25,5 +25,3 @@ TEST("ratelimit", function()
 		CHECK(check_limit("meow") == false)
 	end
 end)
-
-if not FINISH() then error(nil, 0) end
