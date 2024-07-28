@@ -6,13 +6,31 @@ local TEST, CASE, CHECK, FINISH = testkit.test()
 TEST("ratelimit", function()
 	do CASE "create ratelimit"
 		local check_limit = ratelimit(10, 60)
-                local ratelimit_count = getfenv()
-                print(ratelimit_count)
 
-		check_limit("meow")
+		CHECK(testkit.seq(check_limit :: any, {
+			count_map = {},
+			interval = 60,
+			limit = 10,
+		}))
+	end
+
+	do CASE "call without key"
+		local check_limit = ratelimit(10, 60)
+
                 check_limit()
-		CHECK(testkit.deq(check_limit :: any, {
-			count_map = { meow = 1, [ratelimit_count] = 1 },
+		CHECK(function()
+                for key, count in check_limit do
+                return type(key) == "userdata" and count == 1
+                end
+                end)
+	end
+
+	do CASE "call with key"
+		local check_limit = ratelimit(10, 60)
+
+                check_limit("meow")
+		CHECK(testkit.seq(check_limit :: any, {
+			count_map = { meow = 1 },
 			interval = 60,
 			limit = 10,
 		}))
