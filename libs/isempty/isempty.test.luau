@@ -11,7 +11,7 @@ TEST("isempty", function()
 	end
 
 	do CASE("filled table")
-		CHECK(isempty({ meow = "mrrp" }) == true)
+		CHECK(isempty({ meow = "mrrp" }) == false)
 	end
 end)
 
