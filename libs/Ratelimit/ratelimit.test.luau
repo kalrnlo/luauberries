@@ -20,7 +20,7 @@ TEST("ratelimit", function()
                 check_limit()
 		CHECK(function()
                 for key, count in check_limit do
-                return type(key) == "userdata" and count == 0
+                return type(key) == "userdata" and count == 1
                 end
                 end)
 	end
@@ -30,7 +30,7 @@ TEST("ratelimit", function()
 
                 check_limit("meow")
 		CHECK(testkit.seq(check_limit :: any, {
-			count_map = { meow = 0 },
+			count_map = { meow = 1 },
 			interval = 60,
 			limit = 10,
 		}))
