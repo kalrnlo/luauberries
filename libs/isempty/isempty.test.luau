@@ -1,5 +1,3 @@
-assert("meow")
-
 local testkit = require("../../testkit")
 local isempty = require("isempty")
 
@@ -14,5 +12,3 @@ TEST("isempty", function()
 		CHECK(isempty({ meow = "mrrp" }) == false)
 	end
 end)
-
-if not FINISH() then error(nil, 0) end

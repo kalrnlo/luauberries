@@ -39,5 +39,8 @@ jobs:
         shell: bash
         run: |
           find libs -name "*test.luau" | while read -r file; do
+            # append the finish call to the end of the file, because im lazy!!
+            echo -e "\n\nif not FINISH() then error(nil, 0) end" >> "$file"
+
             lune run $file
           done
