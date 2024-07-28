@@ -24,20 +24,6 @@ jobs:
 
       - name: Run Tests
         run: |
-          set +e  # Don't exit on error
           find libs -name "*test.luau" | while read -r file; do
-            echo "Running test: $file"
-            lune run "$file" 2>&1 | tee -a test_output.log
-            echo "Exit code: $?" >> test_output.log
-            echo "----------------------------------------" >> test_output.log
+            lune run "$file"
           done
-          set -e  # Re-enable exit on error
-          echo "Full test output:"
-          cat test_output.log
-
-      - name: Upload Results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: test_output.log
