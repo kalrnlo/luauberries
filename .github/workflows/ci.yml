@@ -1,10 +1,17 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+      - "libs/**.luau"
+      - "testkit.luau"
   pull_request:
     branches: [ main ]
+    paths:
+      - "libs/**.luau"
+      - "testkit.luau"
 
 jobs:
   run-tests:
