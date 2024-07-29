@@ -75,7 +75,7 @@ local tbl = {
 }
 
 local mt = {
-	__call = @checked function(self: unknown, min: number?, max: number?, seed: number?): number
+	__call = function(self: unknown, min: number?, max: number?, seed: number?): number
 		return int(min, max, seed)
 	end
 }
