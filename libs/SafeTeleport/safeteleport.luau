@@ -5,7 +5,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-local retryer = require("libs/Retryer")
+local retryer = require("../retryer/retryer")
 
 type SafeTeleportPrototype = { __call: (self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?) -> (boolean, SafeTeleportResult)}
 type SafeTeleport = typeof(setmetatable({} :: {

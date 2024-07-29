@@ -6,7 +6,7 @@
 
 local math_randomseed = math.randomseed
 local math_random = math.random
-local ZERO_VEC = Vector3.zero
+--local ZERO_VEC = Vector3.zero
 local NEG_PI = -math.pi
 local SEED: number
 
@@ -38,6 +38,7 @@ local function vector(min: Vector3?, max: Vector3?, seed: number?): Vector3
 	).Unit
 	local min = min or ZERO_VEC
 
+	
 	return Vector3.new(
 		float(min.X, max.X, seed),
 		float(min.Y, max.Y, seed),
@@ -75,7 +76,7 @@ local tbl = {
 }
 
 local mt = {
-	__call = @checked function(self: unknown, min: number?, max: number?, seed: number?): number
+	__call = function(self: unknown, min: number?, max: number?, seed: number?): number
 		return int(min, max, seed)
 	end
 }
