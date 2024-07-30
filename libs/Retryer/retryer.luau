@@ -17,8 +17,14 @@ end
 
 -- they both have the same type but luau infers it as (number?) -> number | (number?) -> number
 -- if the local itself isnt annotated
-local WAIT_FN: (number?) -> number = if task then task.wait elseif wait then wait else WAIT
-
+local WAIT_FN: (number?) -> number = if task then 
+		task.wait 
+	elseif string.find(_VERSION, "Lune") then 
+		(require)("@lune/task").wait 
+	elseif wait then 
+		wait 
+	else 
+		WAIT
 
 local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
 	local results: any = { pcall(f, ...) }
