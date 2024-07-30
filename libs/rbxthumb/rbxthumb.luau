@@ -22,6 +22,7 @@ type AvatarBustThumbnailSize = "100x100" | "150x15" | "75×75" | "100×100" | "1
 type FullAvatarThumbnailSize = "50×50" | "60×60" | "75×75" | "100×100" | "150×150" | "180×180" | 
 	"352×352" | "420×420"
 
+
 local BASE_URL = "rbxthumb://type=%s&id=%d&w=%d&h=%d"
 local CIRCULAR_URL = `{BASE_URL}&filters=circular`
 local ASSET_ENUM = Enum.AvatarItemType.Asset
