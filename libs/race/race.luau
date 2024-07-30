@@ -40,8 +40,6 @@ local function callback_handler<A..., R...>(
 		end
 	end
 	
-	-- threads dont gc on their own, even if dead
-	table.clear(threads)
 	spawn(main_thread, unpack(results))
 end
 
