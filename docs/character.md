@@ -51,7 +51,7 @@ type Character = Model & {
 
 ## Methods
 
-### `Added`
+### `added`
 
 Wrapper around [`Player.CharacterAdded`](https://create.roblox.com/docs/reference/engine/classes/Player#CharacterAdded), except that if the given `Player` already has a character it'll run the given callback for the existing character. Unless the third arg `dont_run_for_existing_character` is true
 
