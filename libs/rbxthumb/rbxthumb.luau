@@ -23,6 +23,13 @@ type FullAvatarThumbnailSize = "50×50" | "60×60" | "75×75" | "100×100" | "15
 	"352×352" | "420×420"
 
 
+-- making an enum var rq so no errors occur in lune
+local Enum = Enum or table.freeze({
+	AvatarItemType = table.freeze({
+		Asset = 1,
+	})
+})
+
 local BASE_URL = "rbxthumb://type=%s&id=%d&w=%d&h=%d"
 local CIRCULAR_URL = `{BASE_URL}&filters=circular`
 local ASSET_ENUM = Enum.AvatarItemType.Asset
