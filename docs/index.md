@@ -9,7 +9,7 @@ hero:
 
 features:
   - title: Character
-    details: Module for having types for characters easily.
+    details: Utility for getting better types with player characters in roblox
     link: /character
   - title: Grouper
     details: Module for getting accurate group ranks for players on the server, and detecting rank changes
