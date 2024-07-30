@@ -12,7 +12,7 @@ local start_len = #launch_data_start
 local function get_launch_data(player: Player): string?
 	local launch_data = player:GetJoinData().LaunchData
 
-	if launch_data and #launch_data ~= 0 then
+	if launch_data and #launch_data == 0 then
 		return nil
 	elseif not launch_data then
 		return nil
