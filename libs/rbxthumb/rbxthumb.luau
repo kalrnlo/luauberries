@@ -49,7 +49,6 @@ local function SPLIT_SIZE(size: ThumbnailSize?, defualt_width: number, defualt_h
 	end
 end
 
-@checked
 local function FORMAT_RBXTHUMB_URL(id: number, type: ThumbnailType, size: ThumbnailSize?, circular: boolean?): string
 	local width, height = SPLIT_SIZE(size, DEFUALT_SIZE_NUM, DEFUALT_SIZE_NUM)
 	return RAW_FORMAT(id, type, width, height, circular)
