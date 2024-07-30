@@ -4,6 +4,8 @@
 -- url
 -- utility functions for encoding and decoding urls
 
+export type SpaceEncoding = "+" | "%20"
+
 -- these dont have fast calls
 local string_format = string.format
 local string_gmatch = string.gmatch
@@ -19,7 +21,7 @@ end
 
 -- i just wanted to do this because i find it funny,
 -- sure its a bit less readable but its not thaaaat bad
-local function encode_url(url: string, encode_spaces_as: ("+" | "%20")?): string
+local function encode_url(url: string, encode_spaces_as: SpaceEncoding?): string
 	return (
 		string_gsub(
 			string_gsub(
@@ -31,11 +33,13 @@ local function encode_url(url: string, encode_spaces_as: ("+" | "%20")?): string
 	)
 end
 
-local function queryify(tbl: { [string]: string }): string
+local function queryify(tbl: { [string]: string }, encode_spaces_as: SpaceEncoding?): string
 	local query_strings = {} :: { string }
 
 	for key, value in tbl do
-		table.insert(query_strings, `{encode_url(key)}={encode_url(value)}`)
+		local encoded_value = encode_url(value, encode_spaces_as)
+		local encoded_key = encode_url(key, encode_spaces_as)
+		table.insert(query_strings, `{encoded_key}={encoded_value}`)
 	end
 	return `?{table.concat(query_strings, "&")}`
 end
