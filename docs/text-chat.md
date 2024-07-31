@@ -122,7 +122,7 @@ end)
 
 ### `is_muted`
 
-Returns a bool indicating if a player is muted in all channels, if the `channel` arg is provided it will only check if the player is muted in that specific channel.
+Returns a boolean indicating if a player is muted in all channels, if the `channel` arg is provided it will only check if the player is muted in that specific channel.
 
 ```luau
 local Players = game:GetService("Players")
