@@ -6,7 +6,7 @@ Utility for easily retrying functions
 local StarterGui = game:GetService("StarterGui")
 local retryer = require("retryer")
 
-retryer.inf(10, StarterGui.SetCore, "ResetButtonCallback", false)
+retryer.inf(StarterGui.SetCore, StarterGui, "ResetButtonCallback", false)
 
 ```
 
