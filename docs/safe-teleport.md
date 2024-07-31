@@ -1,6 +1,6 @@
 # Safe Teleport
 
-A [`TeleportService:TeleportAsync`](https://create.roblox.com/docs/reference/engine/classes/TeleportService#TeleportAsync) wrapper that makes teleporting simple
+[`TeleportService:TeleportAsync`](https://create.roblox.com/docs/reference/engine/classes/TeleportService#TeleportAsync) wrapper that makes teleporting simple
 
 ```luau
 
