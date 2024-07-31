@@ -70,14 +70,13 @@ end)
 
 ### `added_once`
 
-Same as [`added`](#added), except that it only runs the callback once and not for every character added
-afterwards.
+Same as [`added`](#added), except that it only runs the callback once and not for every [`Player.CharacterAdded`](https://create.roblox.com/docs/reference/engine/classes/Player#CharacterAdded) afterwards.
 
 ```luau
 local Players = game:GetService("Players")
 
 Players.PlayerAdded:Connect(function(player)
-	local disconnect = character.added_once(player, function(character)
+	character.added_once(player, function(character)
 		character.Humanoid.DisplayName = `{character.Name}'s first character!`
 	end)
 end)
@@ -102,9 +101,8 @@ end)
 
 ### `removing_once`
 
-Same as [`removing`](#removing), except that it only runs the callback once and not for every character added
+Same as [`removing`](#removing), except that it only runs the callback once and not for every [`Player.CharacterRemoving`](https://create.roblox.com/docs/reference/engine/classes/Player#CharacterRemoving) 
 afterwards.
-
 
 ```luau
 local Players = game:GetService("Players")
@@ -112,6 +110,37 @@ local Players = game:GetService("Players")
 Players.PlayerAdded:Connect(function(player)
 	character.removing(player, function(character)
 		print(`{character.Name}'s first death!`)
+	end)
+end)
+```
+
+### `appearance_loaded`
+
+Wrapper around [`Player.CharacterAppearanceLoaded`](https://create.roblox.com/docs/reference/engine/classes/Player#CharacterAppearanceLoaded), except that if the given `Player` already has a character with its appearance loaded it'll run the given callback for the existing character. Unless the third arg `dont_run_for_existing_character` is true
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+	local disconnect = character.appearance_loaded(player, function(character)
+		character.Humanoid.DisplayName = "🐈"
+	end)
+
+	task.wait()
+	disconnect()
+end)
+```
+
+### `appearance_loaded_once`
+
+Same as [`appearance_loaded`](#appearance_loaded), except that it only runs the callback once and not for every [`Player.CharacterAppearanceLoaded`](https://create.roblox.com/docs/reference/engine/classes/Player#CharacterAppearanceLoaded) afterwards.
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+	local disconnect = character.appearance_loaded_once(player, function(character)
+		character.Humanoid.DisplayName = `{character.Name}'s first character with its appearance loaded!`
 	end)
 end)
 ```
@@ -125,4 +154,15 @@ local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
 local character = character.get(player)
+```
+
+### `get_appearance_loaded`
+
+Same as [`get`](#get) except that it'll only return the character, if the player's character has its appearance loaded.
+
+```luau
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local character = character.get_appearance_loaded(player)
 ```
