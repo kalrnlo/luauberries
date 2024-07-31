@@ -1,3 +1,4 @@
+--!native
 
 -- playerzone
 -- simple util module for detecting players in rectangular zones
@@ -6,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
-local character = require("../character")
+local character = require("../character/character")
 
 export type ZoneType = "WHITELIST" | "BLACKLIST"
 
@@ -48,13 +49,15 @@ type BaseZoneInfo = {
 	size: Vector3,
 }
 
-local POINT_TO_OBJECT_SPACE = CFrame.identity.PointToObjectSpace
-local WEAK = table.freeze({ __mode = "v" })
+export type ZoneInfo<Type = ZoneType> = BaseZoneInfo & {
+	type: Type?,
+}
 
-local WHITELIST_ZONES = (setmetatable({}, WEAK) :: any) :: { WhitelistZone }
-local BLACKLIST_ZONES = (setmetatable({}, WEAK) :: any) :: { BlacklistZone }
-local ZONES = (setmetatable({}, WEAK) :: any) :: { Zone }
+local POINT_TO_OBJECT_SPACE = CFrame.identity.PointToObjectSpace
 local PLAYER_ZONE_INFO = {} :: { PlayerZoneInfo }
+local WHITELIST_ZONES = {} :: { WhitelistZone }
+local BLACKLIST_ZONES = {} :: { BlacklistZone }
+local ZONES = {} :: { Zone }
 local NEXT_ID = 1
 
 local function FIND_AND_REMOVE_ZONE_INFO(tbl: { PlayerZoneInfo }, player: Player)
@@ -109,17 +112,17 @@ local function insert(zone: Zone, player: Player)
 	end
 end
 
-local function create(info: BaseZoneInfo & { type: ZoneType? }): Zone
+local function create(info: ZoneInfo): Zone
 	local size = info.size - Vector3.one
 	local size_halved = size / 2
 	local zone = {
-		blacklist = setmetatable({}, WEAK) :: any,
 		type = info.type or "BLACKLIST" :: any,
 		size_halved_x = size_halved.X,
 		size_halved_y = size_halved.Y,
 		size_halved_z = size_halved.Z,
 		callback = info.callback,
 		cframe = info.cframe,
+		blacklist = {},
 		id = NEXT_ID,
 		size = size,
 	}
@@ -137,9 +140,19 @@ local function create(info: BaseZoneInfo & { type: ZoneType? }): Zone
 	return zone :: any
 end
 
+local function destroy(zone: Zone)
+	if zone.type == "WHITELIST" then
+		FIND_AND_REMOVE(WHITELIST_ZONES, zone)
+	else
+		FIND_AND_REMOVE(BLACKLIST_ZONES, zone)
+	end
+
+	FIND_AND_REMOVE(ZONES, zone)
+end
+
 do
 
-	RunService.PostSimulation:Connect(@native function()
+	RunService.PostSimulation:Connect(function()
 		for _, player_zone_info in PLAYER_ZONE_INFO do
 			player_zone_info.position = player_zone_info.rootpart.CFrame.Position
 		end
@@ -168,6 +181,10 @@ do
 	Players.PlayerAdded:Connect(function(player)
 		character.removing(player, function(character)
 			FIND_AND_REMOVE_ZONE_INFO(PLAYER_ZONE_INFO, player)
+
+			for _, zone in ZONES do
+				FIND_AND_REMOVE_ZONE_INFO(zone.blacklist, player)
+			end
 		end)
 		character.added(player, function(character)
 			local rootpart: BasePart = character.PrimaryPart :: any
@@ -192,22 +209,23 @@ do
 				end
 			end
 		end)
-	end)
 
-	Players.PlayerRemoving:Connect(function(player)
-		for _, zone in WHITELIST_ZONES do
-			FIND_AND_REMOVE(zone.whitelisted, player)
-		end
+		Players.PlayerRemoving:Connect(function(player)
+			for _, zone in WHITELIST_ZONES do
+				FIND_AND_REMOVE(zone.whitelisted, player)
+			end
 
-		for _, zone in BLACKLIST_ZONES do
-			FIND_AND_REMOVE(zone.blacklisted, player)
-		end
+			for _, zone in BLACKLIST_ZONES do
+				FIND_AND_REMOVE(zone.blacklisted, player)
+			end
+		end)
 	end)
 end
 
 return table.freeze({
 	create = (create :: any) :: ((info: BaseZoneInfo & { type: "BLACKLIST"? }) -> BlacklistZone) & 
 		((info: BaseZoneInfo & { type: "WHITELIST" }) -> WhitelistZone),
+	destroy = destroy,
 	remove = remove,
 	insert = insert,
 })
