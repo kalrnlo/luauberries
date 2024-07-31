@@ -3,11 +3,15 @@
 -- modified version of robloxs safe teleport function on the docs for TeleportAsync with types
 -- and api improvements
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 local retryer = require("../retryer/retryer")
 
-type SafeTeleportPrototype = { __call: (self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?) -> (boolean, SafeTeleportResult)}
+type SafeTeleportPrototype = { 
+    __call: (
+        self: SafeTeleport, placeid: number, players_or_player: { Player } | Player, info: SafeTeleportInfo?
+    ) -> (boolean, SafeTeleportResult)
+}
+
 type SafeTeleport = typeof(setmetatable({} :: {
     ATTEMPT_LIMIT: number,
     RETRY_DELAY: number,
@@ -15,8 +19,8 @@ type SafeTeleport = typeof(setmetatable({} :: {
 }, {} :: SafeTeleportPrototype))
 
 export type SafeTeleportResult = {
-    reserved_server_access_code: string,
     private_server_id: string,
+    access_code: string,
 }
 
 export type SafeTeleportInfo = {
@@ -26,44 +30,41 @@ export type SafeTeleportInfo = {
     jobid: string?,
 }
 
-local failed_teleport_result: SafeTeleportResult = table.freeze {
-    reserved_server_access_code = "",
+local TELEPORT_ASYNC = TeleportService.TeleportAsync
+local FAILED_RESULT: SafeTeleportResult = table.freeze({
     private_server_id = "0",
-}
-local self = {
-    ATTEMPT_LIMIT = 5,
-    RETRY_DELAY = 1,
-    FLOOD_DELAY = 15,
-}
+    access_code = "",
+})
+local ATTEMPT_LIMIT = 5
+local FLOOD_DELAY = 15
+local RETRY_DELAY = 1
 
-local teleport_async = TeleportService.TeleportAsync
-
-local function safe_teleport(place_id: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
+local function safe_teleport(placeid: number, players_or_player: {Player} | Player, opts: TeleportOptions?): (boolean, SafeTeleportResult)
 	local success, result = retryer.delay(
-        self.RETRY_DELAY, 
-        self.ATTEMPT_LIMIT,
-        teleport_async, 
-        TeleportService,  
-        place_id, 
-        if type(players_or_player) == "table" then players_or_player else table.create(1, players_or_player), 
+        RETRY_DELAY, ATTEMPT_LIMIT, TELEPORT_ASYNC, TeleportService,  
+        placeid, 
+        if type(players_or_player) == "table" then players_or_player else { players_or_player }, 
         opts
     )
 
 	if success then
-        return success, table.freeze {
-            reserved_server_access_code = result.ReservedServerAccessCode,
+        return success, table.freeze({
+            access_code = result.ReservedServerAccessCode,
             private_server_id = result.PrivateServerId,
-        }
+        })
     else
-		warn(`[SAFE_TELEPORT]: unsucessful teleport\n\tteleport_async_err: {result}`)
-        return success, failed_teleport_result
+		warn(`[SAFE TELEPORT]: unsucessful teleport\n\tteleport_async_err: {result}`)
+        return success, FAILED_RESULT
 	end
 end
 
-local function safe_teleport_call(self: SafeTeleport, place_id: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
+local function safe_teleport_call(self: SafeTeleport, placeid: number, players_or_player: {Player} | Player, info: SafeTeleportInfo?): (boolean, SafeTeleportResult)
     -- freezing it here, as somebody might want to configure the delays n stuff before its frozen
     if not table.isfrozen(self :: any) then 
         table.freeze(self) 
+        ATTEMPT_LIMIT = self.ATTEMPT_LIMIT
+        RETRY_DELAY = self.RETRY_DELAY
+        
     end
 
     if info then
@@ -72,30 +73,31 @@ local function safe_teleport_call(self: SafeTeleport, place_id: number, players_
         opts.ShouldReserveServer = info.reserve_server :: any
         opts.ServerInstanceId = info.jobid :: any
         opts:SetTeleportData(info.data)
-        return safe_teleport(place_id, players_or_player, opts)
+        return safe_teleport(placeid, players_or_player, opts)
     else
-        return safe_teleport(place_id, players_or_player)
+        return safe_teleport(placeid, players_or_player)
     end
 end
 
-TeleportService.TeleportInitFailed:Connect(function(player, result, err, place_id, opts)
-	if result == Enum.TeleportResult.Flooded then
-		task.wait(self.FLOOD_DELAY)
-	elseif result == Enum.TeleportResult.Failure then
-		task.wait(self.RETRY_DELAY)
-	else
-		-- if the teleport is invalid, report the error instead of retrying
-		error(`[SAFE_TELEPORT]: teleport failed\n\tresult_name: {result.Name}\n\terr: {err}`)
-	end
+do
 
-	safe_teleport(place_id, player, opts)
-end)
+    TeleportService.TeleportInitFailed:Connect(function(player, result, err, place_id, opts)
+	    if result == Enum.TeleportResult.Flooded then
+		    task.wait(FLOOD_DELAY)
+	    elseif result == Enum.TeleportResult.Failure then
+	    	task.wait(RETRY_DELAY)
+	    else
+		    -- if the teleport is invalid, report the error instead of retrying
+	    	error(`[SAFE TELEPORT]: teleport failed\n\tresult_type: {result.Name}\n\terror: {err}`)
+	    end
 
-local mt = {
-    __call = safe_teleport_call
-}
-mt.__index = mt 
+	    safe_teleport(place_id, player, opts)
+    end)
 
-local export: SafeTeleport = setmetatable(self, table.freeze(mt)) :: any
+end
 
-return export
+return setmetatable({
+    ATTEMPT_LIMIT = ATTEMPT_LIMIT,
+    FLOOD_DELAY = FLOOD_DELAY,
+    RETRY_DELAY = RETRY_DELAY,
+}, table.freeze({ __call = safe_teleport_call })) :: SafeTeleport
