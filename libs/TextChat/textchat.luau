@@ -10,7 +10,7 @@ local VERIFIED_CHAT_PREFIX_FORMAT = "<font color=\"#%*\">\u{E000}%*</font>%*`"
 local CHAT_PREFIX_FORMAT = "<font color=\"#%*\">%*</font>%*`"
 local PLAYERS_CHAT_LOADED = {} :: { [number]: { thread } | true }
 local PLAYER_SOURCES = {} :: { [number]: { TextSource } }
-local DEFUALT_CHAT_PREFIX = ":  "
+local DEFUALT_CHAT_ENDING = ":  "
 local CHAT_COLORS = table.freeze {
 	 -- BrickColor.new("Bright red").Color,
 	Color3.new(253/255, 41/255, 67/255),
@@ -150,13 +150,13 @@ local function get_chat_prefix(
 	name: string,
 	is_verified: boolean?,
 	include_name: boolean?,
-	prefix: string?
+	ending: string?
 ): string
 	return string.format(
 		if is_verified then VERIFIED_CHAT_PREFIX_FORMAT else CHAT_PREFIX_FORMAT, 
 		get_color_for_name(name):ToHex(),
 		if include_name then `{display}(@{name})` else display,
-		prefix or DEFUALT_CHAT_PREFIX
+		ending or DEFUALT_CHAT_ENDING
 	)
 end
 
