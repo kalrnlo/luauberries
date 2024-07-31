@@ -18,33 +18,8 @@ export type Character = Model & {
     Head: BasePart,
 }
 
---[[
-Maps players to their characters (which have their appearance loaded)
-]]
-local characterAppearanceLoaded: {Player: Character?} = {}
-do 
-	local function playerAdded(player: Player)
-		player.CharacterAppearanceLoaded:Connect(function(character: any)
-			characterAppearanceLoaded[player] = character
-		end)
-
-		player.CharacterRemoving:Connect(function()
-			characterAppearanceLoaded[player] = nil
-		end)
-	end
-
-	local function PlayerRemoving(player: Player)
-		characterAppearanceLoaded[player] = nil
-	end
-
-	Players.PlayerRemoving:Connect(PlayerRemoving)
-
-	for _, player in Players:GetPlayers() do
-		task.spawn(playerAdded, player)
-	end
-	Players.PlayerAdded:Connect(playerAdded)
-end
-
+-- maps players w their characters appearance loaded to their character
+local CHARACTER_APPEARANCE_LOADED = {} :: { [Player]: Character? }
 local character = {}
 
 function character.removing_once(player: Player, f: (character: Character) -> ()): () -> ()
@@ -133,7 +108,7 @@ function character.appearance_loaded(
 	f: (character: Character) -> (),
 	dont_run_for_existing_character: boolean?
 ): () -> ()
-	local character = character.get_appearance_loaded(player)
+	local character = CHARACTER_APPEARANCE_LOADED[player]
 	local removing_conn: RBXScriptConnection?
 	local thread: thread
 
@@ -165,7 +140,7 @@ function character.appearance_loaded_once(
 	f: (character: Character) -> (),
 	dont_run_for_existing_character: boolean?
 ): () -> ()
-	local character = character.get_appearance_loaded(player)
+	local character = CHARACTER_APPEARANCE_LOADED[player]
 
 	if character and not dont_run_for_existing_character then
 		local thread = task.defer(f, character)
@@ -198,7 +173,26 @@ function character.get(player: Player): Character?
 end
 
 function character.get_appearance_loaded(player: Player): Character?
-	return characterAppearanceLoaded[player]
+	return CHARACTER_APPEARANCE_LOADED[player]
 end
 
+do
+	local function on_player_added(player: Player)
+		player.CharacterAppearanceLoaded:Connect(function(character: any)
+			CHARACTER_APPEARANCE_LOADED[player] = character
+		end)
+		player.CharacterRemoving:Connect(function()
+			CHARACTER_APPEARANCE_LOADED[player] = nil
+		end)
+	end
+
+	Players.PlayerRemoving:Connect(function(player)
+		CHARACTER_APPEARANCE_LOADED[player] = nil
+	end)
+
+	for _, player in Players:GetPlayers() do
+		task.spawn(on_player_added, player)
+	end
+	Players.PlayerAdded:Connect(on_player_added)
+end
 return table.freeze(character)
