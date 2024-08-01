@@ -68,7 +68,7 @@ Teams.ChildRemoving:Connect(function(team: Team)
 		for _, zone in zones do
 			playerzone.destroy(zone)
 		end
-		TEAM_TO_CONNECTIONS[team] = nil
+		TEAM_TO_ZONES[team] = nil
 	end
 end :: any)
 
