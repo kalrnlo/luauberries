@@ -40,7 +40,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Toolchain
-        run: rokit install
+        run: |
+          rokit add lune-org/lune
+          rokit install
 
       - name: Run Tests
         shell: bash
