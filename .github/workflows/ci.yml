@@ -42,7 +42,6 @@ jobs:
       - name: Install Toolchain
         run: |
           rokit add lune-org/lune
-          rokit install
 
       - name: Run Tests
         shell: bash
