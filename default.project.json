@@ -1,0 +1,12 @@
+{
+	"emitLegacyScripts": false,
+	"name": "universe",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"libraries": {
+				"$path": "libs"
+			}
+		}
+	}
+}

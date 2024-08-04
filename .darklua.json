@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "current": {
+        "module_folder_name": "init",
+        "name": "path"
+      },
+      "rule": "convert_require",
+      "target": "roblox"
+    }
+  ]
+}
