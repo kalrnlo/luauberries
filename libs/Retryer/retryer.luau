@@ -26,6 +26,8 @@ local WAIT_FN: (number?) -> number = if task then
 	else 
 		WAIT
 
+print(task)
+
 local function retry_with_exponent<A..., R...>(
 	delay: number,
 	delay_exponent: number,
