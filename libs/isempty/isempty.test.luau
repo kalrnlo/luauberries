@@ -1,5 +1,5 @@
 local testkit = require("../../testkit")
-local isempty = require("isempty")
+local isempty = require("init")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
 

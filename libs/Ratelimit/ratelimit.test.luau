@@ -1,4 +1,4 @@
-local ratelimit = require("ratelimit")
+local ratelimit = require("init")
 local testkit = require("../../testkit")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()

@@ -1,5 +1,5 @@
 local testkit = require("../../testkit")
-local random = require("random")
+local random = require("init")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
 

@@ -1,6 +1,6 @@
 local testkit = require("../../testkit")
 local task = require("@lune/task")
-local race = require("race")
+local race = require("init")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
 

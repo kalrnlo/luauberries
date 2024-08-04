@@ -1,5 +1,5 @@
 local testkit = require("../../testkit")
-local leventine = require("leventine")
+local leventine = require("init")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
 

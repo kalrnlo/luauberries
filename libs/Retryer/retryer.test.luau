@@ -1,5 +1,5 @@
 local testkit = require("../../testkit")
-local retryer = require("retryer")
+local retryer = require("init")
 
 local TEST, CASE, CHECK, FINISH, SKIP = testkit.test()
 local ATTEMPTS = 0
