@@ -33,6 +33,7 @@ export default defineConfig({
 			{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 		],
 		nav: [
+			{ text: "Installing", link: "/installing"},
 			{ text: 'Donate', link: 'https://buymeacoffee.com/kalrnlo' },
 		],
 
