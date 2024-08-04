@@ -41,7 +41,6 @@ TEST("retryer", function()
 	end
 
 	do CASE("exp")
-		
 		ATTEMPTS = 0
 		local success1, ret1_1, ret1_2 = retryer.exp(2, .5, 1, meower, "meow", "mrrow")	
 		local success2, ret2_1, ret2_2 = retryer.exp(2, .5, 5, meower, "meow", "mrrow")
