@@ -89,3 +89,13 @@ retryer.infdelay(10, StarterGui.SetCore, "ResetButtonCallback", false)
 
 Works like [`exp`](#exp), except that it infinitely retrys until it succeeds
 
+```luau
+local DataStoreService = game:GetService("DataStoreService")
+
+local STORE = DataStoreService:GetDataStore("COINS", "V1")
+
+retryer.exp(5, 2, STORE.UpdateAsync, STORE, "alice", function(_, keyinfo)
+    return -math.huge, keyinfo:GetUserIds(), keyinfo:GetMetadata()
+end)
+```
+
