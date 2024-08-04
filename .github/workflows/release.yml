@@ -30,7 +30,7 @@ jobs:
     needs: ["create-release"]
     runs-on: ubuntu-latest
     env:
-      BIN: zap
+      BIN: rbxlibs
     steps:
       - uses: actions/checkout@v3
 
@@ -62,7 +62,7 @@ jobs:
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Content-Type: application/zip" \
               --data-binary @"../${dir}.zip" \
-              "${{ needs.create-release.outputs.upload_url }}?name=${{ env.BIN }}-${{ env.PROJECT_VERSION }}-${dir}.zip"
+              "${{ needs.create-release.outputs.upload_url }}?name=${dir}-${{ env.PROJECT_VERSION }}.zip"
           done
 
       - name: Upload Individual Files
@@ -79,6 +79,16 @@ jobs:
             fi
           done
 
+      - name: Get Version from Ref
+        shell: bash
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+             echo "PROJECT_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          else
+             echo "PROJECT_VERSION=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          fi
+          echo "Version is: ${{ env.PROJECT_VERSION }}"
+        
       - name: Upload All as Artifact
         uses: actions/upload-artifact@v3
         with:
