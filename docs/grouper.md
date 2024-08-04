@@ -24,11 +24,6 @@ local MIN_RANK_TO_TEAM = {
 	[250] = CREATE_TEAM("Owners", BrickColor.new("Bright violet")),
 }
 
-grouper.init.server({
-	rank_refresh_rate = 60,
-	groupid = 31287129,
-})
-
 local function SET_TEAM(player: Player, rank: number?)
 	local rank = rank or grouper.rank(player)
 	local prev_teamcolor: BrickColor
@@ -43,6 +38,7 @@ local function SET_TEAM(player: Player, rank: number?)
 	player.TeamColor = prev_teamcolor
 end
 
+grouper.init.server({ groupid = 31287129 })
 Players.PlayerAdded:Connect(SET_TEAM)
 grouper.on_rank_changed(SET_TEAM)
 ```
