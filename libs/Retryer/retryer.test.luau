@@ -39,8 +39,8 @@ TEST("retryer", function()
 
 	do CASE("exp")
 		ATTEMPTS = 0
-		local success1, ret1_1, ret1_2 = retryer.exp(2, 2, 1, meower, "meow", "mrrow")	
-		local success2, ret2_1, ret2_2 = retryer.exp(2, 2, 5, meower, "meow", "mrrow")
+		local success1, ret1_1, ret1_2 = retryer.exp(2, .5, 1, meower, "meow", "mrrow")	
+		local success2, ret2_1, ret2_2 = retryer.exp(2, .5, 5, meower, "meow", "mrrow")
 
 		CHECK(
 			success1 == false and ret1_1 == "lmao" and ret1_2 == nil and
@@ -72,8 +72,8 @@ TEST("retryer", function()
 
 	do CASE("infexp")
 		ATTEMPTS = 0
-		local ret1_1, ret1_2 = retryer.infexp(1, 2, meower, "meow", "mrrow")	
-		local ret2_1, ret2_2 = retryer.infexp(1, 2, meower, "meow", "mrrow")
+		local ret1_1, ret1_2 = retryer.infexp(1, .5, meower, "meow", "mrrow")	
+		local ret2_1, ret2_2 = retryer.infexp(1, .5, meower, "meow", "mrrow")
 
 		CHECK(
 			ret1_1 == "meow :3" and ret1_2 == "mrrow 🐈" and

@@ -53,14 +53,13 @@ local function retry_with_delay<A..., R...>(delay: number, max_attempts: number,
 	local success = results[1]
 
 	if not results[1] then
-		WAIT_FN(delay)
 		local attempts = 1
 
 		repeat
+			WAIT_FN(delay)
 			results = { pcall(f, ...) }
 			success = results[1]
 			attempts += 1
-			WAIT_FN(delay)
 		until results[1] or attempts == max_attempts
 	end
 	return success, unpack(results, 2)
