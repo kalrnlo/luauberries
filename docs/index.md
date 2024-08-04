@@ -6,6 +6,13 @@ hero:
   name: rbxlibs
   text: A collection of libraries for luau and roblox
   tagline:
+  actions:
+    - theme: brand
+      text: API
+      link: /character
+    - theme: alt
+      text: Installing
+      link: /installing
 
 features:
   - title: Character
