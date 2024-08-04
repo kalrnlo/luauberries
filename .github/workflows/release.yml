@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: true
+          prerelease: false
+
+  build:
+    needs: ["create-release"]
+    runs-on: ubuntu-latest
+    env:
+      BIN: zap
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get Version from Tag
+        shell: bash
+        run: |
+          echo "PROJECT_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "Version is: ${{ env.PROJECT_VERSION }}"
+
+      - name: Setup Foreman
+        uses: Roblox/setup-foreman@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Toolchain
+        run: foreman install
+
+      - name: Run release script
+        run: lune run release
+
+      - name: Zip and Upload Subdirectories
+        run: |
+          cd output
+          for dir in */; do
+            dir=${dir%/}
+            zip -r "../${dir}.zip" "$dir"
+            echo "Uploading ${dir}.zip"
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: application/zip" \
+              --data-binary @"../${dir}.zip" \
+              "${{ needs.create-release.outputs.upload_url }}?name=${{ env.BIN }}-${{ env.PROJECT_VERSION }}-${dir}.zip"
+          done
+
+      - name: Upload Individual Files
+        run: |
+          cd output
+          for file in *; do
+            if [ -f "$file" ]; then
+              echo "Uploading $file"
+              curl -X POST \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary @"$file" \
+                "${{ needs.create-release.outputs.upload_url }}?name=$file"
+            fi
+          done
+
+      - name: Upload All as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.BIN }}-${{ env.PROJECT_VERSION }}-all
+          path: output
