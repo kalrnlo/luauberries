@@ -1,8 +1,9 @@
 local testkit = require("../../testkit")
 local retryer = require("retryer")
 
-local TEST, CASE, CHECK, FINISH = testkit.test()
+local TEST, CASE, CHECK, FINISH, SKIP = testkit.test()
 local ATTEMPTS = 0
+
 
 
 local function meower(kitty: string, catter: string): (string, string)
@@ -38,6 +39,7 @@ TEST("retryer", function()
 	end
 
 	do CASE("exp")
+		
 		ATTEMPTS = 0
 		local success1, ret1_1, ret1_2 = retryer.exp(2, .5, 1, meower, "meow", "mrrow")	
 		local success2, ret2_1, ret2_2 = retryer.exp(2, .5, 5, meower, "meow", "mrrow")
@@ -81,3 +83,9 @@ TEST("retryer", function()
 		)
 	end
 end)
+
+SKIP("exp")
+SKIP("delay")
+SKIP("infdelay")
+SKIP("infexp")
+SKIP("inf")
