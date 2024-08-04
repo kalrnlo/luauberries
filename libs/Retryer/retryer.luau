@@ -137,7 +137,9 @@ local mt = {
 mt.__index = mt
 
 local tbl = {
+	infexp = infretry_with_exponent,
 	infdelay = infretry_with_delay,
+	exp = retry_with_exponent,
 	delay = retry_with_delay,
 	inf = infretry,
 }
