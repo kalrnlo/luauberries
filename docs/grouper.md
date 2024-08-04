@@ -2,7 +2,6 @@
 
 Module for getting accurate group ranks for players on the server, and detecting rank changes
 
-
 ```luau
 local Players = game:GetService("Players")
 local Teams = game:GetService("Teams")
