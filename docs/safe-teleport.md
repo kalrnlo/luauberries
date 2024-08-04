@@ -3,6 +3,15 @@
 [`TeleportService:TeleportAsync`](https://create.roblox.com/docs/reference/engine/classes/TeleportService#TeleportAsync) wrapper that makes teleporting simple
 
 ```luau
+local Players = game:GetService("Players")
+local safeteleport = require("safeteleport")
+
+safeteleport(102091321, Players:GetPlayers(), {
+    data = {
+        soft_shutdown = true,
+    },
+    reserve_server = true,
+})
 
 ```
 
