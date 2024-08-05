@@ -9,11 +9,15 @@ local function WAIT(seconds: number?): number
 	local clock_time: number
 
 	repeat
-		math.sqrt(5)
 		clock_time = os.clock()
 	until clock_time >= end_time
 	return clock_time - start_time
 end
+
+-- in roblox, scripts if theyre too fast can exaust execution time 
+-- (its so empty while true do loops dont infintly run)
+-- so we use this for the retry functions without any delays so athey dont have errors in roblox
+local WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME: () -> () = if task then task.wait else function() end
 
 -- they both have the same type but luau infers it as (number?) -> number | (number?) -> number
 -- if the local itself isnt annotated
@@ -36,14 +40,11 @@ local function retry_with_exponent<A..., R...>(
 	local success = results[1]
 
 	if not results[1] then
-		local attempts = 1
-
-		repeat
+		for attempts = 1, max_attempts do
 			WAIT_FN(delay + (delay_exponent ^ attempts))
 			results = { pcall(f, ...) }
 			success = results[1]
-			attempts += 1
-		until success or attempts == max_attempts
+		end
 	end
 	return success, unpack(results, 2)
 end
@@ -53,14 +54,11 @@ local function retry_with_delay<A..., R...>(delay: number, max_attempts: number,
 	local success = results[1]
 
 	if not results[1] then
-		local attempts = 1
-
-		repeat
+		for attempts = 1, max_attempts do
 			WAIT_FN(delay)
 			results = { pcall(f, ...) }
 			success = results[1]
-			attempts += 1
-		until results[1] or attempts == max_attempts
+		end
 	end
 	return success, unpack(results, 2)
 end
@@ -71,13 +69,11 @@ local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> 
 	local success = results[1]
 
 	if not success then
-		local attempts = 1
-
-		repeat
+		for attempts = 1, max_attempts do
+			WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME()
 			results = { pcall(f, ...) }
 			success = results[1]
-			attempts += 1
-		until success or attempts == max_attempts
+		end
 	end
 	return success, unpack(results, 2)
 end
@@ -123,7 +119,7 @@ local function infretry<A..., R...>(f: (A...) -> (R...), ...: A...): (R...)
 
 	if not success then
 		repeat
-			WAIT_FN()
+			WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME()
 			results = { pcall(f, ...) }
 			success = results[1]
 		until success
