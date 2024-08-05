@@ -6,7 +6,10 @@
         "name": "path"
       },
       "rule": "convert_require",
-      "target": "roblox"
+      "target": {
+        "indexing_style": "wait_for_child",
+        "name": "roblox"
+      }
     }
   ]
 }
