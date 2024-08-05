@@ -14,9 +14,9 @@ local function WAIT(seconds: number?): number
 	return clock_time - start_time
 end
 
--- in roblox scripts if theyre too fast can exaust execution time 
+-- in roblox, scripts if theyre too fast can exaust execution time 
 -- (its so empty while true do loops dont infintly run)
--- so we use this for the retry functions without any delays so they dont have errors in roblox
+-- so we use this for the retry functions without any delays so athey dont have errors in roblox
 local WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME: () -> () = if task then task.wait else function() end
 
 -- they both have the same type but luau infers it as (number?) -> number | (number?) -> number
