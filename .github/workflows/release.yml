@@ -54,7 +54,7 @@ jobs:
       - name: Run release script
         run: lune run release
 
-      - name: Upload multi-file libraries
+      - name: Upload libraries
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -64,18 +64,6 @@ jobs:
             zip -r "../${dir}.zip" "$dir"
             echo "Uploading ${dir}.zip"
             gh release upload ${{ github.ref_name }} "../${dir}.zip" --clobber
-          done
-
-      - name: Upload single file libraries
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd output
-          for file in *; do
-            if [ -f "$file" ]; then
-              echo "Uploading $file"
-              gh release upload ${{ github.ref_name }} "$file" --clobber
-            fi
           done
 
       - name: Upload artifact
