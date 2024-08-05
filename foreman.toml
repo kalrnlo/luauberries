@@ -1,2 +1,3 @@
 [tools]
 lune = { source = "lune-org/lune", version = "0.8.6" }
+darklua = { source = "seaofvoices/darklua", version = "0.13.1" }
