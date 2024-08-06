@@ -8,4 +8,4 @@ local function LICENSE_REPLACE(str: string): string
 	return `\n-- {string.sub(str, 2)}`
 end
 
-return `-- MIT License{string.gsub(string.sub(fs.readFile("LICENSE"), 14), "\n%a+", LICENSE_REPLACE)}`
+return `-- MIT License\n{string.gsub(string.sub(fs.readFile("LICENSE"), 14), "\n%a+", LICENSE_REPLACE)}`
