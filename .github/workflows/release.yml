@@ -77,7 +77,7 @@ jobs:
           cd output
           for dir in */; do
             dir=${dir%/}
-            echo "UPLOADING ${dir}"
+            echo "\27[1;4mUPLOADING ${dir}\27[0m"
             (cd "$dir" && zip -r "../${dir}.zip" .)
             gh release upload ${{ env.release_id }} "${dir}.zip" --clobber
           done
