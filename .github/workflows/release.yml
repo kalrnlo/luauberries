@@ -2,27 +2,62 @@ name: Release
 
 on:
   release:
-    types: [ created, published, prereleased, released ]
+    types: [ published, created, edited, prereleased, released ]
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag for this release (e.g., v1.0.0)'
+        required: true
 
 permissions:
   contents: write
 
 jobs:
-  build-and-upload:
+  make_draft:
+    name: Make draft release
     runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_draft.outputs.release_id }}
+      version: ${{ steps.get_version.outputs.version }}
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get Version
+      - name: Get version
+        id: get_version
         shell: bash
         run: |
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            echo "PROJECT_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          if [[ ${{ github.event_name }} == 'release' ]]; then
+            version=${GITHUB_REF#refs/tags/}
           else
-            echo "PROJECT_VERSION=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+            version=${{ github.event.inputs.tag_name }}
           fi
-          echo "Version is: ${{ env.PROJECT_VERSION }}"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "version-found: $version"
+      
+      - name: Create draft
+        id: create_draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ ${{ github.event_name }} == 'release' ]]; then
+            # Convert existing release to draft
+            release_id=$(gh release edit ${{ github.event.release.tag_name }} --draft | grep -oP 'releases/tag/\K.*')
+          else
+            # Create new draft release
+            release_id=$(gh release create ${{ steps.get_version.outputs.version }} --draft --title "${{ steps.get_version.outputs.version }}" --generate-notes | grep -oP 'releases/tag/\K.*')
+          fi
+          echo "release_id=$release_id" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build
+    needs: make_draft
+    runs-on: ubuntu-latest
+    env:
+      release_id: ${{needs.make_draft.outputs.release_id}}
+      version: ${{needs.make_draft.outputs.version}}
+    steps:
+      - uses: actions/checkout@v3
 
       - name: Setup Foreman
         uses: Roblox/setup-foreman@v1
@@ -32,7 +67,7 @@ jobs:
       - name: Install Toolchain
         run: foreman install
 
-      - name: Run release script
+      - name: Run script
         run: lune run release
 
       - name: Upload libraries
@@ -42,13 +77,13 @@ jobs:
           cd output
           for dir in */; do
             dir=${dir%/}
-            zip -r "../${dir}.zip" "$dir"
+            (cd "$dir" && zip -r "../${dir}.zip" .)
             echo "Uploading ${dir}.zip"
-            gh release upload ${{ github.ref_name }} "../${dir}.zip" --clobber
+            gh release upload ${{ env.release_id }} "${dir}.zip" --clobber
           done
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: rbxlibs-${{ env.PROJECT_VERSION }}-ALL-LIBS
+          name: rbxlibs-${{ env.version }}-ALL-LIBS
           path: output
