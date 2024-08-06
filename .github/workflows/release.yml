@@ -74,10 +74,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          bold=$(tput bold)
+          normal=$(tput sgr0)
+
           cd output
           for dir in */; do
             dir=${dir%/}
-            echo "\27[1;4mUPLOADING ${dir}\27[0m"
+            echo "${bold}UPLOADING ${dir}${normal}"
             (cd "$dir" && zip -r "../${dir}.zip" .)
             gh release upload ${{ env.release_id }} "${dir}.zip" --clobber
           done
