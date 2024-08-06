@@ -62,9 +62,6 @@ local connection = Teams.ChildAdded:Connect(on_team_added)
 local rbx_disconnect = connection.Disconnect
 
 Teams.ChildRemoving:Connect(function(team: Team)
-	local connections = TEAM_TO_CONNECTIONS[team]
-	local zones = TEAM_TO_ZONES[team]
-
 	CLEAN_TBL(TEAM_TO_CONNECTIONS[team], rbx_disconnect)
 	CLEAN_TBL(TEAM_TO_ZONES[team], playerzone.destroy)
 	TEAM_TO_CONNECTIONS[team] = nil
