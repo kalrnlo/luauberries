@@ -6,7 +6,6 @@ Fast module for detecting players in rectangular zones
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local playerzone = require("playerzone")
-local character = require("character")
 
 local TEAM_TO_CONNECTIONS = { [Team]: { RBXScriptConnection } }
 local TEAM_TO_ZONES = { [Team]: { playerzone.WhitelistZone } }
