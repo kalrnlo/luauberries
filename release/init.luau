@@ -221,6 +221,5 @@ return table.freeze({"{"}{table.concat(RBXLIBS_MODULE_RET)}{"\n}"})`
 end
 
 RBXLIBS_MODULE.Source = CREATE_RBXLIBS_MODULE_SOURCE(RBXLIBS_MODULE_RBX_REQUIRES)
-print(RBXLIBS_MODULE.Source)
 fs.writeFile("output/ALL_LIBS/rbxlibs.rbxm", PACK_INTO_RBXM(RBXLIBS_MODULE))
 fs.writeFile("output/ALL_LIBS/luau/init.luau", CREATE_RBXLIBS_MODULE_SOURCE(RBXLIBS_MODULE_STR_REQUIRES))
