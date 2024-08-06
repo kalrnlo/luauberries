@@ -40,11 +40,14 @@ local function retry_with_exponent<A..., R...>(
 	local success = results[1]
 
 	if not results[1] then
-		for attempts = 1, max_attempts do
+		local attempts = 1
+
+		repeat
 			WAIT_FN(delay + (delay_exponent ^ attempts))
 			results = { pcall(f, ...) }
 			success = results[1]
-		end
+			attempts += 1
+		until success or attempts == max_attempts
 	end
 	return success, unpack(results, 2)
 end
@@ -54,11 +57,14 @@ local function retry_with_delay<A..., R...>(delay: number, max_attempts: number,
 	local success = results[1]
 
 	if not results[1] then
-		for attempts = 1, max_attempts do
+		local attempts = 1
+
+		repeat
 			WAIT_FN(delay)
 			results = { pcall(f, ...) }
 			success = results[1]
-		end
+			attempts += 1
+		until success or attempts == max_attempts
 	end
 	return success, unpack(results, 2)
 end
@@ -69,11 +75,14 @@ local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> 
 	local success = results[1]
 
 	if not success then
-		for attempts = 1, max_attempts do
+		local attempts = 1
+
+		repeat
 			WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME()
 			results = { pcall(f, ...) }
 			success = results[1]
-		end
+			attempts += 1
+		until success or attempts == max_attempts
 	end
 	return success, unpack(results, 2)
 end
