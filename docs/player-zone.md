@@ -11,45 +11,42 @@ local character = require("character")
 local TEAM_TO_CONNECTIONS = { [Team]: { RBXScriptConnection } }
 local TEAM_TO_ZONES = { [Team]: { playerzone.WhitelistZone } }
 
+local function ZONE_CALLER(
+	zones: { playerzone.WhitelistZone },
+	callback: (zone: playerzone.WhitelistZone, player: Player) -> ()
+): (player: Player) -> ()
+	return function(player: Player)
+		for _, zone in zones do
+			callback(zone, player)
+		end
+	end
+end
+
 local function on_team_added(team: Team)
 	local color = team.Color
 	local zones = {}
 
-	local function on_detected(character: character.Character)
-		character.Humanoid.Health = 0
-	end
-
 	for _, zonepart in CollectionService:GetTagged("TEAM_ZONE") do
 		if color == zonepart:GetAttribute("TeamColor") then
 			table.insert(zones, playerzone.create({
+				callback = function(character)
+					character.Humanoid.Health = 0
+				end,
 				cframe = zonepart.CFrame,
-				callback = on_detected,
 				size = zonepart.Size,
 				type = "WHITELIST",
 			}))
 		end
 	end
 
-	local function add_to_whitelist(player: Player)
-		for _, zone in zones do
-			playerzone.insert(zone, player)
-		end
-	end
-
-	local connections = {
-		team.PlayerRemoving:Connect(function(player)
-			for _, zone in zones do
-				playerzone.remove(zone, player)
-			end
-		end),
-		team.PlayerAdded:Connect(add_to_whitelist),
-	}
-
 	for _, player in team:GetPlayers() do
 		add_to_whitelist(player)
 	end
 
-	TEAM_TO_CONNECTIONS[team] = connections
+	TEAM_TO_CONNECTIONS[team] = {
+		team.PlayerRemoving:Connect(ZONE_CALLER(zones, playerzone.remove)),
+		team.PlayerAdded:Connect(ZONE_CALLER(zones, playerzone.insert)),
+	}
 	TEAM_TO_ZONES[team] = zones
 end
 
