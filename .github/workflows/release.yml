@@ -83,7 +83,7 @@ jobs:
           done
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rbxlibs-${{ env.version }}-ALL-LIBS
-          path: output
+          path: output/ALL_LIBS.zip
