@@ -33,7 +33,7 @@ jobs:
             version=${{ github.event.inputs.tag_name }}
           fi
           echo "version=$version" >> $GITHUB_OUTPUT
-          echo "version-found: $version"
+          echo "FOUND VERSION $version"
       
       - name: Create draft
         id: create_draft
