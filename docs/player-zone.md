@@ -23,6 +23,7 @@ local function ZONE_CALLER(
 end
 
 local function on_team_added(team: Team)
+	local add_to_whitelist = ZONE_CALLER(zones, playerzone.insert)
 	local color = team.Color
 	local zones = {}
 
@@ -45,7 +46,7 @@ local function on_team_added(team: Team)
 
 	TEAM_TO_CONNECTIONS[team] = {
 		team.PlayerRemoving:Connect(ZONE_CALLER(zones, playerzone.remove)),
-		team.PlayerAdded:Connect(ZONE_CALLER(zones, playerzone.insert)),
+		team.PlayerAdded:Connect(add_to_whitelist),
 	}
 	TEAM_TO_ZONES[team] = zones
 end
