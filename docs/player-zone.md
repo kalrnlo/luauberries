@@ -53,26 +53,26 @@ local function on_team_added(team: Team)
 	TEAM_TO_ZONES[team] = zones
 end
 
+local function CLEAN_TBL<V>(t: { V }?, cleaner: (self: V) -> ())
+	if t then
+		for _, value in t do
+			cleaner(value)
+		end
+	end
+end
+
+local connection = Teams.ChildAdded:Connect(on_team_added)
+local rbx_disconnect = connection.Disconnect
+
 Teams.ChildRemoving:Connect(function(team: Team)
 	local connections = TEAM_TO_CONNECTIONS[team]
 	local zones = TEAM_TO_ZONES[team]
 
-	if connections then
-		for _, connection in connections do
-			connection:Disconnect()
-		end
-		TEAM_TO_CONNECTIONS[team] = nil
-	end
-
-	if zones then
-		for _, zone in zones do
-			playerzone.destroy(zone)
-		end
-		TEAM_TO_ZONES[team] = nil
-	end
+	CLEAN_TBL(TEAM_TO_CONNECTIONS[team], rbx_disconnect)
+	CLEAN_TBL(TEAM_TO_ZONES[team], playerzone.destroy)
+	TEAM_TO_CONNECTIONS[team] = nil
+	TEAM_TO_ZONES[team] = nil
 end :: any)
-
-Teams.ChildAdded:Connect(on_team_added)
 
 for _, team in Teams:GetTeams() do
 	if not TEAM_TO_ZONES[team] then
