@@ -44,14 +44,14 @@ jobs:
 
           if [[ ${{ github.event_name }} == 'release' ]]; then
             # Convert existing release to draft
-            release_id=$(gh release edit $version --draft | grep -oP 'releases/tag/\K.*')
+            release_id=$(gh release edit ${version} --draft | grep -oP 'releases/tag/\K.*')
           else
-            gh release edit $version
+            gh release edit ${version}
             if [ $? -ne 0 ]; then
               # Create new draft release
-              release_id=$(gh release create $version --draft --title "$version" --generate-notes | grep -oP 'releases/tag/\K.*')
+              release_id=$(gh release create ${version} --draft --title "${version}" --generate-notes | grep -oP 'releases/tag/\K.*')
             else
-              release_id=$(gh release edit $version --draft | grep -oP 'releases/tag/\K.*')
+              release_id=$(gh release edit ${version} --draft | grep -oP 'releases/tag/\K.*')
             fi
           fi
           echo "release_id=$release_id" >> $GITHUB_OUTPUT
