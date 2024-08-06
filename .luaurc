@@ -2,6 +2,7 @@
 	"languageMode": "strict",
 	"lint": {
         "MultiLineStatement": false,
+        "LocalUnused": false,
         "LocalShadow": false
     },
     "aliases": {
