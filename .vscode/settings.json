@@ -14,12 +14,11 @@
   },
   "explorer.excludeGitIgnore": false,
   "explorer.fileNesting.enabled": false,
-  "explorer.sortOrderLexicographicOptions": "upper",
+  "explorer.sortOrderLexicographicOptions": "lower",
   "search.exclude": {
     "**/darklua_output": true,
     "**/output": true
   },
-  "editor.formatOnPaste": false,
   "luau-lsp.completion.imports.enabled": false,
   "luau-lsp.diagnostics.strictDatamodelTypes": true,
   "luau-lsp.require.fileAliases": {
