@@ -32,7 +32,7 @@ jobs:
             runner-os: macos-14
 
     concurrency:
-      group: CI-${{ matrix.runner-os }}-${{ github.workflow }}-${{ github.ref }}
+      group: CI-${{ matrix.runner-os }}-${{ github.ref }}
       cancel-in-progress: true
     runs-on: ${{ matrix.runner-os }}
     name: ${{ matrix.name }}
