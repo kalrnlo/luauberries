@@ -21,13 +21,25 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: CompeyDev/setup-rokit@v0.1.0
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
+
+      - name: Install Toolchain
+        shell: bash
+        run: rokit install --no-trust-check
+
+      - name: Sort homepage libraries
+        shell: bash
+        run: lune run scripts/sort_libraries
+
       - run: npm ci
       - name: Build
         run: npm run docs:build
