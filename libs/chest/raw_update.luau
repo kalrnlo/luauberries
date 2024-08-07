@@ -5,6 +5,24 @@
 local retryer = require("libs/retryer")
 local t = require("types")
 
+type RawUpdate = typeof(setmetatable({} :: { retry: RawUpdateFn }, {} :: RawUpdatePrototype))
+
+type RawUpdateFn = <Value, A...>(
+	chest: t.Chest<Value>, key: string,
+	f: t.RawUpdateAsyncCallback<Value, A...>,
+	A...
+) -> (boolean, Value, DataStoreKeyInfo)
+
+type RawUpdatePrototype = {
+	__call: <S, Value, A...>(
+		self: S, chest: t.Chest<Value>, key: string,
+		f: t.RawUpdateAsyncCallback<Value, A...>, A...
+	) -> (boolean, Value, DataStoreKeyInfo)
+}
+
+local raw_update = {} :: { retry: RawUpdateFn }
+local raw_update_mt = {} :: RawUpdatePrototype
+
 -- exists so the typechecker doesnt yell at me
 local function PACK_VARADIC(...: any): { any }
 	return { ... }
@@ -16,7 +34,6 @@ local function RAW_UPDATE_ASYNC<Value, A...>(
 	f: t.RawUpdateAsyncCallback<Value, A...>,
 	...: A...
 ): (Value, DataStoreKeyInfo)
-	-- doing this to not get a type error
 	local packed_args = PACK_VARADIC(...)
 	
 	return chest.datastore:UpdateAsync(key, 
@@ -37,66 +54,19 @@ local function RAW_UPDATE_ASYNC<Value, A...>(
 	)
 end
 
-local raw_update_mt = {}
-
-function raw_update_mt.__call<S, Value, A...>(
-	self: S,
-	chest: t.Chest<Value>,
-	key: string,
-	f: t.RawUpdateAsyncCallback<Value, A...>,
-	...: A...
-): (boolean, Value, DataStoreKeyInfo)
-	return pcall(RAW_UPDATE_ASYNC, chest, key, f, ...)
+function raw_update_mt.__call(self, chest, key, f, ...)
+	-- type error: generic subtype escaping scope occurs if i dont typecast chest
+	return pcall(RAW_UPDATE_ASYNC, chest :: any, key, f, ...)
 end
 
-local raw_update = setmetatable({}, raw_update_mt)
-
-function raw_update.retryC<Value, A...>(
-	chest: t.Chest<Value>,
-	key: string,
-	f: t.RawUpdateAsyncCallback<Value, A...>,
-	...: A...
-): (boolean, Value, DataStoreKeyInfo)
-
-end
-
-local function PCALL_RAW_UPDATE_ASYNC<S, Value, A...>(
-	self: S,
-	chest: t.Chest<Value>,
-	key: string,
-	f: t.RawUpdateAsyncCallback<Value, A...>,
-	...: A...
-): (boolean, Value, DataStoreKeyInfo)
-
-end
-
-
-local function RETRY_RAW_UPDATE_ASYNC<Value, A...>(
-	chest: Chest<Value>,
-	key: string,
-	f: t.RawUpdateAsyncCallback<Value, A...>,
-	...: A...
-): (boolean, Value, DataStoreKeyInfo)
-
+function raw_update.retry(chest, key, f, ...)
+	-- same type error here sigh..
 	return retryer.exp(
-		chest.time_between_attempts, chest.retry_exponent, chest.max_attempts,
-		RAW_UPDATE_ASYNC
+		chest.time_between_attempts, chest.retry_exponent, 
+		chest.max_attempts, RAW_UPDATE_ASYNC, chest :: any, 
+		key, f, ...
 	)
-
-	local results = { RAW_UPDATE_ASYNC(chest, key, f, ...) } :: { any }
-	local success = results[1]
-
-	if not success then
-		local time_between_attempts = chest.time_between_attempts
-		local max_attempts = chest.max_attempts
-		local attempts = 1
-
-		repeat
-			task.wait(time_between_attempts)
-			results = { RAW_UPDATE_ASYNC(chest, key, f, ...) } :: { any }
-			success = results[1]
-			attempts += 1
-		until success or attempts == max_attempts
-	end
-	return success, unpack(results, 2)
 end
+
+table.freeze(setmetatable(raw_update, table.freeze(raw_update_mt)))
+return (raw_update :: any) :: RawUpdate
