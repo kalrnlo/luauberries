@@ -31,7 +31,7 @@
     "**/darklua_output/**"
   ],
   "luau-lsp.fflags.override": {
-    "DebugLuauDeferredConstraintResolution": "true"
+    "DebugLuauDeferredConstraintResolution": "true",
   },
   "luau-lsp.bytecode.vectorType": "vector",
 }
