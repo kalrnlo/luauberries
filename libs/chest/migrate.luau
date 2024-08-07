@@ -3,10 +3,10 @@
 -- migrate
 -- function for handling migrating save data
 
-local data_ops = require("data_ops")
+local DATA_OPS = require("data_ops")
 local t = require("types")
 
-local function migrate(
+local function MIGRATE(
 	chest: t.Chest,
 	saveinfo: t.SaveInfo,
 	key: string,
@@ -19,7 +19,7 @@ local function migrate(
 	local success
 
 	if not save_version then
-		return "SUCCESS", data_ops.clone_default_val(chest, key)
+		return "SUCCESS", DATA_OPS.CLONE_DEFAULT_VAL(chest, key)
 	elseif save_version > our_version then
 		-- COULD NOT LOAD VALUE ERROR HERE
 		return "SAVE VERSION TOO HIGH", nil
@@ -44,4 +44,4 @@ local function migrate(
 	return "SUCCESS", new_value
 end
 
-return migrate
+return MIGRATE

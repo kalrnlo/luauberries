@@ -3,6 +3,8 @@
 -- cross
 -- cross runtime utility
 
+type Spawn = <A..., R...>(f: ((A...) -> (R...)) | thread, A...) -> thread
+
 local IS_ROBLOX = Instance and Instance.new and game and game.Genre
 local IS_LUNE = string.find(_VERSION, "Lune") ~= nil
 -- putting paraentheses around require removes its magic function
@@ -28,10 +30,10 @@ return table.freeze({
 	lune = IS_LUNE,
 
 	purespawn = PURE_SPAWN,
-	spawn = if task then 
-		task.spawn 
+	spawn = (if task then 
+		task.spawn
 	elseif IS_LUNE then 
 		REQUIRE("@lune/task").spawn 
 	else 
-		PURE_SPAWN,
+		PURE_SPAWN) :: Spawn,
 })

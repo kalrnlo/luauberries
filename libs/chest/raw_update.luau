@@ -5,23 +5,23 @@
 local retryer = require("libs/retryer")
 local t = require("types")
 
-type RawUpdate = typeof(setmetatable({} :: { retry: RawUpdateFn }, {} :: RawUpdatePrototype))
-
 type RawUpdateFn = <Value, A...>(
 	chest: t.Chest<Value>, key: string,
 	f: t.RawUpdateAsyncCallback<Value, A...>,
 	A...
 ) -> (boolean, Value, DataStoreKeyInfo)
 
-type RawUpdatePrototype = {
-	__call: <S, Value, A...>(
-		self: S, chest: t.Chest<Value>, key: string,
-		f: t.RawUpdateAsyncCallback<Value, A...>, A...
-	) -> (boolean, Value, DataStoreKeyInfo)
+type RawUpdate = { 
+	RETRY: RawUpdateFn, 
+	SAFE: RawUpdateFn, 
+	UNSAFE: <Value, A...>(
+		chest: t.Chest<Value>, key: string,
+		f: t.RawUpdateAsyncCallback<Value, A...>,
+		A...
+	) -> (Value, DataStoreKeyInfo)
 }
 
-local raw_update = {} :: { retry: RawUpdateFn }
-local raw_update_mt = {} :: RawUpdatePrototype
+local raw_update = {} :: RawUpdate
 
 -- exists so the typechecker doesnt yell at me
 local function PACK_VARADIC(...: any): { any }
@@ -54,12 +54,12 @@ local function RAW_UPDATE_ASYNC<Value, A...>(
 	)
 end
 
-function raw_update_mt.__call(self, chest, key, f, ...)
+function raw_update.SAFE(chest, key, f, ...)
 	-- type error: generic subtype escaping scope occurs if i dont typecast chest
 	return pcall(RAW_UPDATE_ASYNC, chest :: any, key, f, ...)
 end
 
-function raw_update.retry(chest, key, f, ...)
+function raw_update.RETRY(chest, key, f, ...)
 	-- same type error here sigh..
 	return retryer.exp(
 		chest.time_between_attempts, chest.retry_exponent, 
@@ -68,5 +68,6 @@ function raw_update.retry(chest, key, f, ...)
 	)
 end
 
-table.freeze(setmetatable(raw_update, table.freeze(raw_update_mt)))
-return (raw_update :: any) :: RawUpdate
+raw_update.UNSAFE = RAW_UPDATE_ASYNC
+
+return table.freeze(raw_update)
