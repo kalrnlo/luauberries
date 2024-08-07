@@ -75,7 +75,7 @@ jobs:
         run: rokit install --no-trust-check
         
       - name: Run script
-        run: lune run release
+        run: lune run scripts/release
 
       - name: Upload libraries
         env:
