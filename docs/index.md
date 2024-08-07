@@ -16,7 +16,7 @@ hero:
 
 features:
   - title: Cross
-    details: Utility for dealing with cross runtime shennanigans, covering the bear nessisities
+    details: Utility for dealing with cross runtime shenanigans, covering the bear nessisities
     link: /cross
   - title: Retryer
     details: Utility for easily retrying functions

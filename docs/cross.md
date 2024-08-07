@@ -1,6 +1,6 @@
 # Cross
 
-Utility for dealing with crosss runtime shennanigans, covering the bear nessisities
+Utility for dealing with crosss runtime shenanigans, covering the bear nessisities
 
 > [!NOTE]
 > Cross adds the following globals if they don't already exist,
