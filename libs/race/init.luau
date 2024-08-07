@@ -2,6 +2,8 @@
 -- race
 -- a function for getting the first return out of a vararg of functions
 
+local cross = require("../cross")
+
 local spawn = (function()
 	if task then
 		return task.spawn
@@ -28,7 +30,7 @@ local function callback_handler<A..., R...>(
 	main_thread: thread, ...: A...
 )
 	local callback_thread = coroutine.running()
-	local results = { f(...) }
+	local results = table.pack(f(...))
 
 	for _, thread in threads do
 		if thread ~= callback_thread then
@@ -40,7 +42,7 @@ local function callback_handler<A..., R...>(
 		end
 	end
 	
-	spawn(main_thread, unpack(results))
+	cross.spawn(main_thread, table.unpack(results, 1, results.n))
 end
 
 local function race<A..., R...>(callbacks: { (A...) -> R... }, ...: A...): R...
@@ -48,7 +50,7 @@ local function race<A..., R...>(callbacks: { (A...) -> R... }, ...: A...): R...
 	local main_thread = coroutine.running()
 
 	for index, f in callbacks do
-		threads[index] = spawn(callback_handler, f, threads, main_thread, ...)
+		threads[index] = cross.spawn(callback_handler, f, threads, main_thread, ...)
 	end
 
 	return coroutine.yield()
