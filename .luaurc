@@ -6,6 +6,7 @@
         "LocalShadow": false
     },
     "aliases": {
+        "libs": "./libs",
         "testkit": "./testkit"
     }
 }

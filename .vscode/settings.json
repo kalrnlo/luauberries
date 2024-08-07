@@ -2,8 +2,36 @@
   "luau-lsp.completion.autocompleteEnd": true,
   "luau-lsp.require.mode": "relativeToFile",
   "luau-lsp.require.directoryAliases": {
-    "@lune/": "~/.lune/.typedefs/0.8.3/"
+    "@lune/": "~/.lune/.typedefs/0.8.3/",
+    "libs/": "libs",
   },
-  "luau-lsp.completion.imports.requireStyle": "alwaysAbsolute",
+  "luau-lsp.completion.imports.requireStyle": "alwaysRelative",
   "luau-lsp.completion.imports.separateGroupsWithLine": false,
+  "explorer.autoRevealExclude": {
+    "**/bower_components": false,
+    "**/darklua_output": true,
+    "sourcemap.json": true
+  },
+  "explorer.excludeGitIgnore": false,
+  "explorer.fileNesting.enabled": false,
+  "explorer.sortOrderLexicographicOptions": "upper",
+  "search.exclude": {
+    "**/darklua_output": true,
+    "**/output": true
+  },
+  "editor.formatOnPaste": false,
+  "luau-lsp.completion.imports.enabled": false,
+  "luau-lsp.diagnostics.strictDatamodelTypes": true,
+  "luau-lsp.require.fileAliases": {
+    "testkit": "testkit"
+  },
+  "luau-lsp.completion.imports.ignoreGlobs": [
+    "**/_Index/**",
+    "**/output/**",
+    "**/darklua_output/**"
+  ],
+  "luau-lsp.fflags.override": {
+    "DebugLuauDeferredConstraintResolution": "true"
+  },
+  "luau-lsp.bytecode.vectorType": "vector",
 }
