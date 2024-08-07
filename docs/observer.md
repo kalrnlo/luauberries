@@ -1,10 +1,9 @@
-### Observer
+# Observer
 
-A simple observer library for roblox
+Simple observer library for roblox
 
-#### example
-```lua
-local observer = require("@kalrnlo/observer")
+```luau
+local observer = require("observer")
 
 local disconnect = observer.character(function(character, player)
     character:SetAttribute("rank", player:GetRankInGroup(23239231))
