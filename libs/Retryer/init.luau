@@ -3,6 +3,11 @@
 -- retryer
 -- utility module for retrying functions easily
 
+type Results = { 
+	n: number,
+	[any]: any
+}
+
 local function WAIT(seconds: number?): number
 	local start_time = os.clock()
 	local end_time = start_time + (seconds or 1)
@@ -36,7 +41,7 @@ local function retry_with_exponent<A..., R...>(
 	max_attempts: number,
 	f: (A...) -> (R...), ...: A...
 ): (boolean, R...)
-	local results: any = { pcall(f, ...) }
+	local results: Results = table.pack(pcall(f, ...))
 	local success = results[1]
 
 	if not results[1] then
@@ -44,16 +49,16 @@ local function retry_with_exponent<A..., R...>(
 
 		repeat
 			WAIT_FN(delay + (delay_exponent ^ attempts))
-			results = { pcall(f, ...) }
+			results = table.pack(pcall(f, ...))
 			success = results[1]
 			attempts += 1
 		until success or attempts == max_attempts
 	end
-	return success, unpack(results, 2)
+	return success, table.unpack(results, 2, results.n)
 end
 
 local function retry_with_delay<A..., R...>(delay: number, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
-	local results: any = { pcall(f, ...) }
+	local results: Results = table.pack(pcall(f, ...))
 	local success = results[1]
 
 	if not results[1] then
@@ -61,17 +66,17 @@ local function retry_with_delay<A..., R...>(delay: number, max_attempts: number,
 
 		repeat
 			WAIT_FN(delay)
-			results = { pcall(f, ...) }
+			results = table.pack(pcall(f, ...))
 			success = results[1]
 			attempts += 1
 		until success or attempts == max_attempts
 	end
-	return success, unpack(results, 2)
+	return success, table.unpack(results, 2, results.n)
 end
 
 -- if self isnt defined as a generic the other generics dont get infered correctly
 local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> (R...), ...: A...): (boolean, R...)
-	local results: any = { pcall(f, ...) }
+	local results: Results = table.pack(pcall(f, ...))
 	local success = results[1]
 
 	if not success then
@@ -79,12 +84,12 @@ local function retry<S, A..., R...>(self: S, max_attempts: number, f: (A...) -> 
 
 		repeat
 			WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME()
-			results = { pcall(f, ...) }
+			results = table.pack(pcall(f, ...))
 			success = results[1]
 			attempts += 1
 		until success or attempts == max_attempts
 	end
-	return success, unpack(results, 2)
+	return success, table.unpack(results, 2, results.n)
 end
 
 local function infretry_with_exponent<A..., R...>(
@@ -92,7 +97,7 @@ local function infretry_with_exponent<A..., R...>(
 	delay_exponent: number,
 	f: (A...) -> (R...), ...: A...
 ): (R...)
-	local results: any = { pcall(f, ...) }
+	local results: Results = table.pack(pcall(f, ...))
 	local success = results[1]
 
 	if not success then
@@ -100,40 +105,40 @@ local function infretry_with_exponent<A..., R...>(
 
 		repeat
 			WAIT_FN(delay + (delay_exponent ^ attempts))
-			results = { pcall(f, ...) }
+			results = table.pack(pcall(f, ...))
 			success = results[1]
 			attempts += 1
 		until success
 	end
-	return unpack(results, 2)
+	return table.unpack(results, 2, results.n)
 end
 
 local function infretry_with_delay<A..., R...>(delay: number, f: (A...) -> (R...), ...: A...): (R...)
-	local results: any = { pcall(f, ...) }
+	local results: Results = table.pack(pcall(f, ...))
 	local success = results[1]
 
 	if not success then
 		repeat
 			WAIT_FN(delay)
-			results = { pcall(f, ...) }
+			results = table.pack(pcall(f, ...))
 			success = results[1]
 		until success
 	end
-	return unpack(results, 2)
+	return table.unpack(results, 2, results.n)
 end
 
 local function infretry<A..., R...>(f: (A...) -> (R...), ...: A...): (R...)
-	local results: any = { pcall(f, ...) }
+	local results: Results = table.pack(pcall(f, ...))
 	local success = results[1]
 
 	if not success then
 		repeat
 			WAIT_FN_SO_SCRIPT_DOESNT_EXAUST_EXECUTION_TIME()
-			results = { pcall(f, ...) }
+			results = table.pack(pcall(f, ...))
 			success = results[1]
 		until success
 	end
-	return unpack(results, 2)
+	return table.unpack(results, 2, results.n)
 end
 
 local mt = {
