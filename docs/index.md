@@ -25,7 +25,7 @@ features:
     details: Runs several functions at once, and returns the result of the function that completes first
     link: /race
   - title: Connector
-    details: Utility for dealing with crosss runtime shennanigans, covering the bear nessisities
+    details: Utility for handling event callbacks
     link: /connector
   - title: Character
     details: Utility for getting better types with player characters in roblox
