@@ -8,9 +8,14 @@ on:
       tag_name:
         description: 'Tag for this release (e.g., v1.0.0)'
         required: true
+        type: string
 
 permissions:
   contents: write
+
+concurrency:
+  group: RELEASE-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   make_draft:
@@ -19,8 +24,11 @@ jobs:
     outputs:
       release_id: ${{ steps.create_draft.outputs.release_id }}
       version: ${{ steps.get_version.outputs.version }}
+    env:
+      version: placeholder
 
     steps:
+      - uses: ./.github/workflows/ci.yml
       - uses: actions/checkout@v3
 
       - name: Get version
@@ -33,6 +41,7 @@ jobs:
             version=${{ github.event.inputs.tag_name }}
           fi
           echo "version=$version" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_ENV
           echo "FOUND VERSION $version"
       
       - name: Create draft
@@ -40,17 +49,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [[ ${{ github.event_name }} == 'release' ]]; then
-            # Convert existing release to draft
-            release_id=$(gh release edit ${{ steps.get_version.outputs.version }} --draft | grep -oP 'releases/tag/\K.*')
+          if gh release view ${{ env.version }}; then
+            gh release edit ${{ env.version }} --draft
           else
-            if gh release edit ${{ steps.get_version.outputs.version }}; then
-              release_id=$(gh release edit ${{ steps.get_version.outputs.version }} --draft | grep -oP 'releases/tag/\K.*')
-            else
-              # Create new draft release
-              release_id=$(gh release create ${{ steps.get_version.outputs.version }} --draft --title "${{ steps.get_version.outputs.version }}" --generate-notes | grep -oP 'releases/tag/\K.*')
-            fi
+            gh release create ${{ env.version }} --draft --title "${{ env.version }}" --generate-notes
           fi
+          release_id=$(gh release view v2.1.0 --json id -q ".id")
+
           echo "release_id=$release_id" >> $GITHUB_OUTPUT
 
   build:
@@ -62,14 +67,6 @@ jobs:
       version: ${{needs.make_draft.outputs.version}}
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup Foreman
-        uses: Roblox/setup-foreman@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Toolchain
-        run: foreman install
 
       - name: Run script
         run: lune run release
