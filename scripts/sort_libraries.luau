@@ -8,8 +8,9 @@ local fs = require("@lune/fs")
 type SidebarItem = { text: string, link: string }
 
 local SIDEBAR_JSON_PATH = "docs/.vitepress/sidebar-libs.json"
-local TITLE_PATTERN = "  %- title: (.+)"
+local TITLE_PATTERN = "(.-)\n"
 local HOME_MD_PATH = "docs/index.md"
+local TITLE_KEY = "%- title"
 
 local content = fs.readFile(HOME_MD_PATH)
 local section_start, section_end = string.find(content, "features:\n.-\n[^\n ]")
@@ -22,6 +23,14 @@ local section = string.sub(content, section_start, section_end - 1)
 local sidebar_libs = {} :: { SidebarItem }
 local libs = {} :: { string }
 local find_start = 1
+
+local function SUB_KEY_FROM_ENTRY(
+	entry_name: string,
+	entry: string
+): string
+	local _, name_end = string.find(entry, `{entry_name}: `)
+	return string.sub(entry, (name_end + 1) or 1)
+end
 
 while true do
 	local _, lib_end, lib = string.find(
@@ -39,8 +48,8 @@ while true do
 	end
 
 	table.insert(sidebar_libs, {
-		name = string.sub(title, 12),
-		link = string.sub(link, 11),
+		text = SUB_KEY_FROM_ENTRY(TITLE_KEY, title),
+		link = SUB_KEY_FROM_ENTRY("link", link),
 	})
 
 	table.insert(libs, lib)
@@ -48,10 +57,11 @@ while true do
 end
 
 table.sort(libs, function(a, b)
-	local title_a = string.match(a, TITLE_PATTERN)
-	local title_b = string.match(b, TITLE_PATTERN)
+	-- subbing to remove the "- title: " part
+	local len_a = #SUB_KEY_FROM_ENTRY(TITLE_KEY, string.match(a, TITLE_PATTERN))
+	local len_b = #SUB_KEY_FROM_ENTRY(TITLE_KEY, string.match(b, TITLE_PATTERN))
 
-	return #title_a > #title_b
+	return len_a > len_b
 end)
 
 local before_section = string.sub(content, 1, section_start - 1)

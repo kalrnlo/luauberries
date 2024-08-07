@@ -55,7 +55,7 @@ export default defineConfig({
 			},
 			{
 				text: 'Libraries',
-				items: JSON.parse(fs.readFileSync("sidebar-libs.json", {
+				items: JSON.parse(fs.readFileSync("docs/.vitepress/sidebar-libs.json", {
 					encoding: 'utf8'
 				}))
 			}
