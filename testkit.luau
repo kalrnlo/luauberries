@@ -1,4 +1,7 @@
---------------------------------------------------------------------------------
+--!nocheck
+--!nolint
+
+-------------------------------------------------------------------------------
 -- testkit.luau
 -- v0.7.3
 --------------------------------------------------------------------------------
@@ -465,5 +468,13 @@ local testkit = {
 
     color = color
 }
+
+-- yes ik global bad, but this is here for unit testing
+-- so shush
+local roblox = require("@lune/roblox")
+
+DateTime = require("@lune/DateTime")
+Instance = roblox.Instance
+game = Instance.new("DataModel")
 
 return testkit
