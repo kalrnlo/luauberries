@@ -28,8 +28,10 @@ jobs:
       version: placeholder
 
     steps:
-      - uses: ./.github/workflows/ci.yml
       - uses: actions/checkout@v3
+
+      - name: Run CI
+        uses: ./.github/workflows/ci.yml
 
       - name: Get version
         id: get_version
@@ -66,8 +68,12 @@ jobs:
       release_id: ${{needs.make_draft.outputs.release_id}}
       version: ${{needs.make_draft.outputs.version}}
     steps:
+      - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
 
+      - name: Install Toolchain
+        run: rokit install --no-trust-check
+        
       - name: Run script
         run: lune run release
 
