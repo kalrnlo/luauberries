@@ -8,32 +8,45 @@ on:
         required: false
         type: string
   push:
-    branches: [ main ]
     paths:
       - "libs/**.luau"
       - "testkit.luau"
   pull_request:
-    branches: [ main ]
     paths:
       - "libs/**.luau"
       - "testkit.luau"
 
 jobs:
-  parse_skips:
-    name: Parse skips
-    if: inputs.skip
-    runs-on: ubuntu-latest
-    concurrency:
-      group: CI-PARSE-${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
-    outputs:
-      skip_json: ${{ steps.main.outputs.skip_json }}
+  Main:    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            runner-os: windows-latest
+  
+          - name: Linux
+            runner-os: ubuntu-latest
+  
+          - name: macOS
+            runner-os: macos-14
 
+    concurrency:
+      group: CI-${{ matrix.runner-os }}-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    runs-on: ${{ matrix.runner-os }}
+    name: ${{ matrix.name }}
+        
     steps:
+      - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
 
-      - name: main
-        id: main
+      - name: Install Toolchain
+        run: rokit install --no-trust-check
+
+      - name: Parse skips
+        id: parse
+        if: inputs.skip
         shell: bash
         run: |
           skip_json="{}"
@@ -45,7 +58,7 @@ jobs:
             if [[ $item =~ ^([A-Za-z0-9_]+)\(([A-Za-z0-9_,]+)\)$ ]]; then
               lib="${BASH_REMATCH[1]}"
               IFS=',' read -ra cases <<< "${BASH_REMATCH[2]}"
-              
+                
               for case in "${cases[@]}"; do
                 if [[ ! $case =~ ^[A-Za-z0-9_]+$ ]]; then
                   echo "SYNTAX ERROR INVALID CASE NAME '$case' IN LIB '$item'"
@@ -63,42 +76,14 @@ jobs:
               exit 1
             fi
           done
-          
+            
           echo "skip_json=$(echo $skip_json | jq -c .)" >> $GITHUB_OUTPUT
 
-  Run:
-    needs: parse_skips
-    env:
-      SKIP_JSON: ${{ needs.parse_skips.outputs.skip_json }}
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Windows
-            runner-os: windows-latest
-  
-          - name: Linux
-            runner-os: ubuntu-latest
-  
-          - name: macOS
-            runner-os: macos-14
-    concurrency:
-      group: CI-${{ matrix.runner-os }}-${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
-    runs-on: ${{ matrix.runner-os }}
-    name: ${{ matrix.name }}
-        
-    steps:
-      - uses: CompeyDev/setup-rokit@v0.1.0
-      - uses: actions/checkout@v3
-
-      - name: Install Toolchain
-        run: rokit install --no-trust-check
-
       - name: Append skips
-        if: inputs.skip
+        if: inputs.skip && steps.parse.outcome.success
         shell: bash
+        env:
+          SKIP_JSON: ${{ steps.parse.outputs.skip_json }}
         run: |
           find libs -name "*test.luau" | while read -r file; do
             echo "Running test: $file"
