@@ -1,37 +1,63 @@
+--!nocheck
 --!native
+--!nolint
 
 -- cross
--- cross runtime utility
+-- basic cross runtime utility, covering the bear nessisities
 
-local IS_ROBLOX = Instance and Instance.new and game and game.Genre
-local IS_LUNE = string.find(_VERSION, "Lune") ~= nil
--- putting paraentheses around require removes its magic function
--- so i nolonger will get type errors :3
-local REQUIRE = (require)
+local cross_task = require("task")
+local cross_warn = require("warn")
 
-local function PURE_SPAWN<A..., R...>(
-	thread_or_func: thread | (A...) -> R..., 
-	...: A...
-): thread
-	if type(thread_or_func) == "thread" then
-		coroutine.resume(thread_or_func, ...)
-		return thread_or_func
+type Runtime = "ROBLOX" | "LUNE" | "NONE"
+
+local RUNTIME: Runtime = if game and game.ClassName == "DataModel" and game.GraphicsQualityChangeRequest then
+		"ROBLOX"
+	elseif string.find(_VERSION, "Lune") then
+		"LUNE"
 	else
-		local thread = coroutine.create(thread_or_func)
-		coroutine.resume(thread, ...)
-		return thread
+		"NONE"
+
+local WARN: typeof(cross_warn) = warn or cross_warn
+
+local TASK: typeof(cross_task) = if task then 
+		task 
+	elseif RUNTIME == "LUNE" then 
+		(require)("@lune/task") 
+	else 
+		cross_task
+
+do
+
+	local function SET_G(key: string, value: unknown)
+		if not _G[key] then
+			_G[key] = value
+		end
 	end
+
+	if not _RUNTIME then
+		SET_G("_RUNTIME", RUNTIME)
+		_RUNTIME = RUNTIME
+	end
+
+	if not warn then
+		SET_G("warn", WARN)
+		warn = WARN
+	end
+
+	if not task then
+		SET_G("task", TASK)
+		task = TASK
+	end
+
 end
 
-return table.freeze({ 
-	roblox = IS_ROBLOX,
-	lune = IS_LUNE,
+return table.freeze({
+	cancel = TASK.cancel,
+	spawn = TASK.spawn,
+	defer = TASK.defer,
+	delay = TASK.delay,
+	wait = TASK.wait,
+	warn = WARN,
 
-	purespawn = PURE_SPAWN,
-	spawn = if task then 
-		task.spawn 
-	elseif IS_LUNE then 
-		REQUIRE("@lune/task").spawn 
-	else 
-		PURE_SPAWN,
+	runtime = RUNTIME,
 })

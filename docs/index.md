@@ -18,6 +18,10 @@ features:
   - title: Character
     details: Utility for getting better types with player characters in roblox
     link: /character
+    target: lol
+  - title: Cross
+    details: Utility for dealing with crosss runtime shennanigans, covering the bear nessisities
+    link: /cross
   - title: Grouper
     details: Module for getting accurate group ranks for players on the server, and detecting rank changes
     link: /grouper
