@@ -1,18 +1,17 @@
-name: Print libs metadata
+name: Print diff
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   Main:
     runs-on: ubuntu-latest
         
     steps:
-      - uses: CompeyDev/setup-rokit@v0.1.0
-      - uses: actions/checkout@v3
-
-      - name: Install Toolchain
-        run: rokit install --no-trust-check
-
-      - name: print
-        run: lune run scripts/print_metadata
+            - uses: actions/checkout@v2
+            - uses: technote-space/get-diff-action@v6
+              with:
+                FORMAT: json
+            - run: echo '${{ env.GIT_DIFF }}' | jq .
