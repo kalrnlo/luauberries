@@ -1,0 +1,18 @@
+name: Print libs metadata
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Main:
+    runs-on: ubuntu-latest
+        
+    steps:
+      - uses: CompeyDev/setup-rokit@v0.1.0
+      - uses: actions/checkout@v3
+
+      - name: Install Toolchain
+        run: rokit install --no-trust-check
+
+      - name: print
+        run: lune run scripts/print_metadata
