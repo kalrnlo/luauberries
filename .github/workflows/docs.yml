@@ -22,31 +22,33 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: CompeyDev/setup-rokit@v0.1.0
+      - uses: actions/configure-pages@v2
 
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Install Toolchain
+        shell: bash
+        run: rokit install --no-trust-check
+
+      - name: Sort libraries
+        shell: bash
+        run: lune run scripts/sort_libraries
 
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
 
-      - name: Install Toolchain
-        shell: bash
-        run: rokit install --no-trust-check
-
-      - name: Sort homepage libraries
-        shell: bash
-        run: lune run scripts/sort_libraries
-
-      - run: npm ci
       - name: Build
-        run: npm run docs:build
-      - uses: actions/configure-pages@v2
+        shell: bash
+        run: npm ci && npm run docs:build
+
       - uses: actions/upload-pages-artifact@v1
         with:
           path: docs/.vitepress/dist
+          
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v1
