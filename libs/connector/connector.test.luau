@@ -16,7 +16,7 @@ TEST("connector", function()
 
 		CHECK(
 			table.find(connections, connection) ~= nil and
-			table.isfrozen(connection) and
+			table.isfrozen(connection :: any) and
 			connection.f == NOOP and
 			connection.connections == connections
 		)
@@ -71,9 +71,7 @@ TEST("connector", function()
 		connector.spawn(connections, "mrrp", "meow")
 
 		CHECK(
-			connections[1] == conn1 and
-			connections[2] == conn2 and
-			connections[3] == conn3 and
+			testkit.seq(connections, { conn1, conn2, conn3 }) and
 			conn1_got_correct_args and
 			conn2_got_correct_args and
 			conn3_got_correct_args
@@ -114,9 +112,7 @@ TEST("connector", function()
 		end
 
 		CHECK(
-			connections[1] == conn1 and
-			connections[2] == conn2 and
-			connections[3] == conn3 and
+			testkit.seq(connections, { conn1, conn2, conn3 }) and
 			conn1_got_correct_args and
 			conn2_got_correct_args and
 			conn3_got_correct_args

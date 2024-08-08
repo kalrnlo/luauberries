@@ -3,28 +3,6 @@ local cross = require("init")
 
 local TEST, CASE, CHECK, FINISH, SKIP = testkit.test()
 
-local function spawner_test(name: string,spawn_func: <A..., R...>(f: ((A...) -> (R...)) | thread, A...) -> thread)
-	do CASE(name)
-		local args_str: string
-
-		local func_thread = spawn_func(function()
-			local args = { coroutine.yield() }
-			args_str = table.concat(args, ", ")
-		end)
-
-		local thread_thread = spawn_func(
-			func_thread, "meow", "mrrp"
-		)
-
-		CHECK(
-			type(func_thread) == "thread" and
-			type(thread_thread) == "thread" and
-			func_thread == thread_thread and
-			args_str == "meow, mrrp"
-		)
-	end
-end
-
 TEST("cross", function()
 	do CASE("check globals")
 		CHECK(
