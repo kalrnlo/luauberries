@@ -2,7 +2,7 @@
 -- race
 -- a function for getting the first return out of a vararg of functions
 
-local cross = require("../cross")
+local cross = require("../cross/init")
 
 local spawn = (function()
 	if task then

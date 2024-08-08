@@ -3,7 +3,7 @@
 -- retryer
 -- utility module for retrying functions easily
 
-local cross = require("../cross")
+local cross = require("../cross/init")
 
 type Results = { 
 	n: number,

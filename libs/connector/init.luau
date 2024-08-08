@@ -3,7 +3,7 @@
 -- connector
 -- utility for handling event callbacks
 
-local cross = require("../cross")
+local cross = require("../cross/init")
 
 type ConnectionPrototype<A...> = {
 	__call: (self: Connection<A...>) -> ()
