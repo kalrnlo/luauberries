@@ -1,37 +1,28 @@
 {
-  "luau-lsp.completion.autocompleteEnd": true,
-  "luau-lsp.require.mode": "relativeToFile",
-  "luau-lsp.require.directoryAliases": {
-    "@lune/": "~/.lune/.typedefs/0.8.3/"
-  },
-  "luau-lsp.completion.imports.requireStyle": "alwaysRelative",
-  "luau-lsp.completion.imports.separateGroupsWithLine": false,
-  "explorer.autoRevealExclude": {
-    "**/bower_components": false,
-    "**/darklua_output": true,
-    "sourcemap.json": true
-  },
-  "explorer.excludeGitIgnore": false,
-  "explorer.fileNesting.enabled": false,
-  "explorer.sortOrderLexicographicOptions": "upper",
-  "search.exclude": {
-    "**/darklua_output": true,
-    "**/output": true
-  },
-  "editor.formatOnPaste": false,
-  "luau-lsp.completion.imports.enabled": false,
-  "luau-lsp.diagnostics.strictDatamodelTypes": true,
-  "luau-lsp.completion.imports.ignoreGlobs": [
-    "**/node_modules/**/**/**",
-    "**/_Index/**",
-    "**/output/**",
-    "**/darklua_output/**",
+	// luau-lsp
+	"luau-lsp.completion.imports.requireStyle": "alwaysRelative",
+	"luau-lsp.completion.autocompleteEnd": true,
+	"luau-lsp.require.mode": "relativeToFile",
+	"luau-lsp.bytecode.vectorType": "vector",
+	"luau-lsp.completion.imports.ignoreGlobs": [
+		"**/node_modules/**/**/**",
+		"**/darklua_output/**",
+		"**/output/**",
+	],
+	"luau-lsp.ignoreGlobs": [
+		"**/node_modules/**",
+		"*.lua"
+	],
+	"luau-lsp.require.directoryAliases": {
+		"@lune/": "~/.lune/.typedefs/0.8.6/"
+	},
 
-  ],
-  "luau-lsp.bytecode.vectorType": "vector",
-  "luau-lsp.ignoreGlobs": [
-    "**/_Index/**",
-    "**/node_modules/**",
-    "*.lua"
-  ],
+	// vscode
+	"explorer.sortOrderLexicographicOptions": "upper",
+	"explorer.sortOrder": "foldersNestsFiles",
+	"search.exclude": {
+		"**/darklua_output/**": true,
+		"**/node_modules/**": true,
+		"**/output/**": true
+	},
 }
