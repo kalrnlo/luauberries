@@ -17,6 +17,7 @@ local function get_libs_to_test(): { string }
 		local diff = fs.readFile(".diff")
 		local scripts = diff_to_tbl.scripts(diff)
 	
+		print(scripts)
 		for _, script in scripts do
 			if table.find(SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN, script) then
 				return fs.readDir("libs")

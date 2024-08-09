@@ -32,7 +32,6 @@ local function find_deps(lib: string, dir: string, dependencies_tbl: { string })
 			local contents = fs.readFile(entry_path)
 
 			for require_path in GMATCH(contents, REQUIRE_PATTERN) do
-				print(require_path)
 				local deplib = FIND_LIB_IN_RELATIVE_PATH(require_path)
 				
 				if deplib and not table.find(dependencies_tbl, deplib) then
