@@ -57,4 +57,9 @@ for _, dependencies_tbl in GRAPH do
 end
 
 print(GRAPH)
+print(table.find(GRAPH["playerzone"], "character"))
+print(table.find(GRAPH["Grouper"], "connector"))
+print(table.find(GRAPH["connector"], "cross"))
+print(table.find(GRAPH["Retryer"], "cross"))
+print(table.find(GRAPH["Race"], "cross"))
 return table.freeze(GRAPH)
