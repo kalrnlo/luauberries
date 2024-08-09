@@ -6,7 +6,7 @@
 
 local fs = require("@lune/fs")
 
-local REQUIRE_PATTERN = "\r\nlocal%s+%w+%s*=%s*require%s*%(%-?%-?%-?[\"'`](.-)[\"'`]%)"
+local REQUIRE_PATTERN = "local%s+%w+%s*=%s*require%s*%(%-?%-?%-?[\"'`](.-)[\"'`]%)"
 local GRAPH = {} :: { [string]: { string } }
 local LINE_PATTERN = "[^\r\n]+"
 local GMATCH = string.gmatch
@@ -15,6 +15,7 @@ local SUB = string.sub
 
 local function FIND_LIB_IN_RELATIVE_PATH(path: string): string?
 	local fixed_path = if MATCH(path, "/init$") then SUB(path, 1, #path - 5) else path
+	print(fixed_path)
 	local found_lib = MATCH(fixed_path, "([^/]+)$")
 
 	warn(fixed_path, found_lib)
