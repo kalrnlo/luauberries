@@ -2,17 +2,45 @@
 -- test runner
 -- script for running tests for ci
 
+local diff_to_tbl = require("diff_to_tbl")
 local process = require("@lune/process")
-local serde = require("@lune/serde")
+local depgraph = require("depgraph")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
-local DIFF = process.args[1] :: string?
+local CHANGED_SET: { [string]: boolean }
 local LIBS: { string }
 
-print(DIFF)
+if fs.isFile(".diff") then
+	local diff = fs.readFile(".diff")
+	LIBS, CHANGED_SET = diff_to_tbl(diff)
 
-for _, lib in fs.readDir("libs") do
+	for lib, deps in depgraph do
+		if CHANGED_SET[lib] then
+			continue
+		end
+
+		for _, dep in deps do
+			if not CHANGED_SET[dep] then
+				continue
+			end
+			table.insert(LIBS, lib)
+			CHANGED_SET[lib] = true
+					
+			for search_lib, search_deps in depgraph do
+				if table.find(search_deps, lib) then
+					CHANGED_SET[search_lib] = true
+					table.insert(LIBS, search_lib)
+				end
+			end
+			break
+		end
+	end
+else
+	LIBS = fs.readDir("libs")
+end
+
+for _, lib in LIBS do
 	local path = `libs/{lib}/test`
 	local file_path = `{path}.luau`
 	local real_path: string
