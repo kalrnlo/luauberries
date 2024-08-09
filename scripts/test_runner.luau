@@ -9,7 +9,9 @@ local fs = require("@lune/fs")
 local ansi = require("ansi")
 
 local SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN = table.freeze({
-	"test_runner", "depgraph", "diff_to_tbl"
+	test_runner = true, 
+	depgraph = true, 
+	diff_to_tbl = true,
 })
 
 local function get_libs_to_test(): { string }
@@ -19,7 +21,8 @@ local function get_libs_to_test(): { string }
 	
 		print(scripts)
 		for _, script in scripts do
-			if table.find(SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN, script) then
+			print(#script, script)
+			if SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN[script] then
 				return fs.readDir("libs")
 			end
 		end
