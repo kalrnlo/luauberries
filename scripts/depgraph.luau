@@ -32,6 +32,7 @@ local function find_deps(lib: string, dir: string, dependencies_tbl: { string })
 		if MATCH(entry, "%.luau$") then
 			local contents = fs.readFile(entry_path)
 			print(`entry: {entry_path}`)
+			print(contents)
 
 			for require_path in GMATCH(contents, REQUIRE_PATTERN) do
 				print(require_path)
