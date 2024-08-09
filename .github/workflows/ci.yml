@@ -54,4 +54,4 @@ jobs:
           fi
 
       - name: Run test runner
-        run: lune run scripts/test_runner -- $(<.diff)
+        run: lune run scripts/test_runner
