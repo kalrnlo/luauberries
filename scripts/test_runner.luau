@@ -7,16 +7,10 @@ local serde = require("@lune/serde")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
-print(process.args)
--- local PROVIDED_LIBS = process.args[1]
+local DIFF = if fs.isFile(".diff") then fs.readFile(".diff") else nil
 local LIBS: { string }
 
-if PROVIDED_LIBS then
-	print(PROVIDED_LIBS)
-	--LIBS = serde.decode("json", PROVIDED_LIBS)
-else
-	LIBS = fs.readDir("libs")
-end
+print(DIFF)
 
 for _, lib in fs.readDir("libs") do
 	local path = `libs/{lib}/test`
