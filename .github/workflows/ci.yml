@@ -2,19 +2,16 @@ name: CI
 
 on:
   workflow_dispatch:
-    inputs:
-      skip:
-        description: 'Test cases to skip (format: LIBNAME.TESTCASE or LIBNAME(...TESTCASE))'
-        required: false
-        type: string
   push:
     branches: [ main ]
     paths:
+      - "scripts/test_runner.luau"
       - "libs/**.luau"
       - "testkit.luau"
   pull_request:
     branches: [ main ]
     paths:
+      - "scripts/test_runner.luau"
       - "libs/**.luau"
       - "testkit.luau"
 
@@ -46,68 +43,5 @@ jobs:
       - name: Install Toolchain
         run: rokit install --no-trust-check
 
-      - name: Parse skips
-        id: parse
-        if: inputs.skip
-        shell: bash
-        run: |
-          skip_json="{}"
-
-          # Remove all whitespace and then split
-          IFS=',' read -ra SKIP_ITEMS <<< "$(echo "${{ inputs.skip }}" | tr -d '[:space:]')"
-
-          for item in "${SKIP_ITEMS[@]}"; do
-            if [[ $item =~ ^([A-Za-z0-9_]+)\(([A-Za-z0-9_,]+)\)$ ]]; then
-              lib="${BASH_REMATCH[1]}"
-              IFS=',' read -ra cases <<< "${BASH_REMATCH[2]}"
-                
-              for case in "${cases[@]}"; do
-                if [[ ! $case =~ ^[A-Za-z0-9_]+$ ]]; then
-                  echo "SYNTAX ERROR INVALID CASE NAME '$case' IN LIB '$item'"
-                  exit 1
-                else
-                  skip_json=$(echo $skip_json | jq --arg lib "$lib" --arg case "$case" '. + {($lib): (.[($lib)] + [$case] | unique)}')
-                fi
-              done
-            elif [[ $item =~ ^([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)$ ]]; then
-              lib="${BASH_REMATCH[1]}"
-              case="${BASH_REMATCH[2]}"
-              skip_json=$(echo $skip_json | jq --arg lib "$lib" --arg case "$case" '. + {($lib): (.[($lib)] + [$case] | unique)}')
-            else
-              echo "SYNTAX ERROR INVALID FORMAT GIVEN FOR '$item'"
-              exit 1
-            fi
-          done
-            
-          echo "skip_json=$(echo $skip_json | jq -c .)" >> $GITHUB_OUTPUT
-
-      - name: Append skips
-        if: inputs.skip && steps.parse.outcome.success
-        shell: bash
-        env:
-          SKIP_JSON: ${{ steps.parse.outputs.skip_json }}
-        run: |
-          find libs -name "*test.luau" | while read -r file; do
-            echo "Running test: $file"
-            
-            # Extract lib name from filename
-            lib_name=$(basename "$file" | sed 's/\.test\.luau$//')
-            
-            skip_cases=$(echo $SKIP_JSON | jq -r --arg lib "$lib_name" '.[$lib] // [] | .[]')
-            
-            while IFS= read -r case; do
-              if [[ -n $case ]]; then
-                echo "SKIP(\"$case\")" >> "$file"
-              fi
-            done <<< "$skip_cases"
-          done
-
-      - name: Run Tests
-        shell: bash
-        run: |
-          find libs -name "*test.luau" | while read -r file; do
-            # append the finish call to the end of the file, because im lazy!!
-            echo -e "\n\nassert(FINISH())" >> "$file"
-
-            lune run $file
-          done
+      - name: Run test runner
+        run: lune run scripts/test_runner
