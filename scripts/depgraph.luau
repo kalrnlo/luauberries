@@ -15,10 +15,8 @@ local SUB = string.sub
 
 local function FIND_LIB_IN_RELATIVE_PATH(path: string): string?
 	local fixed_path = if MATCH(path, "/init$") then SUB(path, 1, #path - 5) else path
-	print(fixed_path)
 	local found_lib = MATCH(fixed_path, "([^/]+)$")
 
-	warn(fixed_path, found_lib)
 	return if found_lib and GRAPH[found_lib] then
 			found_lib
 		else
@@ -32,8 +30,6 @@ local function find_deps(lib: string, dir: string, dependencies_tbl: { string })
 		-- does the file have a .luau extention
 		if MATCH(entry, "%.luau$") then
 			local contents = fs.readFile(entry_path)
-			print(`entry: {entry_path}`)
-			print(contents)
 
 			for require_path in GMATCH(contents, REQUIRE_PATTERN) do
 				print(require_path)
@@ -62,9 +58,4 @@ for _, dependencies_tbl in GRAPH do
 end
 
 print(GRAPH)
-print(table.find(GRAPH["playerzone"], "character"))
-print(table.find(GRAPH["Grouper"], "connector"))
-print(table.find(GRAPH["connector"], "cross"))
-print(table.find(GRAPH["Retryer"], "cross"))
-print(table.find(GRAPH["race"], "cross"))
 return table.freeze(GRAPH)
