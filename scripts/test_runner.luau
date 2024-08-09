@@ -7,7 +7,8 @@ local serde = require("@lune/serde")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
-local PROVIDED_LIBS = process.args[1]
+print(process.args)
+-- local PROVIDED_LIBS = process.args[1]
 local LIBS: { string }
 
 if PROVIDED_LIBS then

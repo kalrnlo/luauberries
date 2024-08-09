@@ -52,4 +52,4 @@ jobs:
           fi
 
       - name: Run test runner
-        run: lune run scripts/test_runner ${{ steps.fetch_diff.outputs.diff }}
+        run: lune --version && lune run scripts/test_runner -- ${{ steps.fetch_diff.outputs.diff }}
