@@ -11,53 +11,49 @@ local ansi = require("ansi")
 local SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN = table.freeze({
 	"test_runner", "depgraph", "diff_to_tbl"
 })
-local CHANGED_SET: { [string]: boolean }
-local LIBS: { string }
 
-if fs.isFile(".diff") then
-	local diff = fs.readFile(".diff")
-	local scripts = diff_to_tbl.scripts(diff)
-
-	if #scripts ~= 0 then
+local function get_libs_to_test(): { string }
+	if fs.isFile(".diff") then
+		local diff = fs.readFile(".diff")
+		local scripts = diff_to_tbl.scripts(diff)
+	
 		for _, script in scripts do
 			if table.find(SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN, script) then
-				LIBS = fs.readDir("libs")
-				print(LIBS)
-				break
+				return fs.readDir("libs")
 			end
 		end
-	else
-		LIBS, CHANGED_SET = diff_to_tbl.libs(diff)
 
-		print(LIBS)
+		local libs, changed_set = diff_to_tbl.libs(diff)
+	
 		for lib, deps in depgraph do
-			if CHANGED_SET[lib] then
+			if changed_set[lib] then
 				continue
 			end
-
+	
 			for _, dep in deps do
-				if not CHANGED_SET[dep] then
+				if changed_set[dep] then
 					continue
 				end
-				table.insert(LIBS, lib)
-				CHANGED_SET[lib] = true
-					
+				table.insert(libs, lib)
+				changed_set[lib] = true
+						
 				for search_lib, search_deps in depgraph do
-					if table.find(search_deps, lib) then
-						CHANGED_SET[search_lib] = true
-						table.insert(LIBS, search_lib)
+					if search_lib ~= lib and table.find(search_deps, lib) then
+						changed_set[search_lib] = true
+						table.insert(libs, search_lib)
 					end
 				end
 				break
 			end
 		end
+
+		return libs
+	else
+		return fs.readDir("libs")
 	end
-else
-	LIBS = fs.readDir("libs")
-	print(LIBS)
 end
 
-for _, lib in LIBS do
+for _, lib in get_libs_to_test() do
 	local path = `libs/{lib}/test`
 	local file_path = `{path}.luau`
 	local real_path: string
