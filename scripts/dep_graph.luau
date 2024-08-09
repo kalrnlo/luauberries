@@ -1,32 +1,41 @@
+--!optimize 2
+--!native
 
 -- dep graph
 -- module for generating a dependency graph for all libraries
 
-local find_library_in_string = require("find_library_in_string")
 local fs = require("@lune/fs")
 
-local REQUIRE_PATTERN = "^local%s+%w+%s*=%s*require%s*%(%-?%-?[\"'](.+)[\"']%)$"
+local REQUIRE_PATTERN = "\r\nlocal%s+%w+%s*=%s*require%s*%(%-?%-?%-?[\"'`](.-)[\"'`]%)"
 local GRAPH = {} :: { [string]: { string } }
 local LINE_PATTERN = "[^\r\n]+"
-local LIBS = fs.readDir("libs")
+local GMATCH = string.gmatch
+local MATCH = string.match
+local SUB = string.sub
+
+local function FIND_LIB_IN_RELATIVE_PATH(path: string): string?
+	local fixed_path = if MATCH(path, "/init$") then SUB(path, 1, #path - 5) else path
+	local found_lib = MATCH(fixed_path, "([^/]+)$")
+
+	return if found_lib and GRAPH[found_lib] then
+			found_lib
+		else
+			nil
+end
 
 local function find_deps(lib: string, dir: string, dependencies_tbl: { string })
 	for _, entry in fs.readDir(dir) do
 		local entry_path = `{dir}/{entry}`
 		
 		-- does the file have a .luau extention
-		if string.match(entry, "%.luau$") then
+		if MATCH(entry, "%.luau$") then
 			local contents = fs.readFile(entry_path)
 
-			for line in string.gmatch(contents, LINE_PATTERN) do
-				local require_path = string.match(line, REQUIRE_PATTERN)
-
-				if require_path then
-					local deplib = find_library_in_string(require_path)
+			for require_path in GMATCH(contents, REQUIRE_PATTERN) do
+				local deplib = FIND_LIB_IN_RELATIVE_PATH(require_path)
 					
-					if deplib and not table.find(dependencies_tbl, deplib) then
-						table.insert(dependencies_tbl, deplib)
-					end
+				if deplib and not table.find(dependencies_tbl, deplib) then
+					table.insert(dependencies_tbl, deplib)
 				end
 			end
 		elseif fs.isDir(entry_path) then
@@ -35,7 +44,7 @@ local function find_deps(lib: string, dir: string, dependencies_tbl: { string })
 	end
 end
 
-for _, lib in LIBS do
+for _, lib in fs.readDir("libs") do
 	GRAPH[lib] = {}
 end
 
