@@ -14,7 +14,6 @@ local SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN = table.freeze({
 local CHANGED_SET: { [string]: boolean }
 local LIBS: { string }
 
-
 if fs.isFile(".diff") then
 	local diff = fs.readFile(".diff")
 	local scripts = diff_to_tbl.scripts(diff)
@@ -23,12 +22,14 @@ if fs.isFile(".diff") then
 		for _, script in scripts do
 			if table.find(SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN, script) then
 				LIBS = fs.readDir("libs")
+				print(LIBS)
 				break
 			end
 		end
 	else
 		LIBS, CHANGED_SET = diff_to_tbl.libs(diff)
 
+		print(LIBS)
 		for lib, deps in depgraph do
 			if CHANGED_SET[lib] then
 				continue
@@ -53,6 +54,7 @@ if fs.isFile(".diff") then
 	end
 else
 	LIBS = fs.readDir("libs")
+	print(LIBS)
 end
 
 for _, lib in LIBS do
