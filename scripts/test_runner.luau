@@ -8,32 +8,47 @@ local depgraph = require("depgraph")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
+local SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN = table.freeze({
+	"test_runner", "depgraph", "diff_to_tbl"
+})
 local CHANGED_SET: { [string]: boolean }
 local LIBS: { string }
 
+
 if fs.isFile(".diff") then
 	local diff = fs.readFile(".diff")
-	LIBS, CHANGED_SET = diff_to_tbl(diff)
+	local scripts = diff_to_tbl.scripts(diff)
 
-	for lib, deps in depgraph do
-		if CHANGED_SET[lib] then
-			continue
+	if #scripts ~= 0 then
+		for _, script in scripts do
+			if table.find(SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN, script) then
+				LIBS = fs.readDir("libs")
+				break
+			end
 		end
+	else
+		LIBS, CHANGED_SET = diff_to_tbl.libs(diff)
 
-		for _, dep in deps do
-			if not CHANGED_SET[dep] then
+		for lib, deps in depgraph do
+			if CHANGED_SET[lib] then
 				continue
 			end
-			table.insert(LIBS, lib)
-			CHANGED_SET[lib] = true
-					
-			for search_lib, search_deps in depgraph do
-				if table.find(search_deps, lib) then
-					CHANGED_SET[search_lib] = true
-					table.insert(LIBS, search_lib)
+
+			for _, dep in deps do
+				if not CHANGED_SET[dep] then
+					continue
 				end
+				table.insert(LIBS, lib)
+				CHANGED_SET[lib] = true
+					
+				for search_lib, search_deps in depgraph do
+					if table.find(search_deps, lib) then
+						CHANGED_SET[search_lib] = true
+						table.insert(LIBS, search_lib)
+					end
+				end
+				break
 			end
-			break
 		end
 	end
 else
