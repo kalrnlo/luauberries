@@ -25,6 +25,7 @@ jobs:
       release_id: ${{ steps.create_draft.outputs.release_id }}
       version: ${{ steps.get_version.outputs.version }}
     env:
+      GH_TOKEN: ${{ github.token }}
       version: placeholder
 
     steps:
@@ -48,8 +49,6 @@ jobs:
       
       - name: Create draft
         id: create_draft
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if gh release view ${{ env.version }}; then
             gh release edit ${{ env.version }} --draft
@@ -67,6 +66,7 @@ jobs:
     env:
       release_id: ${{needs.make_draft.outputs.release_id}}
       version: ${{needs.make_draft.outputs.version}}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
@@ -75,8 +75,6 @@ jobs:
         run: lune run scripts/release
 
       - name: Upload libraries
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd output
           for dir in */; do
