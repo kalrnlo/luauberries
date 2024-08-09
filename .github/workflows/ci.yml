@@ -7,6 +7,7 @@ on:
     paths:
       - "scripts/diff_to_tbl.luau"
       - "scripts/test_runner.luau"
+      - "scripts/depgraph.luau"
       - "libs/**.luau"
       - "testkit.luau"
   pull_request:
@@ -14,6 +15,7 @@ on:
     paths:
       - "scripts/diff_to_tbl.luau"
       - "scripts/test_runner.luau"
+      - "scripts/depgraph.luau"
       - "libs/**.luau"
       - "testkit.luau"
 
