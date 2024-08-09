@@ -38,4 +38,6 @@ for _, lib in fs.readDir("libs") do
 	fs.writeFile(real_path, contents)
 end
 
+print(process.env)
+
 process.exit(0)
