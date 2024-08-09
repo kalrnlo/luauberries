@@ -11,6 +11,7 @@ local PROVIDED_LIBS = process.args[1]
 local LIBS: { string }
 
 if PROVIDED_LIBS then
+	print(PROVIDED_LIBS)
 	LIBS = serde.decode("json", PROVIDED_LIBS)
 else
 	LIBS = fs.readDir("libs")
