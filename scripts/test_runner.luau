@@ -32,7 +32,7 @@ local function get_libs_to_test(): { string }
 			end
 	
 			for _, dep in deps do
-				if changed_set[dep] then
+				if not changed_set[dep] then
 					continue
 				end
 				table.insert(libs, lib)
