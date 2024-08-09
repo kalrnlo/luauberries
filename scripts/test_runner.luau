@@ -7,7 +7,7 @@ local serde = require("@lune/serde")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
-local DIFF = if fs.isFile(".diff") then fs.readFile(".diff") else nil
+local DIFF = process.args[1] :: string?
 local LIBS: { string }
 
 print(DIFF)
