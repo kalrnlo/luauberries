@@ -31,6 +31,7 @@ local function find_deps(lib: string, dir: string, dependencies_tbl: { string })
 		-- does the file have a .luau extention
 		if MATCH(entry, "%.luau$") then
 			local contents = fs.readFile(entry_path)
+			print(`entry: {entry_path}`)
 
 			for require_path in GMATCH(contents, REQUIRE_PATTERN) do
 				print(require_path)
