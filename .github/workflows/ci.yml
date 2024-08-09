@@ -37,8 +37,13 @@ jobs:
     name: ${{ matrix.name }}
         
     steps:
+      - uses: ./.github/workflows/getdiff.yml
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
 
+      - name: Get diff
+        id: diff
+        uses: ./.github/workflows/getdiff.yml
+
       - name: Run test runner
-        run: lune run scripts/test_runner
+        run: lune run scripts/test_runner ${{ steps.diff.outputs. }}

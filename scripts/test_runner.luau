@@ -3,10 +3,20 @@
 -- script for running tests for ci
 
 local process = require("@lune/process")
+local serde = require("@lune/serde")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
-for _, lib in fs.readDir("libs") do
+local PROVIDED_LIBS = process.args[1]
+local LIBS: { string }
+
+if PROVIDED_LIBS then
+	LIBS = serde.decode("json", PROVIDED_LIBS)
+else
+	LIBS = fs.readDir("libs")
+end
+
+for _, lib in LIBS do
 	local path = `libs/{lib}/test`
 	local file_path = `{path}.luau`
 	local real_path: string
@@ -37,7 +47,5 @@ for _, lib in fs.readDir("libs") do
 	;(require)(`../{real_path}`)
 	fs.writeFile(real_path, contents)
 end
-
-print(process.env)
 
 process.exit(0)
