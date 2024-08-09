@@ -12,12 +12,12 @@ local LIBS: { string }
 
 if PROVIDED_LIBS then
 	print(PROVIDED_LIBS)
-	LIBS = serde.decode("json", PROVIDED_LIBS)
+	--LIBS = serde.decode("json", PROVIDED_LIBS)
 else
 	LIBS = fs.readDir("libs")
 end
 
-for _, lib in LIBS do
+for _, lib in fs.readDir("libs") do
 	local path = `libs/{lib}/test`
 	local file_path = `{path}.luau`
 	local real_path: string

@@ -5,18 +5,22 @@ on:
   push:
     branches: [ main ]
     paths:
+      - "scripts/diff_to_tbl.luau"
       - "scripts/test_runner.luau"
       - "libs/**.luau"
       - "testkit.luau"
   pull_request:
     branches: [ main ]
     paths:
+      - "scripts/diff_to_tbl.luau"
       - "scripts/test_runner.luau"
       - "libs/**.luau"
       - "testkit.luau"
 
 jobs:
   Main:    
+    runs-on: ${{ matrix.runner-os }}
+    name: ${{ matrix.name }}
     strategy:
       fail-fast: false
       matrix:
@@ -29,23 +33,23 @@ jobs:
   
           - name: macOS
             runner-os: macos-14
-
-    concurrency:
-      group: CI-${{ matrix.runner-os }}-${{ github.ref }}
-      cancel-in-progress: true
-    runs-on: ${{ matrix.runner-os }}
-    name: ${{ matrix.name }}
         
     steps:
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
 
       - name: Fetch diff
-        if: ${{ github.event.compare }}
         id: fetch_diff
-        shell: bash
         run: |
-          echo "json=$(curl -O ${{ github.event.compare }} | jq)" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "diff=$(gh pr diff ${{ github.event.pull_request.number }})" >> $GITHUB_OUTPUT
+          else
+            echo "diff=$(\
+              gh api \
+              /repos/${{ github.repository }}/commits/${{ github.sha }} \
+              --header \"Accept: application/vnd.github.v3.diff\" \
+            )" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run test runner
-        run: lune run scripts/test_runner ${{ steps.fetch_diff.outputs.json }}
+        run: lune run scripts/test_runner ${{ steps.fetch_diff.outputs.diff }}
