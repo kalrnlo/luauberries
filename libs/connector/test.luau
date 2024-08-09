@@ -5,6 +5,7 @@ local TEST, CASE, CHECK, FINISH, SKIP = testkit.test()
 
 local function NOOP() end
 
+
 TEST("connector", function()
 	do CASE("create connection")
 		local connections = {}
