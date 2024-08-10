@@ -3,7 +3,11 @@
 -- module for converting a github .diff file to a lua table
 -- containg the names of each library changed
 
-local SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN = {}
+local LIB_IGNORE_FILES = table.freeze({
+	-- yes ik index.d is cringe, but its the easiest way to detect typescript imports..
+	"LIBINFO.json", "README.md", "index.d",
+})
+
 local GMATCH = string.gmatch
 local diff_to_tbl = {}
 
@@ -24,8 +28,11 @@ function diff_to_tbl.libs(diff: string): ({ string }, { [string]: boolean })
 	local changed_array = {}
 	local changed_set = {}
 	
-	for lib in GMATCH(diff, "diff %-%-git a/libs/([^/]+)") do
-		if not changed_set[lib] then
+	for lib, file_or_dir in GMATCH(diff, "diff %-%-git a/libs/([^/]+)/([^/%.]+)") do
+		if 
+			not (file_or_dir and table.find(LIB_IGNORE_FILES, file_or_dir)) and 
+			not changed_set[lib] 
+		then
 			table.insert(changed_array, lib)
 			changed_set[lib] = true
 		end
