@@ -6,22 +6,8 @@
 local LIB_IGNORE_FILE_NAMES = table.freeze({
 	"LIBINFO", "README", "index",
 })
-
 local GMATCH = string.gmatch
 local diff_to_tbl = {}
-
-function diff_to_tbl.scripts(diff: string): ({ string }, { [string]: boolean })
-	local changed_array = {}
-	local changed_set = {}
-	
-	for script in GMATCH(diff, "diff %-%-git a/scripts/([^/%.]+)") do
-		if not changed_set[script] then
-			table.insert(changed_array, script)
-			changed_set[script] = true
-		end
-	end
-	return changed_array, changed_set
-end
 
 function diff_to_tbl.libs(diff: string): ({ string }, { [string]: boolean })
 	local changed_array = {}
@@ -37,6 +23,17 @@ function diff_to_tbl.libs(diff: string): ({ string }, { [string]: boolean })
 		end
 	end
 	return changed_array, changed_set
+end
+
+function diff_to_tbl.scripts(diff: string): { string }
+	local changed_array = {}
+	
+	for script in GMATCH(diff, "diff %-%-git a/scripts/([^/%.]+)") do
+		if not table.find(changed_array, script) then
+			table.insert(changed_array, script)
+		end
+	end
+	return changed_array
 end
 
 return table.freeze(diff_to_tbl)
