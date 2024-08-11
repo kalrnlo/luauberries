@@ -25,4 +25,15 @@
 		"**/node_modules/**": true,
 		"**/output/**": true
 	},
+	/** 
+	this is set to sync, because it makes my life easier
+	as i dont have to do more w getting a diff for test running
+	and auto generating releases, blah blah blah
+
+	ok just don't change this,
+	because it'll make u end up having to do extra work
+	and thats lame, esp when it'll otherwise be done automatically 
+	**/ 
+	"git.postCommitCommand": "sync",
+	"git.rememberPostCommitCommand": true,
 }
