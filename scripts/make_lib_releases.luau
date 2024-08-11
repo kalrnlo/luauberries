@@ -20,7 +20,6 @@ local function LIB_LATEST_RELEASE_DATE(lib: string): number
     local latest_date = 0
 
     for type, iso in GMATCH(RELEASES, pattern) do
-        print(type, iso)
         if type ~= "Draft" then
             local date = DateTime.fromIsoDate(iso).unixTimestamp
 
@@ -127,13 +126,13 @@ end
 -- Example usage:
 local exampleLog = [[
 commit d46612a46f27b637d63a960ae95dfa8ecdfc5606
-Author: kalrnlo <azgoodlo95@gmail.com>
+Author: kalrnlo <noreply@github.com>
 Date:   Sat Aug 10 12:35:32 2024 -0400
 
     Update diff to table to ignore changes from certain files
 
 commit 558a524099e3e69b79f8ecddaec99f335fc14e47
-Author: kalrnlo <azgoodlo95@gmail.com>
+Author: kalrnlo <noreply@github.com>
 Date:   Thu Aug 8 18:03:36 2024 -0400
 
     Switch to new library format
@@ -143,7 +142,7 @@ Date:   Thu Aug 8 18:03:36 2024 -0400
     * created init folders for libraries with more than one module
 
 commit 5404a8da1403d42ed9966707f6d9a6b168dcc46d
-Author: kalrnlo <azgoodlo95@gmail.com>
+Author: kalrnlo <noreply@github.com>
 Date:   Sun Aug 4 16:54:25 2024 -0400
 
     Rename library main files to init.luau (because it makes generating releases easier)
