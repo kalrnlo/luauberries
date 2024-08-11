@@ -92,7 +92,6 @@ local function insert(zone: Zone, player: Player)
 		table.insert(whitelisted, player)
 		FIND_AND_REMOVE_ZONE_INFO(zone.blacklist, player)
 	elseif not table.find(blacklisted, player) then
-		local player_zone_info: PlayerZoneInfo
 		local character = player.Character
 
 		table.insert(blacklisted, player)
