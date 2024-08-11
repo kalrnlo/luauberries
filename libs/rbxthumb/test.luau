@@ -40,6 +40,8 @@ TEST("rbx thumb", function()
 
 	do CASE("avatar item")
 		local avatar_item = rbxthumb.avatar.item
+		-- using len because string eq had issues??? as in the first iterator it would always fail
+		-- even tho they were both the same??
 		CHECK(
 			#avatar_item(Enum.AvatarItemType.Asset, 1234, "420x420") == #string.format(BASE_URL, "Asset", 1234, 420, 420)
 		)
@@ -53,34 +55,22 @@ TEST("rbx thumb", function()
 		CHECK(rbxthumb.avatar_item_type_to_thumbnail_type(Enum.AvatarItemType.Bundle) == "BundleThumbnail")
 	end
 
-	do CASE("generated methods")
-		local success = false
+	do CASE("font family")
+		CHECK(#rbxthumb.fontfamily(1234, "1200x80" :: any) == #string.format(BASE_URL, type, "1234", "1200", "80"))
+		CHECK(#rbxthumb.fontfamily(1234, "1200x80" :: any, true) == #string.format(CIRCULAR_URL, type, "1234", "1200", "80"))
+	end
 
+	do CASE("generated methods")
 		for type, method in AUTO_GENERATED_METHODS do
-			if type == "FontFamily" then
-				success = method(1234, "1200x80") == string.format(BASE_URL, type, "1234", "1200", "80")
-				CHECK(success)
-				success = method(1234, "1200x80", true) == string.format(CIRCULAR_URL, type, "1234", "1200", "80")
-				CHECK(success)
-			else
-				-- using len because string eq had issues??? as in the first iterator it would always fail
-				-- even tho they were both the same??
-				success = #method(1234, "150x150") == #string.format(BASE_URL, type, 1234, 150, 150)
-				CHECK(success)
-				success = #method(1234, "150x150", true) == #string.format(CIRCULAR_URL, type, 1234, 150, 150)
-				CHECK(success)
-			end
+			CHECK(#method(1234, "150x150") == #string.format(BASE_URL, type, 1234, 150, 150))
+			CHECK(#method(1234, "150x150", true) == #string.format(CIRCULAR_URL, type, 1234, 150, 150))
 		end
 	end
 
 	do CASE("player generated methods")
-		local success = false
-
 		for type, method in PLAYER_AUTO_GENERATED_METHODS do
-			success = #method(DUMMY_PLAYER, "150x150") == #string.format(BASE_URL, type, 1234, 150, 150)
-			success = #method(DUMMY_PLAYER, "150x150", true) == #string.format(CIRCULAR_URL, type, 1234, 150, 150)
+			CHECK(#method(DUMMY_PLAYER, "150x150") == #string.format(BASE_URL, type, 1234, 150, 150))
+			CHECK(#method(DUMMY_PLAYER, "150x150", true) == #string.format(CIRCULAR_URL, type, 1234, 150, 150))
 		end
-
-		CHECK(success)
 	end
 end)

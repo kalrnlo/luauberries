@@ -3,8 +3,8 @@
 -- module for easily creating roblox thumbnail urls, based on nevermores rbxthumbutil
 -- although with types 
 
-type PlayerThumbnailFormatter<sizes> = (player: Player, size: (sizes & string)?, circular: boolean?) -> string
-type ThumbnailFormatter<sizes> = (id: number, size: (sizes & string)?, circular: boolean?) -> string
+type PlayerThumbnailFormatter<sizes> = (player: Player, size: sizes?, circular: boolean?) -> string
+type ThumbnailFormatter<sizes> = (id: number, size: sizes?, circular: boolean?) -> string
 
 export type ThumbnailType = "Asset" | "Avatar" | "AvatarHeadShot" | "BadgeIcon"  | 
 	"BundleThumbnail" | "GameIcon" | "GamePass" | "GroupIcon" | "Outfit" | "FontFamily" | 
@@ -66,7 +66,7 @@ local function CREATE_PLAYER_FORMATTER<sizes>(type: ThumbnailType, default_width
 	local defualt_height = default_height or DEFUALT_SIZE_NUM
 	local defualt_width = default_width or DEFUALT_SIZE_NUM
 
-	return function(player: Player, size: (sizes & string)?, circular: boolean?): string
+	return function(player: Player, size: sizes?, circular: boolean?): string
 		local width, height = SPLIT_SIZE(size :: any, defualt_width, defualt_height)
 		return RAW_FORMAT(player.UserId, type, width, height, circular)
 	end
@@ -76,7 +76,7 @@ local function CREATE_FORMATTER<sizes>(type: ThumbnailType, default_width: numbe
 	local defualt_height = default_height or DEFUALT_SIZE_NUM
 	local defualt_width = default_width or DEFUALT_SIZE_NUM
 
-	return function(id: number, size: (sizes & string)?, circular: boolean?): string
+	return function(id: number, size: sizes?, circular: boolean?): string
 		local width, height = SPLIT_SIZE(size :: any, defualt_width, defualt_height)
 		return RAW_FORMAT(id, type, width, height, circular)
 	end
