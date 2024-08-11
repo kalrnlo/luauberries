@@ -29,7 +29,7 @@ local function SUB_KEY_FROM_ENTRY(
 	entry: string
 ): string
 	local _, name_end: any = string.find(entry, `{entry_name}: `)
-	return string.sub(entry, (name_end + 1) or 1)
+	return string.sub(entry, if name_end then name_end + 1 else 1)
 end
 
 while true do
