@@ -2,30 +2,18 @@
 -- test runner
 -- script for running tests for ci
 
-local diff_to_tbl = require("diff_to_tbl")
+local diff_reader = require("diff_reader")
 local process = require("@lune/process")
 local depgraph = require("depgraph")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
-local SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN = table.freeze({
-	"test_runner", "depgraph", "diff_to_tbl"
-})
-
 local function get_libs_to_test(): { string }
 	if fs.isFile(".diff") then
-		local diff = fs.readFile(".diff")
-		local scripts = diff_to_tbl.scripts(diff)
-	
-		print(diff)
-
-		for _, script in scripts do
-			if table.find(SCRIPTS_THAT_IF_CHANGED_ALL_TESTS_MUST_BE_RAN, script) then
-				return fs.readDir("libs")
-			end
+		if diff_reader.scripts() then
+			return fs.readDir("libs")
 		end
-
-		local libs, changed_set = diff_to_tbl.libs(diff)
+		local libs, changed_set = diff_reader.libs()
 	
 		for lib, deps in depgraph do
 			if changed_set[lib] then
