@@ -17,7 +17,6 @@ local AUTO_GENERATED_METHODS: { [string]: (id: number, size: string?, circular: 
 	AvatarBust = rbxthumb.avatar.bust,
 	Avatar = rbxthumb.avatar.full,
 	BundleThumbnail = rbxthumb.bundle,
-	FontFamily = rbxthumb.fontfamily,
 	GroupIcon = rbxthumb.group,
 	Outfit = rbxthumb.outfit,
 	Asset = rbxthumb.asset,
@@ -56,8 +55,8 @@ TEST("rbx thumb", function()
 	end
 
 	do CASE("font family")
-		CHECK(#rbxthumb.fontfamily(1234, "1200x80" :: any) == #string.format(BASE_URL, type, "1234", "1200", "80"))
-		CHECK(#rbxthumb.fontfamily(1234, "1200x80" :: any, true) == #string.format(CIRCULAR_URL, type, "1234", "1200", "80"))
+		CHECK(#rbxthumb.fontfamily(1234, "1200x80" :: any) == #string.format(BASE_URL, "FontFamily", "1234", "1200", "80"))
+		CHECK(#rbxthumb.fontfamily(1234, "1200x80" :: any, true) == #string.format(CIRCULAR_URL, "FontFamily", "1234", "1200", "80"))
 	end
 
 	do CASE("generated methods")
