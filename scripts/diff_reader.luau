@@ -7,7 +7,7 @@ local fs = require("@lune/fs")
 
 local DEFAULT_DIFF = if fs.isFile(".diff") then fs.readFile(".diff") else ""
 local SCRIPT_FILENAME_WHITELIST = table.freeze({
-	"test_runner", "depgraph", "diff_to_tbl"
+	"test_runner", "depgraph", "diff_reader"
 })
 local LIB_FILENAME_BLACKLIST = table.freeze({
 	"LIBINFO", "README", "index",
