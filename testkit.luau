@@ -485,6 +485,8 @@ do
 			_G[key] = value
 		end
 	end
+	_G["DateTime"] = DateTime
+	_G["Enum"] = Enum
 end
 
 return table.freeze({
