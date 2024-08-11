@@ -4,27 +4,6 @@
 
 local cross = require("../cross/init")
 
-local spawn = (function()
-	if task then
-		return task.spawn
-	elseif string.find(_VERSION, "Lune") then
-		return (require)("@lune/task").spawn
-	else
-		return function<A..., R...>(thread_or_func: thread | (A...) -> R..., ...: A...): thread
-			if type(thread_or_func) == "thread" then
-				coroutine.resume(thread_or_func, ...)
-				return thread_or_func
-			else
-				local thread = coroutine.create(thread_or_func)
-				coroutine.resume(thread, ...)
-				return thread
-			end
-		end
-	end
-end)()
-
-local warn: <T...>(T...) -> () = warn or print
-
 local function callback_handler<A..., R...>(
 	f: (A...) -> R..., threads: { thread }, 
 	main_thread: thread, ...: A...
