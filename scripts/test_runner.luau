@@ -5,35 +5,27 @@
 local diff_reader = require("diff_reader")
 local process = require("@lune/process")
 local depgraph = require("depgraph")
+local task = require("@lune/task")
 local fs = require("@lune/fs")
 local ansi = require("ansi")
 
 local function get_libs_to_test(): { string }
-	if fs.isFile(".diff") then
+	local args = process.args
+
+	if #args ~= 0 then
+		return args
+	elseif fs.isFile(".diff") then
 		if diff_reader.scripts() then
 			return fs.readDir("libs")
 		end
 		local libs, changed_set = diff_reader.libs()
 	
-		for lib, deps in depgraph do
-			if changed_set[lib] then
-				continue
-			end
-	
-			for _, dep in deps do
-				if not changed_set[dep] then
-					continue
+		for _, lib in libs do
+			for _, libdep in depgraph[lib].deep do
+				if not changed_set[libdep] then
+					changed_set[libdep] = true
+					table.insert(libs, libdep)
 				end
-				table.insert(libs, lib)
-				changed_set[lib] = true
-						
-				for search_lib, search_deps in depgraph do
-					if search_lib ~= lib and table.find(search_deps, lib) then
-						changed_set[search_lib] = true
-						table.insert(libs, search_lib)
-					end
-				end
-				break
 			end
 		end
 
@@ -71,8 +63,14 @@ for _, lib in get_libs_to_test() do
 	end
 
 	fs.writeFile(real_path, `{contents}\n\nassert(FINISH())\nprint()`)
-	;(require)(`../{real_path}`)
+	-- require is no longer relative if its called within a pcall??
+	local success, responce = pcall(require, real_path)
 	fs.writeFile(real_path, contents)
+
+	if not success then
+		task.spawn(error, responce)
+		process.exit(1)
+	end
 end
 
 process.exit(0)
