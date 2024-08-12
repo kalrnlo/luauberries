@@ -153,8 +153,7 @@ do
 		for _, player_zone_info in PLAYER_ZONE_INFO do
 			player_zone_info.position = player_zone_info.rootpart.CFrame.Position
 		end
-
-		-- weak tables skip over the __mode key in iteration!
+		
 		for key, zone in ZONES do
 			local size_halved_x = zone.size_halved_x
 			local size_halved_y = zone.size_halved_y
