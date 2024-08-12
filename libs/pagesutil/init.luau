@@ -9,7 +9,7 @@ export type PageInfo = {
 	page: number,
 }
 
-local advance_to_next_page_err_format = "[PAGES] an error occured while trying to advance to the next page\n\tadvance-next-page-err: %s"
+local advance_to_next_page_err_format = "[PAGES] an error occurred while trying to advance to the next page\n\tadvance-next-page-err: %s"
 
 local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?)
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
