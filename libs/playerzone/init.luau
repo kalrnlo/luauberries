@@ -3,9 +3,7 @@
 -- playerzone
 -- simple util module for detecting players in rectangular zones
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 local character = require("../character")
 
