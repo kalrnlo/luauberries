@@ -12,9 +12,11 @@ local ansi = require("ansi")
 local function get_libs_to_test(): { string }
 	local args = process.args
 
-	if #args ~= 0 then
+	if args[1] == "all" or not fs.isFile(".diff") then
+		return fs.readDir("libs")
+	elseif #args ~= 0 then
 		return args
-	elseif fs.isFile(".diff") then
+	else
 		if diff_reader.scripts() then
 			return fs.readDir("libs")
 		end
@@ -30,8 +32,6 @@ local function get_libs_to_test(): { string }
 		end
 
 		return libs
-	else
-		return fs.readDir("libs")
 	end
 end
 

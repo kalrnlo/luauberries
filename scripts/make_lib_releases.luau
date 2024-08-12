@@ -30,7 +30,7 @@ local GIT_DATE_FORMAT = "(%w+) (%w+) (%d+) (%d+):(%d+):(%d+) (%d+) ([?%+%-]%d%d)
 local BASE_REPO_URL = "https://github.com/kalrnlo/rbxlibs"
 local BASE_COMMIT_URL = `{BASE_REPO_URL}/commits/`
 
-local RELEASES = summon("gh", { "release", "list", "--limit", "1000" })
+local RELEASES = summon("gh", { "release", "list", "--repo", "kalrnlo/rbxlibs", "--limit", "1000" })
 local MONTHS = table.freeze({ 
 	Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, Jun = 6, 
 	Jul = 7, Aug = 8, Sep = 9, Oct = 10, Nov = 11, Dec = 12
