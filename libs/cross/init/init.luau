@@ -5,8 +5,9 @@
 -- cross
 -- basic cross runtime utility, covering the bear nessisities
 
-local cross_task = require("task")
-local cross_warn = require("warn")
+-- darklua doesnt like "task" and "warn"
+local cross_task = require("./task")
+local cross_warn = require("./warn")
 
 type Runtime = "ROBLOX" | "LUNE" | "NONE"
 

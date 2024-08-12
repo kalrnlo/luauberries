@@ -118,7 +118,7 @@ TEST("cross", function()
 			cross.wait(4)
 		end)
 
-		pcall(cross.cancel, thread)
+		cross.cancel(thread)
 		CHECK(coroutine.status(thread) == "dead")
 	end
 
