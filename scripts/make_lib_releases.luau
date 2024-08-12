@@ -2,159 +2,215 @@
 -- make lib releases
 -- makes new releases for each lib thats changed
 
+local process = require("@lune/process")
+process.env.RUST_BACKTRACE = "full"
+
 local DateTime = require("@lune/DateTime")
 local diff_reader = require("diff_reader")
 local process = require("@lune/process")
+local build_rbxm = require("build_rbxm")
 local roblox = require("@lune/roblox")
+local modulify = require("modulify")
 local depgraph = require("depgraph")
+local libinfo = require("libinfo")
 local summon = require("summon")
 local fs = require("@lune/fs")
 local zip = require("zip")
 
+type Commit = {
+	author: string,
+	title: string,
+	hash: string,
+	date: number,
+	url: string,
+}
+
+local GIT_LOG_PATTERN = "commit (%x+)\nAuthor: (.-) <.->\nDate:%s+(.-)\n\n%s+(.-)\n?\n"
+local GIT_DATE_FORMAT = "(%w+) (%w+) (%d+) (%d+):(%d+):(%d+) (%d+) ([?%+%-]%d%d)(%d%d)"
+local BASE_REPO_URL = "https://github.com/kalrnlo/rbxlibs"
+local BASE_COMMIT_URL = `{BASE_REPO_URL}/commits/`
+
 local RELEASES = summon("gh", { "release", "list", "--limit", "1000" })
+local MONTHS = table.freeze({ 
+	Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, Jun = 6, 
+	Jul = 7, Aug = 8, Sep = 9, Oct = 10, Nov = 11, Dec = 12
+}) :: { [string]: number }
+local BUILT_LIBS = {} :: { [string]: modulify.ModuleScript }
 local LIBS_CHANGED = diff_reader.libs()
+
+-- local CREATE = roblox.Instance.new
 local GMATCH = string.gmatch
+local MATCH = string.match
+local SUB = string.sub
 
-local function LIB_LATEST_RELEASE_DATE(lib: string): number
-    local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]+)\t{lib}%-v%d+%.%d+%.%d+\t(%S+)`
-    local latest_date = 0
+local function get_latest_release_time(lib: string): number
+	local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]+)\t{lib}%-v%d+%.%d+%.%d+\t(%S+)`
+	local latest_date = 0
 
-    for type, iso in GMATCH(RELEASES, pattern) do
-        if type ~= "Draft" then
-            local date = DateTime.fromIsoDate(iso).unixTimestamp
+	for type, iso in GMATCH(RELEASES, pattern) do
+		if type ~= "Draft" then
+			local date = DateTime.fromIsoDate(iso).unixTimestamp
 
-            if latest_date < date then
-                latest_date = date
-            end
-        end
-    end
-    return latest_date
+			if latest_date < date then
+				latest_date = date
+			end
+		end
+	end
+	return 0
 end
 
-local function get_release_notes_for_lib(lib: string, release_prefix: string)
-    -- Get all release tags that match the prefix
-    --local releases = list_releases()
+local function parse_git_date(date: string): number
+	-- git log date format: "Day Mon DD HH:MM:SS YYYY +-ZZZZ"
+	local _, month, day, hour, minutes, seconds, year, zone_hours, zone_minutes = MATCH(date, GIT_DATE_FORMAT)
+	print(month, day, hour, minutes, seconds, year, zone_hours, zone_minutes)
+	local zone_minutes = tonumber(zone_minutes)
+	local zone_hours = tonumber(zone_hours)
+	local seconds = tonumber(seconds)
+	local minutes = tonumber(minutes)
+	local month = MONTHS[month]
+	local year = tonumber(year)
+	local hour = tonumber(hour)
+	local day = tonumber(day)
 
+	if 
+		day and month and hour and minutes and seconds and 
+		year and zone_hours and zone_minutes
+	then
+		local timestamp = os.time({
+			min = minutes, sec = seconds, month = month, 
+			day = day, year = year, hour = hour,
+		})
 
-
-    -- Get releases that match the prefix and include the file name in the title
-    local releases_json = summon("gh",{
-        "release", "list",
-        "--limit", "1000",
-		"--json", "tagName", "name"
-       	--"--jq", string.format(
-            --`[.[] | select(.TAGNAME | startswith("{release_prefix}")) | select(.name | contains("{file_name}")) | .tagName]`,
-            --release_prefix, file_name
-        --)
-    })
-
-
-print(releases_json)
---[[
-    -- Filter commits not in releases
-    local filtered_commits = {}
-    for commit in all_commits:gmatch("[^\n]+") do
-        local in_release = false
-        for release in releases:gmatch("[^\n]+") do
-            if release:match("^" .. release_prefix) then
-                local release_commit = summon("gh", {"rev-parse", release})
-				warn(release_commit)
-				local res =  summon("git", {"merge-base", "--is-ancestor", commit, release_commit})
-				warn(res)
-
-                if res ~= "" then
-                    in_release = true
-                    break
-                end
-            end
-        end
-        if not in_release then
-            table.insert(filtered_commits, commit)
-        end
-    end
-
-    -- Get commit messages for filtered commits
-    local commit_notes = {}
-    for _, commit in ipairs(filtered_commits) do
-        local message = summon("gh", {"log", "--format=%s", "-n", "1", commit})
-        table.insert(commit_notes, message)
-    end
-
-    return commit_notes
-	--]]
+		return timestamp - ((zone_hours * 3600) + (zone_minutes * 60))
+	else
+		error(`[GIT DATE] could not parse {date} as it wasnt in format "Day Mon DD HH:MM:SS YYYY +-ZZZZ"`)
+	end
 end
 
-local function parseGitLog(logOutput)
-    local commits = {}
-    local currentCommit = {}
-    local inBody = false
-
-    for line in logOutput:gmatch("[^\n]+") do
-        if line:match("^commit %x+") then
-            if next(currentCommit) ~= nil then
-                table.insert(commits, currentCommit)
-            end
-            currentCommit = {
-                hash = line:match("commit (%x+)"),
-                body = ""
-            }
-            inBody = false
-        elseif line:match("^Author: ") then
-            currentCommit.author = line:match("Author: (.+)")
-        elseif line:match("^Date: ") then
-            currentCommit.date = line:match("Date:%s+(.+)")
-        elseif line:match("^%s+") and not inBody then
-            currentCommit.subject = line:match("^%s+(.+)")
-            inBody = true
-        elseif inBody and line ~= "" then
-            currentCommit.body = currentCommit.body .. line:match("^%s*(.-)%s*$") .. "\n"
-        end
-    end
-
-    if next(currentCommit) ~= nil then
-        table.insert(commits, currentCommit)
-    end
-
-    -- Trim trailing newline from body
-    for _, commit in ipairs(commits) do
-        commit.body = commit.body:gsub("\n$", "")
-    end
-
-    return commits
+local function get_commits_after_time(lib: string, time: number): { Commit }
+	local log = summon("git", { "log", "--after", tostring(time), "--", `libs/{lib}` })
+	local commits = {}
+	
+	for hash, author, date, title in GMATCH(log, GIT_LOG_PATTERN) do
+		table.insert(commits, {
+			url = `{BASE_COMMIT_URL}{hash}`,
+			date = parse_git_date(date),
+			author = author,
+			title = title,
+			hash = hash,
+		})
+	end
+	return commits
 end
 
--- Example usage:
-local exampleLog = [[
-commit d46612a46f27b637d63a960ae95dfa8ecdfc5606
-Author: kalrnlo <noreply@github.com>
-Date:   Sat Aug 10 12:35:32 2024 -0400
+local args = process.args
 
-    Update diff to table to ignore changes from certain files
-
-commit 558a524099e3e69b79f8ecddaec99f335fc14e47
-Author: kalrnlo <noreply@github.com>
-Date:   Thu Aug 8 18:03:36 2024 -0400
-
-    Switch to new library format
-
-    * Each library now has their own LIBINFO.json, this is for adding tags (keywords) and specifying the version for each library (note: none of the LIBINFO.json's are actually filled out, its all just placeholders rn)
-    * test files are now just test.luau, not LIBNAME.test.luau
-    * created init folders for libraries with more than one module
-
-commit 5404a8da1403d42ed9966707f6d9a6b168dcc46d
-Author: kalrnlo <noreply@github.com>
-Date:   Sun Aug 4 16:54:25 2024 -0400
-
-    Rename library main files to init.luau (because it makes generating releases easier)
-]]
-
-local parsedCommits = parseGitLog(exampleLog)
-
-local repoUrl = "https://github.com/kalrnlo/rbxlibs/commit/"
-for _, commit in ipairs(parsedCommits) do
-    commit.url = `{repoUrl}{commit.hash}`
+if args[1] == "all" then
+	LIBS_CHANGED = fs.readDir("libs")
+elseif #args ~= 0 then
+	table.move(args, 1, #args, #LIBS_CHANGED + 1, LIBS_CHANGED)
 end
 
--- Print parsed commits
-print(parsedCommits)
+-- with lune run, required scripts cant implement a property so
+-- were doing it a jank way via an arg
+if table.find(args, "implprop") then
+	local SOURCES = {} :: {[roblox.Instance]: string}
+
+	roblox.implementProperty(
+		"ModuleScript", "Source", 
+		function(module)
+			return SOURCES[module] or ""
+		end,
+		function(module, new_val)
+			if type(new_val) == "string" then
+				SOURCES[module] = new_val
+			else
+				error("property source must be of type string!")
+			end
+		end
+	)
+end
+
+local OUTPUT_DIR = "output"
+
+if fs.isDir(OUTPUT_DIR) then
+	fs.removeDir(OUTPUT_DIR)
+end
+fs.writeDir(OUTPUT_DIR)
+
+local function get_or_create_module(lib: string): modulify.ModuleScript
+	local built = BUILT_LIBS[lib]
+
+	if built then 
+		return built 
+	else 
+		local module = modulify(lib)
+		BUILT_LIBS[lib] = module
+		return module
+	end
+end
+
+for _, lib in LIBS_CHANGED do
+	local latest_release_time = get_latest_release_time(lib)
+	local commits = get_commits_after_time(lib, latest_release_time)
+	local libinfo = libinfo(lib)
+
+	local version = libinfo.version
+
+	local lib_output_dir = `{OUTPUT_DIR}/{lib}-{version}`
+	local lib_output_dir_with_deps = `{lib_output_dir}-deps`
+	local depinfo = depgraph[lib]
+	local libdir = `libs/{lib}`
+	local has_deps = depinfo.has_deps
+
+	fs.writeDir(lib_output_dir)
+
+	local initdir = `{libdir}/init`
+	local initdir_exists = fs.isDir(initdir)
+	local initext = if initdir_exists then initdir else `{initdir}.luau`
+
+	if fs.isDir(initdir) then
+		fs.copy(initdir, lib_output_dir, true)
+	else
+		fs.copy(initext, `{lib_output_dir}/init.luau`, true)
+	end
+
+	--zip(lib_output_dir, `{lib_output_dir}.zip`)
+	local module = get_or_create_module(lib)
+	local rbxm_with_deps: string
+
+	fs.writeFile(`{lib_output_dir}.rbxm`, build_rbxm(module))
+
+	if has_deps then
+		fs.writeDir(lib_output_dir_with_deps)
+
+		if initdir_exists then
+			fs.copy(lib_output_dir, `{lib_output_dir_with_deps}/{lib}`, true)
+		else
+			fs.copy(`{lib_output_dir}/init.luau`, `{lib_output_dir_with_deps}/{lib}.luau`, true)
+		end
+		local modules = { module }
+
+		for _, deplib in depinfo.deep do
+			table.insert(modules, get_or_create_module(deplib))
+			local deplibdir = `libs/{deplib}`
+			local initdir = `{deplibdir}/init`
+			local initdir_exists = fs.isDir(initdir)
+			local initext = if initdir_exists then initdir else `{initdir}.luau`
+
+			if fs.isDir(initdir) then
+				fs.copy(initdir, `{lib_output_dir_with_deps}/{deplib}`, true)
+			else
+				fs.copy(initext, `{lib_output_dir_with_deps}/init.luau`, true)
+			end
+		end
+
+		rbxm_with_deps = roblox.serializeModel(modules)
+		fs.writeFile(`{lib_output_dir_with_deps}.rbxm`, rbxm_with_deps)
+	end
+
+
+
+end
+
 process.exit()
