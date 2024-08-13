@@ -105,15 +105,12 @@ end
 
 local args = process.args
 
-if args[1] == "all" then
-	LIBS_CHANGED = fs.readDir("libs")
-elseif #args ~= 0 then
-	table.move(args, 1, #args, #LIBS_CHANGED + 1, LIBS_CHANGED)
-end
-
 -- with lune run, required scripts cant implement a property so
 -- were doing it a jank way via an arg
-if table.find(args, "implprop") then
+local implprop_index = table.find(args, "implprop")
+
+if implprop_index then
+	table.remove(args, implprop_index)
 	local SOURCES = {} :: {[roblox.Instance]: string}
 
 	roblox.implementProperty(
@@ -129,6 +126,12 @@ if table.find(args, "implprop") then
 			end
 		end
 	)
+end
+
+if table.find(args, "all") then
+	LIBS_CHANGED = fs.readDir("libs")
+elseif #args ~= 0 then
+	table.move(args, 1, #args, #LIBS_CHANGED + 1, LIBS_CHANGED)
 end
 
 local OUTPUT_DIR = "output"
