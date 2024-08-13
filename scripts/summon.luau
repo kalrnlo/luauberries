@@ -5,7 +5,6 @@
 
 local process = require("@lune/process")
 
-local SPAWN_OPTS = { shell = "powershell" } :: process.SpawnOptions
 local ENV = table.clone(process.env)
 local SPAWN = process.spawn
 
@@ -14,7 +13,6 @@ local function summon(
 	args: { string }?
 ): string
 	local result = SPAWN(process, args, {
-		shell = "bash",
 		env = ENV
 	})
  

@@ -150,6 +150,8 @@ local function get_or_create_module(lib: string): modulify.ModuleScript
 	end
 end
 
+print(LIBS_CHANGED)
+
 for _, lib in LIBS_CHANGED do
 	local latest_release_time = get_latest_release_time(lib)
 	local commits = get_commits_after_time(lib, latest_release_time)
