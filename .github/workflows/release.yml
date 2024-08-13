@@ -48,8 +48,6 @@ jobs:
       
       - name: Create draft
         id: create_draft
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if gh release view ${{ env.version }}; then
             gh release edit ${{ env.version }} --draft
@@ -67,19 +65,15 @@ jobs:
     env:
       release_id: ${{needs.make_draft.outputs.release_id}}
       version: ${{needs.make_draft.outputs.version}}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
-
-      - name: Install Toolchain
-        run: rokit install --no-trust-check
         
       - name: Run script
-        run: lune run release
+        run: lune run scripts/release
 
       - name: Upload libraries
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd output
           for dir in */; do

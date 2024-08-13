@@ -12,6 +12,7 @@
 local GroupService = game:GetService("GroupService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local connector = require("../connector")
 
 type FireRankChanged = (send_to_player: Player, player_whose_rank_changed: Player, rank: number, role: string) -> ()
 type FireAllRankChanged = (player_whose_rank_changed: Player, rank: number, role: string) -> ()
@@ -51,9 +52,9 @@ local INITIATED = false
 local DEFAULT_RANK = 0
 local GROUP_ID: number
 
+local CHANGED_CONNECTIONS = {} :: connector.Connections<Player, number, number>
 local ROLE_HASH_CACHE = { [0] = DEFAULT_ROLE } :: { [number]: string }
 local THREADS_WAITING_FOR_PLAYERS = {} :: { [Player]: { thread } }
-local RANK_CHANGED_CALLBACKS = {} :: { { RankChangedCallback } }
 local PLAYER_FETCH_INFO = {} :: { [Player]: FetchInfo }
 local ROLE_CACHE = table.create(256, DEFAULT_ROLE)
 local PLAYER_RANKS = {} :: { [Player]: number }
@@ -77,7 +78,7 @@ local function FETCH_RANK_AND_ROLE(userid: number): (number?, string)
 		-- player isn't in group, so we return 0 (the rank of a player not in the group)
 		return DEFAULT_RANK, DEFAULT_ROLE
 	else
-		warn(`[GROUPER] Couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`)
+		warn(`[GROUPER] couldn't fetch rank for user {userid}\n\tgroup-service-err: {groups}`)
 		return nil, DEFAULT_ROLE
 	end
 end
@@ -116,10 +117,8 @@ local function fetcher(player: Player, fetchinfo: FetchInfo)
 		PLAYER_RANKS[player] = new_rank
 		fetchinfo.rank = new_rank
 
+		connector.spawn(CHANGED_CONNECTIONS, player, new_rank, rank)
 		FIRE_ALL_RANK_CHANGED(player, new_rank, new_role)
-		for _, callback_data in RANK_CHANGED_CALLBACKS do
-			task.spawn(callback_data[1], player, new_rank, rank)
-		end
 	end
 
 	fetchinfo.last_fetched = os.time()
@@ -202,7 +201,6 @@ function grouper.init.client(config: ClientConfig)
 	INITIATED = true
 
 	config.connect_rank_changed(function(player, rank, role)
-		-- print(`[GROUPER] client recieved rank data \n\tname: {player.Name}\n\tuserid: {player.UserId}\n\trank: {rank}\n\trole: {role}`)
 		local threads_waiting = THREADS_WAITING_FOR_PLAYERS[player]
 		local old_rank = PLAYER_RANKS[player]
 
@@ -216,9 +214,7 @@ function grouper.init.client(config: ClientConfig)
 			THREADS_WAITING_FOR_PLAYERS[player] = nil
 		end
 		
-		for _, callback_data in RANK_CHANGED_CALLBACKS do
-			task.spawn(callback_data[1], player, rank, old_rank)
-		end
+		connector.spawn(CHANGED_CONNECTIONS, player, rank, old_rank)
 	end)
 
 	Players.PlayerRemoving:Connect(on_player_removing)
@@ -250,21 +246,10 @@ function grouper.init.server(config: ServerConfig)
 	Players.PlayerAdded:Connect(on_player_added)
 end
 
-function grouper.on_rank_changed(callback: RankChangedCallback): () -> ()
-	local callback_info = { callback }
-	table.insert(RANK_CHANGED_CALLBACKS, callback_info)
-
-	return function()
-		local index: number = table.find(RANK_CHANGED_CALLBACKS, callback_info) :: any
-
-		if index ~= 1 then
-			local len = #RANK_CHANGED_CALLBACKS
-			RANK_CHANGED_CALLBACKS[index] = RANK_CHANGED_CALLBACKS[len]
-			RANK_CHANGED_CALLBACKS[len] = nil
-		else
-			RANK_CHANGED_CALLBACKS[1] = nil
-		end
-	end
+function grouper.on_rank_changed(
+	callback: RankChangedCallback
+): connector.Connection<Player, number, number>
+	return connector.connection(CHANGED_CONNECTIONS, callback)
 end
 
 function grouper.rank_and_role(player: Player): (number, string)

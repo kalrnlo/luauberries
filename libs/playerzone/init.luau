@@ -3,9 +3,7 @@
 -- playerzone
 -- simple util module for detecting players in rectangular zones
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 local character = require("../character")
 
@@ -92,7 +90,6 @@ local function insert(zone: Zone, player: Player)
 		table.insert(whitelisted, player)
 		FIND_AND_REMOVE_ZONE_INFO(zone.blacklist, player)
 	elseif not table.find(blacklisted, player) then
-		local player_zone_info: PlayerZoneInfo
 		local character = player.Character
 
 		table.insert(blacklisted, player)
@@ -156,8 +153,7 @@ do
 		for _, player_zone_info in PLAYER_ZONE_INFO do
 			player_zone_info.position = player_zone_info.rootpart.CFrame.Position
 		end
-
-		-- weak tables skip over the __mode key in iteration!
+		
 		for key, zone in ZONES do
 			local size_halved_x = zone.size_halved_x
 			local size_halved_y = zone.size_halved_y

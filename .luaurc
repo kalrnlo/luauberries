@@ -5,8 +5,5 @@
         "LocalUnused": false,
         "LocalShadow": false
     },
-    "aliases": {
-        "libs": "./libs",
-        "testkit": "./testkit"
-    }
+    "globals": ["_RUNTIME"]
 }

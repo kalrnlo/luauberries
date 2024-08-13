@@ -15,6 +15,18 @@ hero:
       link: /installing
 
 features:
+  - title: Cross
+    details: Utility for dealing with cross runtime shenanigans, covering the bear necessities
+    link: /cross
+  - title: Retryer
+    details: Utility for easily retrying functions
+    link: /retryer
+  - title: Race
+    details: Runs several functions at once, and returns the result of the function that completes first
+    link: /race
+  - title: Connector
+    details: Utility for handling event callbacks
+    link: /connector
   - title: Character
     details: Utility for getting better types with player characters in roblox
     link: /character
@@ -36,9 +48,6 @@ features:
   - title: Player Zone
     details: Fast module for detecting players in rectangular zones
     link: /player-zone
-  - title: Race
-    details: Runs several functions at once, and returns the result of the function that completes first
-    link: /race
   - title: Pages Util
     details: Utility for dealing with roblox page instancs easily
     link: /pages-util
@@ -51,9 +60,6 @@ features:
   - title: RbxThumb
     details: Utility for making roblox thumbnail urls
     link: /rbx-thumb
-  - title: Retryer
-    details: Utility for easily retrying functions
-    link: /retryer
   - title: Safe Teleport
     details: TeleportAsync wrapper that makes teleporting simple
     link: /safe-teleport

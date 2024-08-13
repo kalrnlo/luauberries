@@ -1,37 +1,39 @@
 {
-  "luau-lsp.completion.autocompleteEnd": true,
-  "luau-lsp.require.mode": "relativeToFile",
-  "luau-lsp.require.directoryAliases": {
-    "@lune/": "~/.lune/.typedefs/0.8.3/",
-    "libs/": "libs",
-  },
-  "luau-lsp.completion.imports.requireStyle": "alwaysRelative",
-  "luau-lsp.completion.imports.separateGroupsWithLine": false,
-  "explorer.autoRevealExclude": {
-    "**/bower_components": false,
-    "**/darklua_output": true,
-    "sourcemap.json": true
-  },
-  "explorer.excludeGitIgnore": false,
-  "explorer.fileNesting.enabled": false,
-  "explorer.sortOrderLexicographicOptions": "upper",
-  "search.exclude": {
-    "**/darklua_output": true,
-    "**/output": true
-  },
-  "editor.formatOnPaste": false,
-  "luau-lsp.completion.imports.enabled": false,
-  "luau-lsp.diagnostics.strictDatamodelTypes": true,
-  "luau-lsp.require.fileAliases": {
-    "testkit": "testkit"
-  },
-  "luau-lsp.completion.imports.ignoreGlobs": [
-    "**/_Index/**",
-    "**/output/**",
-    "**/darklua_output/**"
-  ],
-  "luau-lsp.fflags.override": {
-    "DebugLuauDeferredConstraintResolution": "true"
-  },
-  "luau-lsp.bytecode.vectorType": "vector",
+	// luau-lsp
+	"luau-lsp.completion.imports.requireStyle": "alwaysRelative",
+	"luau-lsp.completion.autocompleteEnd": true,
+	"luau-lsp.require.mode": "relativeToFile",
+	"luau-lsp.bytecode.vectorType": "vector",
+	"luau-lsp.completion.imports.ignoreGlobs": [
+		"**/node_modules/**/**/**",
+		"**/darklua_output/**",
+		"**/output/**",
+	],
+	"luau-lsp.ignoreGlobs": [
+		"**/node_modules/**",
+		"*.lua"
+	],
+	"luau-lsp.require.directoryAliases": {
+		"@lune/": "~/.lune/.typedefs/0.8.6/"
+	},
+
+	// vscode
+	"explorer.sortOrderLexicographicOptions": "upper",
+	"explorer.sortOrder": "foldersNestsFiles",
+	"search.exclude": {
+		"**/darklua_output/**": true,
+		"**/node_modules/**": true,
+		"**/output/**": true
+	},
+	/** 
+	this is set to sync, because it makes my life easier
+	as i dont have to do more w getting a diff for test running
+	and auto generating releases, blah blah blah
+
+	ok just don't change this,
+	because it'll make u end up having to do extra work
+	and thats lame, esp when it'll otherwise be done automatically 
+	**/ 
+	"git.postCommitCommand": "sync",
+	"git.rememberPostCommitCommand": true,
 }
