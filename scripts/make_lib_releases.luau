@@ -103,7 +103,7 @@ local function get_commits_after_time(lib: string, time: number): { Commit }
 	return commits
 end
 
-local args = process.args
+local args = table.clone(process.args)
 
 -- with lune run, required scripts cant implement a property so
 -- were doing it a jank way via an arg
