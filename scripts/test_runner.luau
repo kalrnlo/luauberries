@@ -22,11 +22,12 @@ local function get_libs_to_test(): { string }
 		end
 		local libs, changed_set = diff_reader.libs()
 	
-		for _, lib in libs do
+		for lib, depinfo in depgraph do
 			for _, libdep in depgraph[lib].deep do
-				if not changed_set[libdep] then
-					changed_set[libdep] = true
-					table.insert(libs, libdep)
+				if changed_set[libdep] then
+					changed_set[lib] = true
+					table.insert(libs, lib)
+					break
 				end
 			end
 		end
