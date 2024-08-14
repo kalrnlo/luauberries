@@ -5,16 +5,17 @@
 
 local process = require("@lune/process")
 
-local ENV = table.clone(process.env)
 local SPAWN = process.spawn
+local OPTS = {
+	shell = if process.os == "windows" then "powershell" else "bash",
+	env = process.env
+}
 
 local function summon(
 	process: string,
-	args: { string }?
+	args: string?
 ): string
-	local result = SPAWN(process, args, {
-		env = ENV
-	})
+	local result = SPAWN(process, { args or "" }, OPTS)
  
 	if not result.ok then
 		error(result.stderr, 2)
