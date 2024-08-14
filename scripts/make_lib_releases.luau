@@ -92,6 +92,11 @@ local function parse_git_date(date: string): number
 	end
 end
 
+local function write_and_insert(t: { string }, path: string, contents: string | buffer)
+	fs.writeFile(path, contents)
+	table.insert(t, path)
+end
+
 impl_module_source_prop()
 
 for index, lib in LIB_LIST do
@@ -169,8 +174,10 @@ for _, release_libinfo in RELEASE_LIBS do
 	local package_libinfo = packager.package(lib)
 	local libinfo = libinfo(lib)
 	local version = libinfo.version
-	local notes = { "## Whats changed" }
 	local base_file_name = package_libinfo.base_file_name
+	local notes = { "## Whats changed" }
+	local release_tag = `{lib}@{version}`
+	local release_files = {}
 
 	for _, pr in release_libinfo.prs do
 		table.insert(notes, `* {pr.title} by @{pr.author} in {BASE_PULL_URL}{pr.num}`)
@@ -181,17 +188,21 @@ for _, release_libinfo in RELEASE_LIBS do
 	end
 
 	fs.writeDir("dist")
-	fs.writeFile(`dist/{base_file_name}.zip`, package_libinfo.zipped)
-	fs.writeFile(`dist/{base_file_name}.rbxm`, package_libinfo.rbxm)
+	write_and_insert(release_files, `./dist/{base_file_name}.zip`, package_libinfo.zipped)
+	write_and_insert(release_files, `./dist/{base_file_name}.rbxm`, package_libinfo.rbxm)
 
 	if package_libinfo.has_deps then
 		local base_deps_file_name = package_libinfo.base_file_name_with_deps
 
-		fs.writeFile(`dist/{base_deps_file_name}.zip`, package_libinfo.zipped_with_deps)
-		fs.writeFile(`dist/{base_deps_file_name}.rbxm`, package_libinfo.rbxm_with_deps)
+		write_and_insert(release_files, `./dist/{base_deps_file_name}.zip`, package_libinfo.zipped_with_deps)
+		write_and_insert(release_files, `./dist/{base_deps_file_name}.rbxm`, package_libinfo.rbxm_with_deps)
 	end
 
-	summon("gh", `release create "{lib}@{version}" ./dist --title "{lib} v{version}" --notes "{table.concat(notes, "\n")}" --draft`)
+	summon("gh", `release create {release_tag} --title "{lib} v{version}" --notes "{table.concat(notes, "\n")}" --draft`)
+
+	for _, path in release_files do
+		summon("gh", `release upload {release_tag} {path} --clobber`)
+	end
 	fs.removeDir("dist")
 end
 
