@@ -35,4 +35,4 @@ jobs:
         run: lune run scripts/test_runner ${{ inputs.libs }}
 
       - name: Run releases script
-        run: lune run scripts/make_lib_releases implprop ${{ inputs.libs }}
+        run: lune run scripts/make_lib_releases ${{ inputs.libs }}

@@ -2,17 +2,28 @@
 -- make lib releases
 -- makes new releases for each lib thats changed
 
-local process = require("@lune/process")
-process.env.RUST_BACKTRACE = "full"
-
 local impl_module_source_prop = require("impl_module_source_prop")
 local DateTime = require("@lune/DateTime")
 local diff_reader = require("diff_reader")
 local process = require("@lune/process")
+local serde = require("@lune/serde")
 local packager = require("packager")
 local libinfo = require("libinfo")
 local summon = require("summon")
 local fs = require("@lune/fs")
+
+type ReleaseLibInfo = {
+	latest_release_time: number,
+	commits: { Commit },
+	prs: { PRInfo },
+	name: string,
+}
+
+type PRInfo = {
+	author: string,
+	title: string,
+	num: number,
+}
 
 type Commit = {
 	author: string,
@@ -25,40 +36,34 @@ local GIT_LOG_PATTERN = "commit (%x+)\nAuthor: (.-) <.->\nDate:%s+(.-)\n\n%s+(.-
 local GIT_DATE_FORMAT = "(%w+) (%w+) (%d+) (%d+):(%d+):(%d+) (%d+) ([?%+%-]%d%d)(%d%d)"
 local BASE_REPO_URL = "https://github.com/kalrnlo/rbxlibs"
 local BASE_COMMIT_URL = `{BASE_REPO_URL}/commits/`
+local BASE_PULL_URL = `{BASE_REPO_URL}/pull/`
 
-local RELEASES = summon("gh", "release list --repo kalrnlo/rbxlibs --limit 1000")
-local MONTHS = table.freeze({ 
-	Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, Jun = 6, 
-	Jul = 7, Aug = 8, Sep = 9, Oct = 10, Nov = 11, Dec = 12
-}) :: { [string]: number }
+local PULL_REQUESTS = serde.decode("json", summon("gh", "pr list --json author,mergedAt,files,title,number --limit 100 --state merged"))
+local RELEASES = summon("gh", "release list --repo kalrnlo/rbxlibs --limit 500")
 local LIBS_CHANGED = diff_reader.libs()
+local ARGS = process.args
+
 local RBXLIBS_CREATION_DATE = DateTime.fromUniversalTime({
 	year = 2024, day = 24, month = 6, 
 	hour = 8, minute = 0, second = 0,
 }).unixTimestamp
-local RELEASE_LIBS: { string }
-local ARGS = process.args
+local MONTHS = table.freeze({ 
+	Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, Jun = 6, 
+	Jul = 7, Aug = 8, Sep = 9, Oct = 10, Nov = 11, Dec = 12
+}) :: { [string]: number }
+
+local LIB_LIST: { string } = if ARGS[1] == "all" then
+		fs.readDir("libs")
+	elseif #ARGS ~= 0 then
+		table.move(ARGS, 1, #ARGS, #LIBS_CHANGED + 1, LIBS_CHANGED)
+	else
+		LIBS_CHANGED
+local RELEASE_LIBS = table.create(#LIB_LIST) :: { ReleaseLibInfo }
 
 -- local CREATE = roblox.Instance.new
 local GMATCH = string.gmatch
 local MATCH = string.match
 local SUB = string.sub
-
-local function get_latest_release_time(lib: string): number
-	local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]+)\t{lib}%-v%d+%.%d+%.%d+\t(%S+)`
-	local latest_date = 0
-
-	for type, iso in GMATCH(RELEASES, pattern) do
-		if type ~= "Draft" then
-			local date = DateTime.fromIsoDate(iso).unixTimestamp
-
-			if latest_date < date then
-				latest_date = date
-			end
-		end
-	end
-	return RBXLIBS_CREATION_DATE
-end
 
 local function parse_git_date(date: string): number
 	-- git log date format: "Day Mon DD HH:MM:SS YYYY +-ZZZZ"
@@ -87,9 +92,23 @@ local function parse_git_date(date: string): number
 	end
 end
 
-local function get_commits_after_time(lib: string, time: number): { Commit }
+impl_module_source_prop()
+
+for index, lib in LIB_LIST do
+	local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]+)\t{lib}%-v%d+%.%d+%.%d+\t(%S+)`
 	local log = summon("git", `log --after {time} -- libs/{lib}`)
+	local latest_release_time = RBXLIBS_CREATION_DATE
 	local commits = {}
+
+	for type, iso in GMATCH(RELEASES, pattern) do
+		if type ~= "Draft" then
+			local date = DateTime.fromIsoDate(iso).unixTimestamp
+
+			if latest_release_time < date then
+				latest_release_time = date
+			end
+		end
+	end
 	
 	for hash, author, date, title in GMATCH(log, GIT_LOG_PATTERN) do
 		table.insert(commits, {
@@ -99,37 +118,81 @@ local function get_commits_after_time(lib: string, time: number): { Commit }
 			hash = hash,
 		})
 	end
-	return commits
+
+	RELEASE_LIBS[index] = {
+		latest_release_time = latest_release_time,
+		commits = commits,
+		name = lib,
+		prs = {},
+	}
 end
 
-local function get_pr_for_commit(commit: Commit): number?
-	return tonumber(MATCH(commit.title, "Merge pull request #(%d+).-"))
-end
+for index, pr in PULL_REQUESTS do
+	local has_changed_a_release_lib: string
 
-RELEASE_LIBS = if table.find(ARGS, "all") then
-		fs.readDir("libs")
-	elseif #ARGS ~= 0 then
-		table.move(ARGS, 1, #ARGS, #LIBS_CHANGED + 1, LIBS_CHANGED)
-	else
-		LIBS_CHANGED
+	for _, file in pr.files do
+		local lib = MATCH(file.path, "^libs/([^/]+)") or MATCH(file.path, "^docs/([^/%.]+)")
 
-impl_module_source_prop()
+		if lib then
+			local pr_time = DateTime.fromIsoDate(pr.mergedAt).unixTimestamp
+			local found_libinfo: ReleaseLibInfo
+			
+			for _, release_lib_info in RELEASE_LIBS do
+				if 
+					release_lib_info.name == lib and
+					pr_time >= release_lib_info.latest_release_time 
+				then
+					found_libinfo = release_lib_info
+					break
+				end
+			end
 
-for _, lib in RELEASE_LIBS do
-	local latest_release_time = get_latest_release_time(lib)
-	local commits = get_commits_after_time(lib, latest_release_time)
-	--local package_libinfo = packager.package(lib)
-	local libinfo = libinfo(lib)
+			if not found_libinfo then
+				continue
+			end
 
-	for _, commit in commits do
-		local pr = get_pr_for_commit(commit)
+			local author_info = pr.author
+			local author_name = author_info.name
 
-		if pr then
-			print(pr)
+			table.insert(found_libinfo.prs, {
+				author = pr.author.login,
+				title = pr.title,
+				num = pr.number,
+			})
+			break
 		end
 	end
+end
 
+for _, release_libinfo in RELEASE_LIBS do
+	local lib = release_libinfo.name
+	local package_libinfo = packager.package(lib)
+	local libinfo = libinfo(lib)
+	local version = libinfo.version
+	local notes = { "## Whats changed" }
+	local base_file_name = package_libinfo.base_file_name
 
+	for _, pr in release_libinfo.prs do
+		table.insert(notes, `* {pr.title} by @{pr.author} in {BASE_PULL_URL}{pr.num}`)
+	end
+
+	for _, commit in release_libinfo.commits do
+		table.insert(notes, `* {commit.title} by @{commit.author} in {BASE_COMMIT_URL}{commit.hash}`)
+	end
+
+	fs.writeDir("dist")
+	fs.writeFile(`dist/{base_file_name}.zip`, package_libinfo.zipped)
+	fs.writeFile(`dist/{base_file_name}.rbxm`, package_libinfo.rbxm)
+
+	if package_libinfo.has_deps then
+		local base_deps_file_name = package_libinfo.base_file_name_with_deps
+
+		fs.writeFile(`dist/{base_deps_file_name}.zip`, package_libinfo.zipped_with_deps)
+		fs.writeFile(`dist/{base_deps_file_name}.rbxm`, package_libinfo.rbxm_with_deps)
+	end
+
+	summon("gh", `release create "{lib}@{version}" ./dist --title "{lib} v{version}" --notes "{table.concat(notes, "\n")}" --draft`)
+	fs.removeDir("dist")
 end
 
 process.exit()
