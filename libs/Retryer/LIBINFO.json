@@ -1,4 +1,4 @@
 {
-	"topics": ["meow", "mrrp"],
-	"version": "12.4.5"
+	"topics": ["retrying", "http"],
+	"version": "2.3.0"
 }
