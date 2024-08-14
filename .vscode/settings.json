@@ -23,7 +23,7 @@
 	"search.exclude": {
 		"**/darklua_output/**": true,
 		"**/node_modules/**": true,
-		"**/output/**": true
+		"**/libs_copy/**": true,
 	},
 	/** 
 	this is set to sync, because it makes my life easier
