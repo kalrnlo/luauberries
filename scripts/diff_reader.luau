@@ -1,7 +1,7 @@
 
--- diff to tbl
--- module for converting a github .diff file to a lua table
--- containg the names of each library changed
+-- diff reader
+-- module for converting a git .diff file to a lua table
+-- containg the names of each file changed
 
 local fs = require("@lune/fs")
 
