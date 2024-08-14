@@ -2,6 +2,7 @@ node_modules
 docs/.vitepress/dist
 docs/.vitepress/cache
 sourcemap.json
-darklua-output
+darklua_output
 docs/.vitepress/sidebar-libs.json
 libs_copy
+dist
