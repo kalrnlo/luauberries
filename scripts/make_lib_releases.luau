@@ -206,4 +206,5 @@ for _, release_libinfo in RELEASE_LIBS do
 	fs.removeDir("dist")
 end
 
+fs.removeDir("libs_copy")
 process.exit()
