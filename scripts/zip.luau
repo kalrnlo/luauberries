@@ -1,23 +1,26 @@
 
 -- zip
--- utility for zipping files within lune
+-- utility for zipping folders within lune
 
+local process = require("@lune/process")
 local summon = require("summon")
+local fs = require("@lune/fs")
 
-local function zip(input: { string } | string, output: string, exclude: { string }?)
-	local args: { string }
+local IS_WINDOWS = process.os == "windows"
+local WIN_OUTPUT = "RESULT.zip"
+local WIN_ARGS_FORMAT = `%* -DestinationPath {WIN_OUTPUT} -CompressionLevel Optimal`
+local UNIX_ARGS_FORMAT = "-9 -r - %*"
+local FORMAT = string.format
 
-	if type(input) == "table" then
-		args = table.move(input, 1, #input, 2, { output })
+local function zip(input: string): string
+	if IS_WINDOWS then
+		local output = summon("Compress-Archive", FORMAT(WIN_ARGS_FORMAT, input))
+		local zipped = fs.readFile(WIN_OUTPUT)
+		fs.removeFile(WIN_OUTPUT)
+		return zipped
 	else
-		args = { "-r", output, input }
-
-		if exclude then
-			table.insert(args, "-x")
-			table.move(exclude, 1, #exclude, 5, args)
-		end
+		return summon("zip", FORMAT(UNIX_ARGS_FORMAT, input))
 	end
-	summon("zip", args)
 end
 
 return zip
