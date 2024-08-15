@@ -9,9 +9,6 @@ Info on how to install rbxlibs, and rbxlibs libraries
 
 ### Releases
 
-For every github release after `v1.4.1`, theres zip files for every library that contain a rbxm file if you're using studio, a luau dir if you're using vscode or another code editor, and also a typescript dir for those who use roblox-ts.
-Theres also a zip file called `ALL_LIBS` that contains every library, although at the moment this doesn't have a typescript output.
+For every library theres a release containing a zip file for that library, and an rbxm. Theres also an rbxm and zip file that include dependencies for that library if that library has dependencies, just look for `-deps` at the end of file names.
 
-### Copy & Paste
-
-You can also just go to the source on github and just copy files
+https://github.com/kalrnlo/rbxlibs/releases

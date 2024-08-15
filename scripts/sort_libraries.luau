@@ -12,7 +12,7 @@ local TITLE_PATTERN = "(.-)\n"
 local HOME_MD_PATH = "docs/index.md"
 local TITLE_KEY = "%- title"
 
-local content = fs.readFile(HOME_MD_PATH)
+local content = string.gsub(fs.readFile(HOME_MD_PATH), "\r", "")
 local section_start, section_end = string.find(content, "features:\n.-\n[^\n ]")
 
 if not (section_end and section_start) then
