@@ -28,6 +28,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Toolchain
+        run: rokit install --no-trust-check
+
       - name: Sort libraries
         shell: bash
         run: lune run scripts/sort_libraries
