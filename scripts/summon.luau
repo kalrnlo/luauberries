@@ -11,10 +11,7 @@ local OPTS = {
 	env = process.env
 }
 
-local function summon(
-	process: string,
-	args: string?
-): string
+local function summon(process: string, args: string?): string
 	local result = SPAWN(process, { args or "" }, OPTS)
  
 	if not result.ok then
