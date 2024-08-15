@@ -1,5 +1,6 @@
 {
 	"recommendations": [
-		"JohnnyMorganz.luau-lsp"
+		"JohnnyMorganz.luau-lsp",
+		"stkb.rewrap"
 	],
 }
