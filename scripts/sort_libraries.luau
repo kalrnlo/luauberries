@@ -64,6 +64,10 @@ table.sort(libs, function(a, b)
 	return len_a > len_b
 end)
 
+table.sort(sidebar_libs, function(a, b)
+	return #a.text > #b.text
+end)
+
 local before_section = string.sub(content, 1, section_start - 1)
 local sidebar_json = serde.encode("json", sidebar_libs, true)
 local after_section = string.sub(content, section_end)
