@@ -175,7 +175,7 @@ for _, release_libinfo in RELEASE_LIBS do
 	local libinfo = libinfo(lib)
 	local version = libinfo.version
 	local base_file_name = package_libinfo.base_file_name
-	local notes = { "## Whats changed" }
+	local notes = {}
 	local release_tag = `{lib}@{version}`
 	local release_files = {}
 
@@ -185,6 +185,10 @@ for _, release_libinfo in RELEASE_LIBS do
 
 	for _, commit in release_libinfo.commits do
 		table.insert(notes, `* {commit.title} by @{commit.author} in {BASE_COMMIT_URL}{commit.hash}`)
+	end
+
+	if #notes ~= 0 then
+		table.insert(notes, 1, "## Whats changed")
 	end
 
 	fs.writeDir("dist")
