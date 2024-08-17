@@ -32,10 +32,10 @@ jobs:
             runner-os: macos-14
         
     steps:
+      - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
-      - uses: CompeyDev/setup-rokit@v0.1.0
 
       - name: Get files changed
         id: files_changed
