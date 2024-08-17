@@ -1,0 +1,84 @@
+name: setup-rokit 
+description: GitHub action to install and run rokit; a toolchain manager.
+author: kalrnlo
+
+inputs:
+  a:
+    description: "a commit hash to get the diff between `a `and `b`"
+    required: false
+    default: ""
+  b:
+    description: "a commit hash to get the diff between `a` and `b`"
+    required: false
+    default: ""
+  event_name:
+    description: the `github.event_name` that triggered the workflow
+    required: false
+    default: "${{ github.event_name }}"
+  event:
+    description: the event object that triggered the workflow
+    default: ${{ github.event }}
+    required: false
+  token:
+    description: "GitHub token via `github.token`"
+    default: "${{ github.token }}"
+    required: false
+
+runs:
+  using: "composite"
+  outputs:
+    diff: ${{ steps.main.outputs.diff }}
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.event_name == "pull_request" && 2 || 0 }}
+
+    - name: Get A
+      shell: bash
+      id: a
+      run: |
+        if [ "${{ inputs.a }}" == "" ] then
+          case "${{ inputs.event_name }}" in
+            push)
+              echo "b=${{ inputs.event.commits[0].id }}" >> $GITHUB_OUTPUT
+              ;;
+            pull_request)
+              echo "b=${{ inputs.event.base_ref }}" >> $GITHUB_OUTPUT
+              ;;
+          esac
+        else
+           echo "b=${{ inputs.a }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Get B
+      shell: bash
+      id: b
+      run: |
+        if [ "${{ inputs.b }}" == "" ] then
+          case "${{ inputs.event_name }}" in
+            push)
+              echo "b=${{ inputs.event.commits[-1].id }}" >> $GITHUB_OUTPUT
+              ;;
+            pull_request)
+              echo "b=${{ inputs.event.head_ref }}" >> $GITHUB_OUTPUT
+              ;;
+          esac
+        else
+           echo "b=${{ inputs.b }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create diff
+      shell: bash
+      id: main
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        a: ${{ steps.a.outputs.a }}
+        b: ${{ steps.b.outputs.b }}
+      run: |
+        diff = git diff --name-only --diff-filter=d "${{ steps.b.outputs.b }}~1" "${{ steps.a.outputs.a }}"
+        echo "diff=$diff" >> $GITHUB_OUTPUT
+        echo diff >> .diff
+
+branding:
+  icon: link-2
+  color: blue
