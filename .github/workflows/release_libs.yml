@@ -46,7 +46,6 @@ jobs:
           esac
 
           diff=$(git diff --name-only --diff-filter=d "${firstCommit}~1" "${lastCommit}");
-          echo "diff=$diff" >> $GITHUB_OUTPUT;
           echo diff >> .diff;
 
       - name: Run releases script
