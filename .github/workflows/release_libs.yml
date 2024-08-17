@@ -30,23 +30,15 @@ jobs:
       - name: Install Toolchain
         run: rokit install --no-trust-check
 
-      - name: Get files changed
-        id: files_changed
+      - name: Fetch diff
+        id: fetch_diff
         shell: bash
         run: |
-          case '${{ github.event_name }}' in
-            push)
-              firstCommit='${{ github.event.commits[0].id }}'
-              lastCommit='${{ github.event.commits[-1].id }}'
-              ;;
-            pull_request)
-              firstCommit='${{ github.event.base_ref }}'
-              lastCommit='${{ github.event.head_ref }}'
-              ;;
-          esac
-
-          diff=$(git diff --name-only --diff-filter=d "${firstCommit}~1" "${lastCommit}");
-          echo diff >> .diff;
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "diff=(gh pr diff ${{ github.event.pull_request.number }})" >> .diff
+          else
+            echo "diff=$(gh api repos/${{ github.repository }}/commits/${{ github.sha }} --header 'Accept: application/vnd.github.v3.diff')" >> .diff
+          fi
 
       - name: Run releases script
         run: lune run scripts/release/make_lib_releases ${{ inputs.libs }}
