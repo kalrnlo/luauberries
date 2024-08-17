@@ -32,8 +32,10 @@ jobs:
             runner-os: macos-14
         
     steps:
-      - uses: actions/checkout@v4
       - uses: CompeyDev/setup-rokit@v0.1.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Fetch Diff
         uses: ./.github/actions/fetch_diff.yml
