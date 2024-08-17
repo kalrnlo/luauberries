@@ -3,16 +3,15 @@
 layout: home
 
 hero:
-  name: luauberry
-  text: A collection of libraries for luau, and other runtimes
-  tagline:
+  name: Luauberry
+  text: A collection of libraries for luau and other runtimes
   actions:
     - theme: brand
       text: Get started
       link: /installing
     - theme: alt
       text: API
-      link: /api
+      link: /safe-teleport
 
 features:
   - title: Cross

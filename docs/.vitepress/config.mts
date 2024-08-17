@@ -5,12 +5,13 @@ import fs from 'fs'
 export default defineConfig({
 	title: "luauberry",
 	description: "a collection of libraries for luau and roblox",
+	
 	lastUpdated: true,
 	cleanUrls: true,
 	lang: 'en-US',
 
 	head: [
-		['link', { rel: 'icon', href: '/rbxlibs_logo.svg' }]
+		['link', { rel: 'icon', href: '/logo.svg' }]
 	],
 
 	markdown: {
@@ -27,9 +28,9 @@ export default defineConfig({
 			  timeStyle: 'short',
 			  forceLocale: true,
 			}
-		  },
+		},
 
-		logo: "/rbxlibs_logo_small.svg",
+		logo: "/logo.svg",
 		editLink: {
 			pattern: 'https://github.com/kalrnlo/rbxlibs/edit/main/docs/:path'
 		},
