@@ -4,9 +4,8 @@
 
 local process = require("@lune/process")
 local roblox = require("@lune/roblox")
-local modulify = require("modulify")
 
-local SOURCES = {} :: { [modulify.ModuleScript]: string }
+local SOURCES = {} :: { [roblox.Instance]: string }
 local HAS_IMPLEMENTED = false
 local ARGS = process.args
 

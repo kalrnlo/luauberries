@@ -2,12 +2,12 @@
 -- packager
 -- makes new releases for each lib thats changed
 
-local require_pattern = require("require_pattern")
-local remove_from_end = require("remove_from_end")
-local iter_scripts = require("iter_scripts")
+local require_pattern = require("../require_pattern")
+local remove_from_end = require("../remove_from_end")
+local iter_scripts = require("../iter_scripts")
+local depgraph = require("../depgraph")
 local roblox = require("@lune/roblox")
 local modulify = require("modulify")
-local depgraph = require("depgraph")
 local license = require("license")
 local libinfo = require("libinfo")
 local fs = require("@lune/fs")

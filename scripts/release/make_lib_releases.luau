@@ -2,14 +2,14 @@
 -- make lib releases
 -- makes new releases for each lib thats changed
 
-local impl_module_source_prop = require("impl_module_source_prop")
+local impl_module_source_prop = require("../roblox_dep_injection/impl_module_source_prop")
+local diff_reader = require("../diff_reader")
 local DateTime = require("@lune/DateTime")
-local diff_reader = require("diff_reader")
 local process = require("@lune/process")
 local serde = require("@lune/serde")
 local packager = require("packager")
+local summon = require("../summon")
 local libinfo = require("libinfo")
-local summon = require("summon")
 local fs = require("@lune/fs")
 
 type ReleaseLibInfo = {

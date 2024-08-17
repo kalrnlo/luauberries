@@ -32,7 +32,7 @@ jobs:
         run: rokit install --no-trust-check
 
       - name: Sort libraries
-        run: lune run scripts/sort_libraries
+        run: lune run scripts/docs/sort_libraries
 
       - uses: actions/setup-node@v3
         with:

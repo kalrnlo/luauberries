@@ -33,6 +33,6 @@ jobs:
 
       - name: Get files changed
         uses: ./.github/actions/fetch_diff.yml
-        
+
       - name: Run releases script
-        run: lune run scripts/make_lib_releases ${{ inputs.libs }}
+        run: lune run scripts/release/make_lib_releases ${{ inputs.libs }}
