@@ -16,17 +16,19 @@ jobs:
   CI:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run CI
-        uses: ./.github/workflows/ci.yml
+      - uses: ./.github/workflows/ci.yml
 
   Main:
     needs: CI
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Toolchain
         run: rokit install --no-trust-check
