@@ -1,9 +1,9 @@
 # Installing
 
-Info on how to install Luauberry, and Luauberry libraries
+Info on how to install Luauberries, and Luauberries libraries
 
 > [!NOTE]
-> Luauberry is not avaliable on any package managers, as I'm waiting for luau to get an offical package manager before bothering with any of that.
+> Luauberries is not avaliable on any package managers, as I'm waiting for luau to get an offical package manager before bothering with any of that.
 
 ## Methods
 
@@ -11,4 +11,4 @@ Info on how to install Luauberry, and Luauberry libraries
 
 For every library theres a release containing a zip file for that library, and an rbxm. Theres also an rbxm and zip file that include dependencies for that library if that library has dependencies, just look for `-deps` at the end of file names.
 
-https://github.com/kalrnlo/luauberry/releases
+https://github.com/kalrnlo/luauberries/releases

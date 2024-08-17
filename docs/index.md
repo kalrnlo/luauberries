@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: Luauberry
+  name: Luauberries
   text: A collection of libraries for luau and other runtimes
   actions:
     - theme: brand

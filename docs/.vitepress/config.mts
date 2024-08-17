@@ -3,7 +3,7 @@ import fs from 'fs'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-	title: "Luauberry",
+	title: "Luauberries",
 	description: "a collection of libraries for luau and other runtimes",
 	
 	lastUpdated: true,
@@ -40,7 +40,7 @@ export default defineConfig({
 
 		// https://vitepress.dev/reference/default-theme-config
 		socialLinks: [
-			{ icon: 'github', link: 'https://github.com/kalrnlo/luauberry' },
+			{ icon: 'github', link: 'https://github.com/kalrnlo/luauberries' },
 			{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 		],
 		nav: [
