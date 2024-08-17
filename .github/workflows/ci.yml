@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fetch Diff
-        uses: ./.github/actions/fetch_diff.yml
+        uses: .github/actions/fetch_diff.yml
 
       - name: Install Toolchain
         run: rokit install --no-trust-check
