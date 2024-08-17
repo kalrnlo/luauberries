@@ -3,16 +3,16 @@
 layout: home
 
 hero:
-  name: rbxlibs
-  text: A collection of libraries for luau and roblox
+  name: luauberry
+  text: A collection of libraries for luau, and other runtimes
   tagline:
   actions:
     - theme: brand
-      text: API
-      link: /character
-    - theme: alt
-      text: Installing
+      text: Get started
       link: /installing
+    - theme: alt
+      text: API
+      link: /api
 
 features:
   - title: Cross

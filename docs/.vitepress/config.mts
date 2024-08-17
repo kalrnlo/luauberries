@@ -3,8 +3,8 @@ import fs from 'fs'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-	title: "rbxlibs",
-	description: "A collection of libraries for luau and roblox",
+	title: "luauberry",
+	description: "a collection of libraries for luau and roblox",
 	lastUpdated: true,
 	cleanUrls: true,
 	lang: 'en-US',
@@ -39,7 +39,7 @@ export default defineConfig({
 
 		// https://vitepress.dev/reference/default-theme-config
 		socialLinks: [
-			{ icon: 'github', link: 'https://github.com/kalrnlo/rbxlibs' },
+			{ icon: 'github', link: 'https://github.com/kalrnlo/luauberry' },
 			{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 		],
 		nav: [
