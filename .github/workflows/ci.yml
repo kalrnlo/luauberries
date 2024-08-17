@@ -55,4 +55,4 @@ jobs:
         run: rokit install --no-trust-check
 
       - name: Run test runner
-        run: lune run scripts/test_runner all
+        run: lune run scripts/test_runner
