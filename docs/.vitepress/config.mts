@@ -3,8 +3,8 @@ import fs from 'fs'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-	title: "luauberry",
-	description: "a collection of libraries for luau and roblox",
+	title: "Luauberry",
+	description: "a collection of libraries for luau and other runtimes",
 	
 	lastUpdated: true,
 	cleanUrls: true,

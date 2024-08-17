@@ -1,9 +1,9 @@
 # Installing
 
-Info on how to install luauberry, and luauberry libraries
+Info on how to install Luauberry, and Luauberry libraries
 
 > [!NOTE]
-> luauberry is not avaliable on any package managers, as I'm waiting for luau to get an offical package manager before bothering with any of that.
+> Luauberry is not avaliable on any package managers, as I'm waiting for luau to get an offical package manager before bothering with any of that.
 
 ## Methods
 
