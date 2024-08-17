@@ -1,5 +1,6 @@
-# rbxlibs
-A collection of libraries for luau and roblox
+# luauberry
+[![CI](https://github.com/kalrnlo/luauberry/actions/workflows/ci.yml/badge.svg)](https://github.com/kalrnlo/luauberry/actions/workflows/ci.yml)
+A collection of libraries for luau, lune, and roblox
 
 ## Notable libraries:
 - [text chat](<https://libs.luau.lol/text-chat>) - utility library for working with TextChatService and its annoying quirks in behavior
