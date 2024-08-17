@@ -36,7 +36,25 @@ jobs:
         with:
           fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - uses: CompeyDev/setup-rokit@v0.1.0
-      - uses: kalrnlo/fetch-changed@v3
+
+      - name: Get files changed
+        id: files_changed
+        shell: bash
+        run: |
+          case '${{ github.event_name }}' in
+            push)
+              firstCommit='${{ github.event.commits[0].id }}'
+              lastCommit='${{ github.event.commits[-1].id }}'
+              ;;
+            pull_request)
+              firstCommit='${{ github.event.base_ref }}'
+              lastCommit='${{ github.event.head_ref }}'
+              ;;
+          esac
+
+          diff=$(git diff --name-only --diff-filter=d ${firstCommit}~1 ${lastCommit});
+          echo "diff=$diff" >> $GITHUB_OUTPUT;
+          echo diff >> .diff;
 
       - name: Install Toolchain
         run: rokit install --no-trust-check
