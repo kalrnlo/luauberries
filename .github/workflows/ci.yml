@@ -33,10 +33,10 @@ jobs:
         
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
-      - uses: ./.github/actions/fetch_diff.yml
       - uses: CompeyDev/setup-rokit@v0.1.0
+
+      - name: Fetch Diff
+        uses: ./.github/actions/fetch_diff.yml
 
       - name: Install Toolchain
         run: rokit install --no-trust-check

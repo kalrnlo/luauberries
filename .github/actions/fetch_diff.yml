@@ -1,84 +1,46 @@
-name: setup-rokit 
-description: GitHub action to install and run rokit; a toolchain manager.
+name: Fetch Diff
+description: GitHub action to fetch a diff between the previous commits and the current commits
 author: kalrnlo
 
+branding:
+  icon: list
+  color: purple
+
 inputs:
-  a:
-    description: "a commit hash to get the diff between `a `and `b`"
-    required: false
-    default: ""
-  b:
-    description: "a commit hash to get the diff between `a` and `b`"
-    required: false
-    default: ""
-  event_name:
-    description: the `github.event_name` that triggered the workflow
-    required: false
-    default: "${{ github.event_name }}"
-  event:
-    description: the event object that triggered the workflow
-    default: ${{ github.event }}
-    required: false
   token:
     description: "GitHub token via `github.token`"
     default: "${{ github.token }}"
     required: false
 
+outputs:
+  files_changed:
+    description: A multi-line string containing the list of changed files.
+    value: ${{ steps.main.outputs.diff }}
+
 runs:
   using: "composite"
-  outputs:
-    diff: ${{ steps.main.outputs.diff }}
   steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: ${{ inputs.event_name == "pull_request" && 2 || 0 }}
-
-    - name: Get A
-      shell: bash
-      id: a
-      run: |
-        if [ "${{ inputs.a }}" == "" ] then
-          case "${{ inputs.event_name }}" in
-            push)
-              echo "b=${{ inputs.event.commits[0].id }}" >> $GITHUB_OUTPUT
-              ;;
-            pull_request)
-              echo "b=${{ inputs.event.base_ref }}" >> $GITHUB_OUTPUT
-              ;;
-          esac
-        else
-           echo "b=${{ inputs.a }}" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Get B
-      shell: bash
-      id: b
-      run: |
-        if [ "${{ inputs.b }}" == "" ] then
-          case "${{ inputs.event_name }}" in
-            push)
-              echo "b=${{ inputs.event.commits[-1].id }}" >> $GITHUB_OUTPUT
-              ;;
-            pull_request)
-              echo "b=${{ inputs.event.head_ref }}" >> $GITHUB_OUTPUT
-              ;;
-          esac
-        else
-           echo "b=${{ inputs.b }}" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Create diff
+    - name: Main
       shell: bash
       id: main
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
-        a: ${{ steps.a.outputs.a }}
-        b: ${{ steps.b.outputs.b }}
       run: |
-        diff = git diff --name-only --diff-filter=d "${{ steps.b.outputs.b }}~1" "${{ steps.a.outputs.a }}"
+        case "${{ github.event_name }}" in
+          push)
+            previous=${{ github.event.commits[-1].id }}
+            latest=${{ github.event.commits[0].id }}
+
+            diff = gh api "repos/${{github.repository}}/compare/$previous...$latest" --jq .files[].path
+            ;;
+          pull_request)
+            base_repo=${{github.event.pull_request.base.repo.full_name}}
+            base_sha=${{github.event.pull_request.base.sha}}
+            label=${{github.event.pull_request.head.label}}
+
+            diff = gh api "repos/$base_repo/compare/$base_sha...$label" --jq .files[].path'
+            ;;
+        esac
+
         echo "diff=$diff" >> $GITHUB_OUTPUT
         echo diff >> .diff
-
-branding:
-  icon: link-2
-  color: blue

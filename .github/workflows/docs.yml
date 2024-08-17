@@ -32,7 +32,6 @@ jobs:
         run: rokit install --no-trust-check
 
       - name: Sort libraries
-        shell: bash
         run: lune run scripts/sort_libraries
 
       - uses: actions/setup-node@v3
@@ -41,7 +40,6 @@ jobs:
           cache: npm
 
       - name: Build
-        shell: bash
         run: npm ci && npm run docs:build
 
       - uses: actions/upload-pages-artifact@v1
