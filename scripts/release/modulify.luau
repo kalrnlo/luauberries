@@ -2,9 +2,9 @@
 -- modulify
 -- utility for converting a library into a module script instance
 
-local remove_from_end = require("remove_from_end")
+local remove_from_end = require("../remove_from_end")
+local ends_with = require("../ends_with")
 local process = require("@lune/process")
-local ends_with = require("ends_with")
 local roblox = require("@lune/roblox")
 local fs = require("@lune/fs")
 

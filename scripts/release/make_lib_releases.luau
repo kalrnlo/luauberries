@@ -2,7 +2,7 @@
 -- make lib releases
 -- makes new releases for each lib thats changed
 
-local impl_module_source_prop = require("../roblox_dep_injection/impl_module_source_prop")
+local mock_module_script = require("mock_module_script")
 local diff_reader = require("../diff_reader")
 local DateTime = require("@lune/DateTime")
 local process = require("@lune/process")
@@ -97,7 +97,7 @@ local function write_and_insert(t: { string }, path: string, contents: string | 
 	table.insert(t, path)
 end
 
-impl_module_source_prop()
+mock_module_script()
 
 for index, lib in LIB_LIST do
 	local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]+)\t{lib}%-v%d+%.%d+%.%d+\t(%S+)`

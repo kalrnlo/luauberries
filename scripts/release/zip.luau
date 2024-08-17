@@ -3,7 +3,7 @@
 -- utility for zipping folders within lune
 
 local process = require("@lune/process")
-local summon = require("summon")
+local summon = require("../summon")
 local fs = require("@lune/fs")
 
 local IS_WINDOWS = process.os == "windows"

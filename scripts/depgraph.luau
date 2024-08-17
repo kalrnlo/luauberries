@@ -1,4 +1,3 @@
---!optimize 2
 --!native
 
 -- dep graph
