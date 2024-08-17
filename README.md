@@ -1,5 +1,5 @@
-# luauberry
-[![CI](https://github.com/kalrnlo/luauberry/actions/workflows/ci.yml/badge.svg)](https://github.com/kalrnlo/luauberry/actions/workflows/ci.yml)
+# luauberry 
+#### [![CI](https://github.com/kalrnlo/luauberry/actions/workflows/ci.yml/badge.svg)](https://github.com/kalrnlo/luauberry/actions/workflows/ci.yml)
 A collection of libraries for luau, lune, and roblox
 
 ## Notable libraries:
