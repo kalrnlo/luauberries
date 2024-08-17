@@ -7,12 +7,16 @@ local serde = require("@lune/serde")
 local fs = require("@lune/fs")
 
 type LibInfo = {
-	topics: { string },
+	tags: { string },
 	version: string,
+	runtime: {
+		optional: { string }?,
+		main: string,
+	}?
 }
 
 local function libinfo(lib: string): LibInfo
-	return serde.decode("json", fs.readFile(`libs/{lib}/LIBINFO.json`))
+	return serde.decode("yaml", fs.readFile(`libs/{lib}/LIBRARY.yml`))
 end
 
 return libinfo
