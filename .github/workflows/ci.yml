@@ -2,22 +2,17 @@ name: CI
 
 on:
   workflow_dispatch:
+  # im just including everything under scripts,
+  # because its easier and it means i dont forget to add a script here
+  # because theres certain scripts where if theyre changed, all tests should be ran
   push:
     branches: [ main ]
     paths:
-      - "scripts/diff_to_tbl.luau"
-      - "scripts/test_runner.luau"
-      - "scripts/depgraph.luau"
-      - "scripts/mock/**"
-      - "testkit.luau"
+      - "scripts/**"
   pull_request:
     branches: [ main ]
     paths:
-      - "scripts/diff_to_tbl.luau"
-      - "scripts/test_runner.luau"
-      - "scripts/depgraph.luau"
-      - "testkit.luau"
-      - "scripts/mock/**"
+      - "scripts/**"
 
 jobs:
   Main:    
@@ -46,6 +41,7 @@ jobs:
         run: rokit install --no-trust-check
 
       - name: Fetch Diff
+        shell: bash
         run: |
           case '${{ github.event_name }}' in
             push)
@@ -57,7 +53,7 @@ jobs:
               lastCommit='${{ github.event.head_ref }}'
               ;;
           esac
-          echo "diff=$(git diff --name-only --diff-filter=d "${firstCommit}~1" "${lastCommit}")" >> .diff
+          git diff --name-only --output=".diff" --diff-filter=d "${firstCommit}~1" "${lastCommit}"
 
       - name: Run test runner
-        run: lune run scripts/test_runner
+        run: lune run scripts/test_runner all
