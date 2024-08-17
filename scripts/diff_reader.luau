@@ -15,8 +15,6 @@ local LIB_FILENAME_BLACKLIST = table.freeze({
 local GMATCH = string.gmatch
 local diff_reader = {}
 
-print(DEFAULT_DIFF)
-
 function diff_reader.libs(diff: string?): ({ string }, { [string]: boolean })
 	local diff = diff or DEFAULT_DIFF
 	local changed_array = {}
