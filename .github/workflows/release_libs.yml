@@ -17,7 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/ci.yml
+
+      - name: Run CI
+        uses: ./.github/workflows/ci.yml
 
   Main:
     needs: CI
