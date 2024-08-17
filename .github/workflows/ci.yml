@@ -33,7 +33,7 @@ jobs:
         
     steps:
       - uses: CompeyDev/setup-rokit@v0.1.0
-      - uses: kalrnlo/fetch-changed@v1
+      - uses: kalrnlo/fetch-changed@v2
       - uses: actions/checkout@v4
 
       - name: Install Toolchain
