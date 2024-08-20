@@ -5,7 +5,7 @@
 
 local roblox = require("@lune/roblox")
 
-type GenericInstance<I> = roblox.Instance & I
+export type GenericInstance<I> = roblox.Instance & I
 
 type PropertySetter<I, P> = (instance: GenericInstance<I>, new_value: unknown) -> P
 
@@ -23,7 +23,7 @@ export type Impl<I> = typeof(setmetatable({} :: {
 }, {} :: ImplPrototype<I>))
 
 local CANNOT_SET_ERR_FORMAT = "[IMPL] cannot set property \"%s\" on class \"%s\" to a value that isn't of type \"%s?\""
-local CLASSES_IMPLEMENTED = {} :: { [string]: boolean }
+local IMPLS = {} :: { [string]: Impl<any> }
 
 local function rwprop<I, P, D>(
 	impl: Impl<I>,
@@ -127,24 +127,37 @@ local function method<I, P, A..., R...>(
 	return impl
 end
 
-local impl = {
+local impl_mt = {
 	method = method,
 	rwprop = rwprop,
 	rprop = rprop,
 }
-impl.__index = impl
-table.freeze(impl)
+impl_mt.__index = impl_mt
+table.freeze(impl_mt)
 
-local function create<I>(name: string): Impl<I>
-	if CLASSES_IMPLEMENTED[name] then
-		error(`[IMPL] class "{name}" has already been implemented`)
-	end
-	CLASSES_IMPLEMENTED[name] = true
-
-	return table.freeze(setmetatable({
-		propstores = {},
-		name = name,
-	}, impl :: any))
+local function set_rprop<I>(
+	class: string,
+	instance: GenericInstance<I>,
+	prop: string,
+	new_value: any
+)
+	IMPLS[class].propstores[prop][instance] = new_value
 end
 
-return create
+local function create<S, I>(self: S, name: string): Impl<I>
+	if IMPLS[name] then
+		error(`[IMPL] class "{name}" has already been implemented`)
+	end
+	local impl = table.freeze(setmetatable({
+		propstores = {},
+		name = name,
+	}, impl_mt :: any))
+
+	IMPLS[name] = impl
+	return impl
+end
+
+return table.freeze(setmetatable(
+	{ set_rprop = set_rprop }, 
+	table.freeze({ __call = create })
+))
