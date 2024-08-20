@@ -1,4 +1,3 @@
---!optimize 2
 
 -- pagesutil
 -- utility for dealing with roblox page instancs easily
@@ -9,9 +8,15 @@ export type PageInfo = {
 	page: number,
 }
 
-local advance_to_next_page_err_format = "[PAGES] an error occurred while trying to advance to the next page\n\tadvance-next-page-err: %s"
+local ADVANCE_ERR_FORMAT = "[PAGES] an error occurred while trying to advance to the next page\
+\tadvance-next-page-err: %s"
 
-local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?)
+local pagesutil = {}
+
+function pagesutil.iter(
+	pages: Pages,
+	f: (info: PageInfo, item: { [any]: any }) -> ("continue" | "break")?
+)
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local page = pages:GetCurrentPage()
 	local page_info = {
@@ -51,14 +56,14 @@ local function iter(pages: Pages, f: (info: PageInfo, item: { [any]: any }) -> (
 					end
 				end
 			else
-				warn(string.format(advance_to_next_page_err_format, err))
+				warn(string.format(ADVANCE_ERR_FORMAT, err))
 				return
 			end
 		until pages.IsFinished
 	end
 end
 
-local function toarray(pages: Pages): { { [any]: any } }
+function pagesutil.toarray(pages: Pages): { { [any]: any } }
 	local advance_to_next_page = pages.AdvanceToNextPageAsync
 	local contents = pages:GetCurrentPage()
 
@@ -70,7 +75,7 @@ local function toarray(pages: Pages): { { [any]: any } }
 				local current_page = pages:GetCurrentPage()
 				table.move(current_page, 1, #current_page, #contents + 1, contents)
 			else
-				warn(string.format(advance_to_next_page_err_format, err))
+				warn(string.format(ADVANCE_ERR_FORMAT, err))
 				break
 			end
 		until pages.IsFinished
@@ -78,7 +83,4 @@ local function toarray(pages: Pages): { { [any]: any } }
 	return contents
 end
 
-return table.freeze {
-	toarray = toarray,
-	iter = iter,
-}
+return table.freeze(pagesutil)

@@ -2,11 +2,8 @@
 -- httpservice
 -- implements a mock http service for lune
 
-local roblox = require("@lune/roblox")
 local net = require("@lune/net")
+local impl = require("../impl")
 
-
-
-local function impl_mock_http()
-
-end
+return impl("HttpService")
+	:rwprop("HttpEnabled", false)
