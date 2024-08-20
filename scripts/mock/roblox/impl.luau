@@ -25,7 +25,7 @@ export type Impl<I> = typeof(setmetatable({} :: {
 local CANNOT_SET_ERR_FORMAT = "[IMPL] cannot set property \"%s\" on class \"%s\" to a value that isn't of type \"%s?\""
 local IMPLS = {} :: { [string]: Impl<any> }
 
-local function rwprop<I, P, D>(
+local function rwprop<I, P>(
 	impl: Impl<I>,
 	propname: string,
 	default_or_setter: P | PropertySetter<I, P>,
@@ -90,7 +90,7 @@ local function rwprop<I, P, D>(
 	return impl
 end
 
-local function rprop<I, P, D>(
+local function rprop<I, P>(
 	impl: Impl<I>,
 	propname: string,
 	default: P
