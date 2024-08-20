@@ -41,6 +41,7 @@ jobs:
         with:
           fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
+        
       - name: Fetch diff
         id: fetch_diff
         shell: bash

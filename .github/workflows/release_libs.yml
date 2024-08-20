@@ -49,7 +49,7 @@ jobs:
         run: rokit install --no-trust-check
 
       - name: Run test runner
-        run: lune run scripts/test_runner all
+        run: lune run scripts/test_runner
 
   Main:
     needs: CI
@@ -58,7 +58,7 @@ jobs:
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
       - name: Install Toolchain
         run: rokit install --no-trust-check
