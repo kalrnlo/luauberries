@@ -14,7 +14,7 @@
 		"*.lua"
 	],
 	"luau-lsp.require.directoryAliases": {
-		"@lune/": "~/.lune/.typedefs/0.8.6/"
+    	"@lune/": "~/.lune/.typedefs/0.8.7/"
 	},
 
 	// vscode
