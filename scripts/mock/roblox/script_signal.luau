@@ -1,4 +1,6 @@
 
+-- script signal
+-- mock version of robloxs RbxScriptSignal in lune
 
 local task = require("@lune/task")
 
