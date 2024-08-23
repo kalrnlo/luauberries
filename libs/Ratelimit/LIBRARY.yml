@@ -2,3 +2,5 @@ tags:
   - ratelimiting
   - mrrp
 version: 2.1.0
+runtime:
+  main: pure

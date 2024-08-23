@@ -4,3 +4,5 @@ tags:
   - Roleplay Group
   - Cafe
 version: 2.2.0
+runtime:
+  main: roblox

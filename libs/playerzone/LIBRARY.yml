@@ -3,3 +3,5 @@ tags:
   - zone detection
   - player
 version: 2.0.0
+runtime:
+  main: roblox

@@ -2,3 +2,5 @@ tags:
   - random
   - math
 version: 1.3.0
+runtime:
+  main: pure

@@ -2,3 +2,5 @@ tags:
   - character
   - typed
 version: 1.4.0
+runtime:
+  main: roblox

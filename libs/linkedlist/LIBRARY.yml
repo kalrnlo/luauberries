@@ -3,3 +3,5 @@ tags:
   - doubly-linked
   - typed
 version: 2.1.0
+runtime:
+  main: pure
