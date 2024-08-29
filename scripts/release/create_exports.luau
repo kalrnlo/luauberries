@@ -94,10 +94,10 @@ local function create_exports(libname: string, contents: string): string
 	local exports = {}
 
 	for _, type in types do
-		table.insert(exports, `export type {libname}_{type} = {libname}.{type}`)
+		table.insert(exports, `export type {type} = {libname}.{type}`)
 	end
 	sort_descending(exports)
-	return if #exports ~= 0 then table.concat(exports, "\n") else ""
+	return table.concat(exports, "\n")
 end
 
 return create_exports

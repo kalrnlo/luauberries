@@ -1,6 +1,6 @@
 
 -- libinfo
--- utility func for reading LIBINFO.json files
+-- utility func for reading LIBRARY.yml files
 -- and providing types for LIBINFOs
 
 local serde = require("@lune/serde")

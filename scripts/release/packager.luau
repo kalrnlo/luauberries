@@ -66,7 +66,7 @@ local function package_lib(lib: string): PackagedLibInfo
 	local zipped_with_deps: string
 	local rbxm_with_deps: string
 
-	if depinfo.has_deps then
+	if has_deps then
 		fs.writeDir(output_deps_dir)
 
 		if initdir_exists then
