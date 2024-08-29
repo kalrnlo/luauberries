@@ -20,6 +20,17 @@ export type Character = Model & {
 
 -- maps players w their characters appearance loaded to their character
 local CHARACTER_APPEARANCE_LOADED = {} :: { [Player]: Character? }
+
+local function GET_APPEARANCE_LOADED(player: Player): Character?
+	return CHARACTER_APPEARANCE_LOADED[player]
+end
+
+-- this function exists so u dont have to do
+-- local character = (player.Character :: any) :: character.Character?
+local function GET(player: Player): Character?
+	return player.Character :: any
+end
+
 local character = {}
 
 function character.removing_once(player: Player, f: (character: Character) -> ()): () -> ()
@@ -45,7 +56,7 @@ function character.added(
 	f: (character: Character) -> (),
 	dont_run_for_existing_character: boolean?
 ): () -> ()
-	local character = character.get(player)
+	local character = GET(player)
 	local removing_conn: RBXScriptConnection?
 	local thread: thread
 
@@ -77,7 +88,7 @@ function character.added_once(
 	f: (character: Character) -> (),
 	dont_run_for_existing_character: boolean?
 ): () -> ()
-	local character = character.get(player)
+	local character = GET(player)
 
 	if character and not dont_run_for_existing_character then
 		local thread = task.defer(f, character)
@@ -108,7 +119,7 @@ function character.appearance_loaded(
 	f: (character: Character) -> (),
 	dont_run_for_existing_character: boolean?
 ): () -> ()
-	local character = CHARACTER_APPEARANCE_LOADED[player]
+	local character = GET_APPEARANCE_LOADED(player)
 	local removing_conn: RBXScriptConnection?
 	local thread: thread
 
@@ -140,7 +151,7 @@ function character.appearance_loaded_once(
 	f: (character: Character) -> (),
 	dont_run_for_existing_character: boolean?
 ): () -> ()
-	local character = CHARACTER_APPEARANCE_LOADED[player]
+	local character = GET_APPEARANCE_LOADED(player)
 
 	if character and not dont_run_for_existing_character then
 		local thread = task.defer(f, character)
@@ -166,17 +177,11 @@ function character.appearance_loaded_once(
 	end
 end
 
--- this function exists so u dont have to do
--- local character = (player.Character :: any) :: character.Character?
-function character.get(player: Player): Character?
-	return player.Character :: any
-end
-
-function character.get_appearance_loaded(player: Player): Character?
-	return CHARACTER_APPEARANCE_LOADED[player]
-end
+character.get_appearance_loaded = GET_APPEARANCE_LOADED
+character.get = GET
 
 do
+	
 	local function on_player_added(player: Player)
 		player.CharacterAppearanceLoaded:Connect(function(character: any)
 			CHARACTER_APPEARANCE_LOADED[player] = character
@@ -194,5 +199,7 @@ do
 		task.spawn(on_player_added, player)
 	end
 	Players.PlayerAdded:Connect(on_player_added)
+
 end
+
 return table.freeze(character)

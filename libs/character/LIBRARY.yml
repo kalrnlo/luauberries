@@ -1,6 +1,4 @@
-tags:
-  - character
-  - typed
-version: 1.4.0
+tags: [ character, typed ]
+version: 1.4.1
 runtime:
   main: roblox
