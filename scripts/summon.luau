@@ -6,10 +6,9 @@
 local process = require("@lune/process")
 
 local SPAWN = process.spawn
-local ENV = table.clone(process.env)
 local OPTS = {
 	shell = if process.os == "windows" then "powershell" else "bash",
-	env = ENV
+	env = process.env
 }
 
 local function summon(process: string, args: string?): string
@@ -20,7 +19,5 @@ local function summon(process: string, args: string?): string
 	end
 	return result.stdout
 end
-
-ENV.GH_TOKEN = ENV.GITHUB_TOKEN
 
 return summon

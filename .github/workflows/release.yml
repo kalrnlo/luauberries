@@ -74,4 +74,6 @@ jobs:
           fi
 
       - name: Run releases script
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: lune run scripts/release ${{ inputs.libs }}
