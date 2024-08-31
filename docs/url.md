@@ -4,38 +4,18 @@ Small utility with basic functions handling url querys and encoding/decoding url
 
 ```luau
 local Players = game:GetService("Players")
+local safeteleport = require("safeteleport")
 local url = require("url")
 
-local launch_data_start = "&launchdata="
-local start_len = #launch_data_start
-
-local function get_launch_data(player: Player): string?
-	local launch_data = player:GetJoinData().LaunchData
-
-	if launch_data and #launch_data == 0 then
-		return nil
-	elseif not launch_data then
-		return nil
-	end
-	local decoded = url.decode(launch_data)
-	local start = string.find(decoded, launch_data_start, 1, true)
-	
-	if start then
-		-- url does not contain launchdata
-		return nil
-	end
-	local data_start = start + start_len
-	-- this shouldnt ever be nil unless roblox does some insane changes to deeplinks
-	local end_char_pos = string.find(data, "&", data_start, true)
-
-	return string.sub(decoded, data_start, if end_char_pos then end_char_pos - 1 else #data)
-end
-
 Players.PlayerAdded:Connect(function(player)
-	local data = get_launch_data(player)
+	local data = url.launchdata(player)
 
 	if data then
-		-- do stuff
+		local placeid = tonumber(string.match(data, "placeid=%d+"))
+		
+		if placeid then
+			safeteleport(placeid, player)
+		end
 	end
 end)
 
@@ -45,7 +25,7 @@ end)
 
 ### `encode`
 
-Encodes the given string using [percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding), so that reserved characters except for spaces properly encode with `%` and two hexadecimal characters. Spaces by defualt are encoded as `+`, but can be specified to be encoded as `%20` with the second arg.
+Encodes the given string using [percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding), so that reserved characters except for spaces properly encode with `%` and two hexadecimal characters. Spaces by defualt are encoded as `%20`, but can be specified to be encoded as `+` with the second arg.
 
 ```luau
 local content = "Je suis allé au cinéma." -- French for "I went to the movies"
@@ -57,6 +37,9 @@ print(encoded) -- "Je+suis+all%C3%A9+au+cin%C3%A9ma."
 ### `decode`
 
 Decodes the given string, into how it originally was before it was [encoded](#encode)
+
+> [!NOTE]
+> If the spaces in the url are encoded as `+`, you need to specifiy this using the second arg for it to be properly decoded
 
 ```luau
 local encoded = "Je%20suis%20all%C3%A9%20au%20cinema%2E"
@@ -87,4 +70,20 @@ local query = "?meow=mrrp&mrrp=meow"
 local tbl = url.read_query(query)
 
 print(tbl.meow, tbl.mrrp) -- "mrrp", "meow"
+```
+
+### `get_launchdata`
+
+Gets the launchdata for the given player (the actual launchdata not the full join url that [`Player:GetJoinData().LaunchData`](https://create.roblox.com/docs/reference/engine/classes/Player#GetJoinData) gives), and decodes it
+
+```luau
+local Players = game:GetService("Players")
+
+Players.PlayerAdded:Connect(function(player)
+	local launchdata = url.get_launchdata(player)
+
+	if launchdata then
+		print(`{player.Name}'s launchdata: {launchdata}`)
+	end
+end)
 ```
