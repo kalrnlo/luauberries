@@ -1,4 +1,4 @@
-# rbxsafeconn
+# Rbx Safe Conn
 
 Connects to events where you'd want to probably also iterate over an array and call the same callback on every array item
 
