@@ -1,5 +1,5 @@
 
--- make lib releases
+-- release
 -- makes new releases for each lib thats changed
 
 local mock_module_script = require("mock_module_script")

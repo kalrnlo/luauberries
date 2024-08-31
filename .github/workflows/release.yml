@@ -1,91 +1,77 @@
 name: Release
 
 on:
-  release:
-    types: [ published, created, edited, prereleased, released ]
   workflow_dispatch:
     inputs:
-      tag_name:
-        description: 'Tag for this release (e.g., v1.0.0)'
+      libs:
+        description: 'List of libraries to force new releases for'
         required: true
         type: string
-
-permissions:
-  contents: write
-
-concurrency:
-  group: RELEASE-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  push:
+    branches: [ main ]
+    paths:
+      - "libs/**.luau"
 
 jobs:
-  make_draft:
-    name: Make draft release
-    runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create_draft.outputs.release_id }}
-      version: ${{ steps.get_version.outputs.version }}
-    env:
-      GH_TOKEN: ${{ github.token }}
-      version: placeholder
-
+  CI:    
+    runs-on: ${{ matrix.runner-os }}
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            runner-os: windows-latest
+  
+          - name: Linux
+            runner-os: ubuntu-latest
+  
+          - name: macOS
+            runner-os: macos-14
+        
     steps:
-      - uses: actions/checkout@v3
+      - uses: CompeyDev/setup-rokit@v0.1.0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
-      - name: Run CI
-        uses: ./.github/workflows/ci.yml
-
-      - name: Get version
-        id: get_version
+      - name: Fetch diff
+        id: fetch_diff
         shell: bash
         run: |
-          if [[ ${{ github.event_name }} == 'release' ]]; then
-            version=${GITHUB_REF#refs/tags/}
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "diff=(gh pr diff ${{ github.event.pull_request.number }})" >> .diff
           else
-            version=${{ github.event.inputs.tag_name }}
+            echo "diff=$(gh api repos/${{ github.repository }}/commits/${{ github.sha }} --header 'Accept: application/vnd.github.v3.diff')" >> .diff
           fi
-          echo "version=$version" >> $GITHUB_OUTPUT
-          echo "version=$version" >> $GITHUB_ENV
-          echo "FOUND VERSION $version"
-      
-      - name: Create draft
-        id: create_draft
-        run: |
-          if gh release view ${{ env.version }}; then
-            gh release edit ${{ env.version }} --draft
-          else
-            gh release create ${{ env.version }} --draft --title "${{ env.version }}" --generate-notes
-          fi
-          release_id=$(gh release view v2.1.0 --json id -q ".id")
 
-          echo "release_id=$release_id" >> $GITHUB_OUTPUT
+      - name: Install Toolchain
+        run: rokit install --no-trust-check
 
-  build:
-    name: Build
-    needs: make_draft
+      - name: Run test runner
+        run: lune run scripts/test_runner
+
+  Main:
+    needs: CI
     runs-on: ubuntu-latest
-    env:
-      release_id: ${{needs.make_draft.outputs.release_id}}
-      version: ${{needs.make_draft.outputs.version}}
-      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: CompeyDev/setup-rokit@v0.1.0
       - uses: actions/checkout@v3
-        
-      - name: Run script
-        run: lune run scripts/release
-
-      - name: Upload libraries
-        run: |
-          cd output
-          for dir in */; do
-            dir=${dir%/}
-            echo "UPLOADING ${dir}"
-            (cd "$dir" && zip -r "../${dir}.zip" .)
-            gh release upload ${{ env.release_id }} "${dir}.zip" --clobber
-          done
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
         with:
-          name: rbxlibs-${{ env.version }}-ALL-LIBS
-          path: output/ALL_LIBS.zip
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+
+      - name: Install Toolchain
+        run: rokit install --no-trust-check
+
+      - name: Fetch diff
+        id: fetch_diff
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "diff=(gh pr diff ${{ github.event.pull_request.number }})" >> .diff
+          else
+            echo "diff=$(gh api repos/${{ github.repository }}/commits/${{ github.sha }} --header 'Accept: application/vnd.github.v3.diff')" >> .diff
+          fi
+
+      - name: Run releases script
+        run: lune run scripts/release ${{ inputs.libs }}
