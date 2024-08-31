@@ -49,7 +49,7 @@ jobs:
         run: rokit install --no-trust-check
 
       - name: Run test runner
-        run: lune run scripts/test_runner
+        run: lune run scripts/test_runner release ${{ inputs.libs }}
 
   Main:
     needs: CI

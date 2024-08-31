@@ -11,29 +11,40 @@ local ansi = require("ansi")
 
 local function get_libs_to_test(): { string }
 	local args = process.args
+	local first_arg = args[1]
+	local is_release = first_arg == "release"
+	local args_len = #args
 
-	if args[1] == "all" or not fs.isFile(".diff") then
+	if first_arg == "all" or not fs.isFile(".diff") then
 		return fs.readDir("libs")
-	elseif #args ~= 0 then
+	elseif args_len > 1 or not is_release then
 		return args
-	else
-		if diff_reader.scripts() then
-			return fs.readDir("libs")
+	elseif diff_reader.scripts() then
+		return fs.readDir("libs")
+	end
+	local libs, changed_set = diff_reader.libs()
+
+	if is_release then
+		args[1] = args[args_len]
+		args[args_len] = nil
+		table.move(args, 1, args_len - 1, #libs + 1, libs)
+
+		for _, lib in args do
+			changed_set[lib] = true
 		end
-		local libs, changed_set = diff_reader.libs()
-	
-		for lib, depinfo in depgraph do
-			for _, libdep in depgraph[lib].deep do
-				if changed_set[libdep] then
-					changed_set[lib] = true
-					table.insert(libs, lib)
-					break
-				end
+	end
+
+	for lib, depinfo in depgraph do
+		for _, libdep in depgraph[lib].deep do
+			if changed_set[libdep] then
+				changed_set[lib] = true
+				table.insert(libs, lib)
+				break
 			end
 		end
-
-		return libs
 	end
+
+	return libs
 end
 
 for _, lib in get_libs_to_test() do
