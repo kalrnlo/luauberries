@@ -4,7 +4,6 @@
 
 local datetime = require("@lune/datetime")
 local serde = require("@lune/serde")
-local net = require("@lune/net")
 local impl = require("../impl")
 
 local RANDOM_SEED = math.randomseed

@@ -448,47 +448,6 @@ local function deep_eq(a: {}, b: {}): boolean
 	return true
 end
 
-do
-	-- yes ik global bad, but this is here for unit testing
-	-- so shush
-	local roblox = require("@lune/roblox")
-
-	NumberSequenceKeypoint = roblox.NumberSequenceKeypoint
-	ColorSequenceKeypoint = roblox.ColorSequenceKeypoint
-	PhysicalProperties = roblox.PhysicalProperties
-	NumberSequence = roblox.NumberSequence
-	ColorSequence = roblox.ColorSequence
-	DateTime = require("@lune/DateTime")
-	Region3int16 = roblox.Region3int16
-	Vector2int16 = roblox.Vector2int16
-	Vector3int16 = roblox.Vector3int16
-	NumberRange = roblox.NumberRange
-	BrickColor = roblox.BrickColor
-	Instance = roblox.Instance
-	Region3 = roblox.Region3
-	Vector3 = roblox.Vector3
-	Vector2 = roblox.Vector2
-	CFrame = roblox.CFrame
-	Color3 = roblox.Color3
-	Faces = roblox.Faces
-	UDim2 = roblox.UDim2
-	Font = roblox.Font
-	Rect = roblox.Rect
-	UDim = roblox.UDim
-	Enum = roblox.Enum
-	-- lune errors for this :(
-	-- game = roblox.Instance.new("DataModel")
-	Ray = roblox.Ray
-
-	for key, value in roblox do
-		if type(value) == "table" and type(value.new) == "function" then
-			_G[key] = value
-		end
-	end
-	_G["DateTime"] = DateTime
-	_G["Enum"] = Enum
-end
-
 return table.freeze({
 	test = function()
 		return TEST, CASE, CHECK, FINISH, SKIP

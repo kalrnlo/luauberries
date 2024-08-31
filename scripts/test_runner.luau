@@ -3,7 +3,9 @@
 -- script for running tests for ci
 
 local diff_reader = require("diff_reader")
+local mock_roblox = require("mock/roblox")
 local process = require("@lune/process")
+local roblox = require("@lune/roblox")
 local depgraph = require("depgraph")
 local task = require("@lune/task")
 local fs = require("@lune/fs")
@@ -45,6 +47,16 @@ local function get_libs_to_test(): { string }
 	end
 
 	return libs
+end
+
+do
+	-- https://github.com/lune-org/lune/issues/236
+	local part = roblox.Instance.new("Part")
+
+	pcall(function(part: { [string]: any })
+		part.Shutdown = 10
+	end, part)
+	mock_roblox()
 end
 
 for _, lib in get_libs_to_test() do

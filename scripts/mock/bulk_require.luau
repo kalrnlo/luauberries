@@ -27,8 +27,6 @@ local function bulk_require(dir: string): { [string]: { [any]: any } }
 		local name = remove_from_end(module, ".luau")
 		modules[name] = (require)(FORMAT(format, name))
 	end
-
-	print(modules)
 	return table.freeze(modules)
 end
 

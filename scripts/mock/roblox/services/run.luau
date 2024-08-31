@@ -17,6 +17,8 @@ task.spawn(function()
 			task.defer(f, os.clock() - START)
 			START = os.clock()
 		end
+		-- do not remove the wait otherwise ur gonna be fired because tests no workey
+		task.wait()
 	end
 end)
 
