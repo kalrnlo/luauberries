@@ -12,7 +12,7 @@ local fs = require("@lune/fs")
 local ansi = require("ansi")
 
 local function get_libs_to_test(): { string }
-	local args = process.args
+	local args = table.clone(process.args)
 	local first_arg = args[1]
 	local is_release = first_arg == "release"
 	local args_len = #args
