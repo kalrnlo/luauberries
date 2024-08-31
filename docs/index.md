@@ -14,6 +14,9 @@ hero:
       link: /safe-teleport
 
 features:
+  - title: rbxsafeconn
+    details: Connects to events where you'd want to probably also iterate over an array and call the same callback on every array item
+    link: /rbx-safe-conn
   - title: Cross
     details: Utility for dealing with cross runtime shenanigans, covering the bear necessities
     link: /cross

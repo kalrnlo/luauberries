@@ -1,0 +1,4 @@
+tags: [ Players, CollectionService, SafePlayerAdded, TagAdded ]
+version: 1.0
+runtime:
+  main: roblox
