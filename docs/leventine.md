@@ -21,14 +21,14 @@ type MapInfo = {
 }
 ```
 * `case_sensitive` - if not true, every string will be lowered before being mapped
-* `min_score` - the minimum score for a string in the list to be included in the mapped list (defualt: 0)
+* `min_score` - the minimum score for a string in the list to be included in the mapped list (default: 0)
 
 ## Methods
 
 
 ### `score`
 
-Gets the distance between 2 strings, includes a optional `case_sensitive` arg that is false by defualt
+Gets the distance between 2 strings, includes a optional `case_sensitive` arg that is false by default
 
 ```luau
 local score = leventine.score("meow", "mrrp")
@@ -37,7 +37,7 @@ print(score) -- 4
 
 ### `closest`
 
-Gets the closest string to `str` from `t` and returns the closest string and closest distance, includes a optional `case_sensitive` arg that is false by defualt
+Gets the closest string to `str` from `t` and returns the closest string and closest distance, includes a optional `case_sensitive` arg that is false by default
 
 ```luau
 local list = { "meow", "mrrp", "mrrow", ":3" }
@@ -60,7 +60,7 @@ print(table.concat(closest_list, ", ")) -- "meow", "mrrow", "mrrp", ":3"
 
 ### `has_match`
 
-Finds an exact match of `match_aginst` in `str`, includes a optional `case_sensitive` arg that is false by defualt
+Finds an exact match of `match_aginst` in `str`, includes an optional `case_sensitive` arg that is false by default
 
 ```luau
 local matches = leventine.has_match("meow", "mrrp")
