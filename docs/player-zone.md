@@ -101,8 +101,8 @@ type PlayerZoneInfo = {
 }
 ```
 * `character` - a reference to the current character of the player
-* `rootpart` - a refrerence to the PrimaryPart of the character
-* `position` - the current position of the players character
+* `rootpart` - a reference to the PrimaryPart of the character
+* `position` - the current position of the player's character
 * `player` - a reference to the [`Player`]() this [`PlayerZoneInfo`](#playerzoneinfo) is for
 
 ### `BaseZone`
