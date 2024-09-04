@@ -1,13 +1,13 @@
 # Cross
 
-Utility for dealing with crosss runtime shenanigans, covering the bear necessities
+Utility for dealing with cross runtime shenanigans, covering the bear necessities
 
 > [!NOTE]
 > Cross adds the following globals if they don't already exist,
 > `warn`, `task`, and `_RUNTIME`. Although these are the exact same as their counterpart globals in roblox's runtime.
 > Except for `_RUNTIME` which is a string indicating the current runtime.
 >
-> Docs for [`task`](https://create.roblox.com/docs/reference/engine/libraries/task#warn) and [`warn`](ttps://create.roblox.com/docs/reference/engine/globals/RobloxGlobals) can be found on [`robloxs docs`](https://create.roblox.com/docs/reference/engine) although `task.synchronize` and `task.desynchronize` do not exist within cross
+> Docs for [`task`](https://create.roblox.com/docs/reference/engine/libraries/task#warn) and [`warn`](ttps://create.roblox.com/docs/reference/engine/globals/RobloxGlobals) can be found on [`Roblox's Docs`](https://create.roblox.com/docs/reference/engine) although `task.synchronize` and `task.desynchronize` don't exist within cross
 
 ```luau
 local cross = require("cross")
