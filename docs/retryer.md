@@ -14,7 +14,7 @@ retryer.inf(StarterGui.SetCore, StarterGui, "ResetButtonCallback", false)
 
 ### `__call`
 
-Retrys a function x times, based on how many retrys its allowed to make
+Retries a function x times, based on how many retrys its allowed to make
 
 ```luau
 local success, added = retryer(20, function(n: number)
@@ -30,7 +30,7 @@ end
 
 ### `delay`
 
-Retrys a function x times, based on how many retrys its allowed to make.
+Retries a function x times, based on how many retrys its allowed to make.
 With a delay in between thats provided as the first argument
 
 ```luau
@@ -47,7 +47,7 @@ end
 
 ### `exp`
 
-Retrys a funtion using [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) x times, based on how many retrys its alowed to make. Same as [`delay`](#delay), except that its second arg is the exponent with the third being `max_attempts`
+Retries a funtion using [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) x times, based on how many retrys its allowed to make. Same as [`delay`](#delay), except that its second arg is the exponent with the third being `max_attempts`
 
 ```luau
 local DataStoreService = game:GetService("DataStoreService")
@@ -60,12 +60,12 @@ end)
 ```
 
 > [!DANGER]
-> The infinite methods can infinitely yield so its reccomended to not use them unless you have to
+> The infinite methods can infinitely yield so its recommended to not use them unless you have to
 > such as with [`StarterGui:SetCore()`](https://create.roblox.com/docs/reference/engine/classes/StarterGui#SetCore)
 
 ### `inf`
 
-Works like [`__call`](#call), except that it infinitely retrys until it succeeds
+Works like [`__call`](#call), except that it infinitely retries until it succeeds
 
 ```luau
 local added = retryer.inf(function(n: number)
@@ -77,7 +77,7 @@ added -= 3
 
 ### `infdelay`
 
-Works like [`delay`](#delay), except that it infinitely retrys until it succeeds
+Works like [`delay`](#delay), except that it infinitely retries until it succeeds
 
 ```luau
 local StarterGui = game:GetService("StarterGui")
@@ -87,7 +87,7 @@ retryer.infdelay(10, StarterGui.SetCore, "ResetButtonCallback", false)
 
 ### `infexp`
 
-Works like [`exp`](#exp), except that it infinitely retrys until it succeeds
+Works like [`exp`](#exp), except that it infinitely retries until it succeeds
 
 ```luau
 local DataStoreService = game:GetService("DataStoreService")
