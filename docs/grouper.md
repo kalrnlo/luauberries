@@ -54,7 +54,7 @@ type ClientConfig = {
 	) -> ()
 }
 ```
-* `connect_rank_changed` - a function that takes in a callback to run when the remote or other thingy used for networking fires to the client
+* `connect_rank_changed` - a function that takes a callback to run when the remote or other thingy used for networking fires to the client
 
 ### `ServerConfig`
 
@@ -86,7 +86,7 @@ type ServerConfig = {
 
 ### `server`
 
-Initalizes grouper on the server, cannot be called from the client
+Initializes grouper on the server, cannot be called from the client
 
 ```luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -108,7 +108,7 @@ grouper.init.server({
 
 ### `client`
 
-Initalizes grouper on the client, cannot be called from the server
+Initializes grouper on the client, cannot be called from the server
 
 ```luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -194,7 +194,7 @@ end)
 
 ### `rank_and_role`
 
-Gets a players current rank and role
+Gets a player's current rank and role
 
 ```luau
 local Players = game:GetService("Players")
@@ -207,7 +207,7 @@ end)
 
 ### `on_rank_changed`
 
-Attaches a callback to be called whenever a players rank changes in the server
+Attaches a callback to be called whenever a player's rank changes in the server
 
 ```luau
 grouper.on_rank_changed(function(player, new_rank, old_rank)
@@ -231,7 +231,7 @@ end)
 
 ### `players`
 
-Returns a dictionary where the keys are players, with the values being each players current rank. The returned dictionary does not auto-update, for that please use [`rank`](#rank)
+Returns a dictionary where the keys are players, with the values being each player's current rank. The returned dictionary does not auto-update, for that please use [`rank`](#rank)
 
 ```luau
 local player_ranks = grouper.players()
@@ -245,7 +245,7 @@ end
 
 ### `roles`
 
-Returns a dictionary where the keys are ranks, with the values being the corrosponding roles for each rank.
+Returns a dictionary where the keys are ranks, with the values being the corresponding roles for each rank.
 > [!NOTE]
 > The returned dictionary may not include every role, as its filled as a player of every possible rank joins the server.
 
