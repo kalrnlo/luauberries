@@ -51,7 +51,7 @@ features:
     details: Fast module for detecting players in rectangular zones
     link: /player-zone
   - title: Pages Util
-    details: Utility for dealing with roblox page instancs easily
+    details: Utility for dealing with roblox page instances easily
     link: /pages-util
   - title: Random
     details: Pure luau version of roblox's Random object
@@ -69,7 +69,7 @@ features:
     details: Utility that makes it easier to work with TextChatService
     link: /text-chat
   - title: Url
-    details: Small utility with basic functions handling url querys and encoding/decoding urls
+    details: Small utility with basic functions handling url queries and encoding/decoding urls
     link: /url
   - title: Is Empty
     details: Checks if a given table is empty
