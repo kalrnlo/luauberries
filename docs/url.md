@@ -1,6 +1,6 @@
 # Url
 
-Small utility with basic functions handling url querys and encoding/decoding urls
+Small utility with basic functions handling url queries and encoding/decoding urls
 
 ```luau
 local Players = game:GetService("Players")
@@ -25,7 +25,7 @@ end)
 
 ### `encode`
 
-Encodes the given string using [percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding), so that reserved characters except for spaces properly encode with `%` and two hexadecimal characters. Spaces by defualt are encoded as `%20`, but can be specified to be encoded as `+` with the second arg.
+Encodes the given string using [percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding), so that reserved characters, except spaces, properly encode with `%` and two hexadecimal characters. Spaces by default are encoded as `%20`, but can be specified to be encoded as `+` with the second arg.
 
 ```luau
 local content = "Je suis allé au cinéma." -- French for "I went to the movies"
@@ -36,10 +36,10 @@ print(encoded) -- "Je+suis+all%C3%A9+au+cin%C3%A9ma."
 
 ### `decode`
 
-Decodes the given string, into how it originally was before it was [encoded](#encode)
+Decodes the given string, into how it originally was before being [encoded](#encode)
 
 > [!NOTE]
-> If the spaces in the url are encoded as `+`, you need to specifiy this using the second arg for it to be properly decoded
+> If the spaces in the url are encoded as `+`, you need to specify this using the second arg for it to be properly decoded
 
 ```luau
 local encoded = "Je%20suis%20all%C3%A9%20au%20cinema%2E"
@@ -63,7 +63,7 @@ print(query) -- "?meow=mrrp&mrrp=meow"
 
 ### `read_query`
 
-Takes in a url query string, and converts it into a table with every value [decoded](#decode)
+Takes a url query string, and converts it into a table with every value [decoded](#decode)
 
 ```luau
 local query = "?meow=mrrp&mrrp=meow"
