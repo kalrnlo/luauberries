@@ -18,7 +18,7 @@ end)
 
 ### `player_added`
 
-Safely connects a callback to [`Players.PlayerAdded`](https://create.roblox.com/docs/reference/engine/classes/Players#PlayerAdded), and runs the callback for every player already in-game
+Connects a callback to [`Players.PlayerAdded`](https://create.roblox.com/docs/reference/engine/classes/Players#PlayerAdded), and runs the callback for every player already in-game
 
 ```luau
 rbxsafeconn.player_added(function(player)
@@ -30,7 +30,7 @@ end)
 
 ### `tag_added`
 
-Safely connects a callback to the instance added signal for the given tag, and runs the callback for every instance with that tag
+Connects a callback to the instance added signal for the given tag, and runs the callback for every instance already existing with that tag
 
 ```luau
 rbxsafeconn.tag_added("GROUP MEMBER", function(player: Player)
