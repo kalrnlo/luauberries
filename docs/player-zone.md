@@ -103,7 +103,7 @@ type PlayerZoneInfo = {
 * `character` - a reference to the current character of the player
 * `rootpart` - a reference to the PrimaryPart of the character
 * `position` - the current position of the player's character
-* `player` - a reference to the [`Player`]() this [`PlayerZoneInfo`](#playerzoneinfo) is for
+* `player` - a reference to the [`Player`](https://create.roblox.com/docs/reference/engine/classes/player) this [`PlayerZoneInfo`](#playerzoneinfo) is for
 
 ### `BaseZone`
 
