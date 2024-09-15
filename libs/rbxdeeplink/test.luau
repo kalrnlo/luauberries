@@ -1,11 +1,11 @@
 local testkit = require("../../testkit")
 local rbxdeeplink = require("init")
-local url = require("../url")
+local url = require("../Url")
 
 local TEST, CASE, CHECK, FINISH = testkit.test()
 
 TEST("rbxdeeplink", function()
-	
+
 	do CASE("get_launchdata")
 		local launchdata = "https://libs.luau.lol/lmao&meow=mrrp&mrrp=meow&launchdata=kitty catters unite now!"
 		local mock_player = table.freeze({

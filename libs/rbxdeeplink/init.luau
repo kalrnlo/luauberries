@@ -3,7 +3,7 @@
 -- rbx deeplink
 -- utility functions for dealing w roblox deeplinks
 
-local url = require("../url")
+local url = require("../Url")
 
 local REGULAR_FORMAT = "https://www.roblox.com/games/start?placeId=%*&launchData=%*"
 local APPSFLYER_FORMAT = "https://ro.blox.com/Ebh5?af_dp=%*&af_web_dp=%*"
