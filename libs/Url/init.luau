@@ -6,8 +6,6 @@
 
 export type SpaceEncoding = "+" | "%20"
 
-local LAUNCH_DATA_START = "&launchdata="
-local START_LEN = #LAUNCH_DATA_START
 local FORMAT = string.format
 local GMATCH = string.gmatch
 local MATCH = string.match
@@ -23,14 +21,8 @@ end
 
 -- modified from:
 -- https://devforum.roblox.com/t/233570/2
-local function DECODE(url: string, spaces_encoded_as: SpaceEncoding?): string
-	local chars_decoded = GSUB(url, "%%(%x%x)", CODE_TO_CHAR)
-
-	if spaces_encoded_as == "+" then
-		return (GSUB(chars_decoded, "+", " "))
-	else
-		return chars_decoded
-	end
+local function DECODE(url: string): string
+	return (GSUB(GSUB(url, "+", " "), "%%(%x%x)", CODE_TO_CHAR))
 end
 
 local function ENCODE(url: string, encode_spaces_as: SpaceEncoding?): string
@@ -43,24 +35,11 @@ end
 
 local url = {}
 
-function url.get_launchdata(player: Player, launchdata_spaces_encoded_as: SpaceEncoding?): string?
-	local launch_data = player:GetJoinData().LaunchData
-
-	if launch_data and #launch_data ~= 0 then
-		local decoded = DECODE(launch_data, launchdata_spaces_encoded_as)
-		-- pattern for getting a string with a non zero length
-		-- right after "&launchdata=" that doesn't include the & character
-		return MATCH(decoded, "&launchdata=([^&]+)")
-	else
-		return nil
-	end
-end
-
 -- modified from: https://stackoverflow.com/questions/28916182/parse-parameters-out-of-url-in-lua
-function url.read_query(url: string, spaces_encoded_as: SpaceEncoding?): { [string]: string }
+function url.read_query<T>(url: string): { [string]: string }
 	local query_tbl = {}
 
-	for key, value: any in GMATCH(DECODE(url, spaces_encoded_as), "([^&=?]-)=([^&=?]+)") do
+	for key, value: any in GMATCH(DECODE(url), "([^&=?]-)=([^&=?]+)") do
 		query_tbl[key] = value
 	end
 	return query_tbl

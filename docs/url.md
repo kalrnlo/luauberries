@@ -8,10 +8,12 @@ local safeteleport = require("safeteleport")
 local url = require("url")
 
 Players.PlayerAdded:Connect(function(player)
-	local data = url.launchdata(player)
+	local launch_data = player:GetJoinData().LaunchData
+	local data = url.decode(player)
 
-	if data then
-		local placeid = tonumber(string.match(data, "placeid=%d+"))
+	if launch_data and #launch_data ~= 0 then
+		local decoded = url.decode(launch_data)
+		local placeid = tonumber(string.match(decoded, "placeId=%d+"))
 		
 		if placeid then
 			safeteleport(placeid, player)
@@ -37,9 +39,6 @@ print(encoded) -- "Je+suis+all%C3%A9+au+cin%C3%A9ma."
 ### `decode`
 
 Decodes the given string, into how it originally was before being [encoded](#encode)
-
-> [!NOTE]
-> If the spaces in the url are encoded as `+`, you need to specify this using the second arg for it to be properly decoded
 
 ```luau
 local encoded = "Je%20suis%20all%C3%A9%20au%20cinema%2E"
@@ -70,20 +69,4 @@ local query = "?meow=mrrp&mrrp=meow"
 local tbl = url.read_query(query)
 
 print(tbl.meow, tbl.mrrp) -- "mrrp", "meow"
-```
-
-### `get_launchdata`
-
-Gets the launchdata for the given player (the actual launchdata not the full join url that [`Player:GetJoinData().LaunchData`](https://create.roblox.com/docs/reference/engine/classes/Player#GetJoinData) gives), and decodes it
-
-```luau
-local Players = game:GetService("Players")
-
-Players.PlayerAdded:Connect(function(player)
-	local launchdata = url.get_launchdata(player)
-
-	if launchdata then
-		print(`{player.Name}'s launchdata: {launchdata}`)
-	end
-end)
 ```
