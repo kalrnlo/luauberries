@@ -78,8 +78,7 @@ end
 ## Types
 
 > [!NOTE]
-> `character.Character` is a reference to the [`Character`](https://libs.luau.lol/character#character-1) type in the character library
-
+> `character.Character` is a reference to the [`Character`](./character.md#character-1) type in the character library
 
 ### `ZoneType`
 
