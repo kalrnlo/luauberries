@@ -1,0 +1,5 @@
+version: 1.0
+tags: [ deeplinking, format, url ]
+runtime:
+  optional: [ roblox ]
+  main: pure
