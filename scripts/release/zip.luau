@@ -14,7 +14,7 @@ local FORMAT = string.format
 
 local function zip(input: string): string
 	if IS_WINDOWS then
-		local output = summon("Compress-Archive", FORMAT(WIN_ARGS_FORMAT, input))
+		summon("Compress-Archive", FORMAT(WIN_ARGS_FORMAT, input))
 		local zipped = fs.readFile(WIN_OUTPUT)
 		fs.removeFile(WIN_OUTPUT)
 		return zipped

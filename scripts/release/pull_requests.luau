@@ -57,8 +57,6 @@ do
 	end
 
 	for index, pr in PULL_REQUESTS do
-		local has_changed_a_release_lib: string
-	
 		for _, file in pr.files do
 			local lib = MATCH(file.path, "^libs/([^/]+)") or MATCH(file.path, "^docs/([^/%.]+)")
 	

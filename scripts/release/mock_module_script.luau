@@ -2,12 +2,10 @@
 -- impl module source prop
 -- func that when called implements the source property to module script instances
 
-local process = require("@lune/process")
 local roblox = require("@lune/roblox")
 
 local SOURCES = {} :: { [roblox.Instance]: string }
 local HAS_IMPLEMENTED = false
-local ARGS = process.args
 
 local function impl_module_source_prop()
 	if not HAS_IMPLEMENTED then

@@ -39,8 +39,6 @@ local RELEASE_LIBS = table.create(#LIB_LIST) :: { ReleaseLibInfo }
 
 -- local CREATE = roblox.Instance.new
 local GMATCH = string.gmatch
-local MATCH = string.match
-local SUB = string.sub
 
 local function write_and_insert(t: { string }, path: string, contents: string | buffer)
 	fs.writeFile(path, contents)
@@ -52,7 +50,6 @@ mock_module_script()
 for index, lib in LIB_LIST do
 	local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]-)\t{lib}@%d+%.%d+%.%d+\t(%S+)`
 	local latest_release_time = first_release_time
-	local commits = {}
 
 	for type, iso in GMATCH(RELEASES, pattern) do
 		if type ~= "Draft" then
