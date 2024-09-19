@@ -84,7 +84,8 @@ for _, release_libinfo in RELEASE_LIBS do
 	end
 
 	for _, commit in release_libinfo.commits do
-		table.insert(notes, `* {commit.title} by @{commit.author} in {BASE_COMMIT_URL}{commit.hash}`)
+		local hash = commit.hash
+		table.insert(notes, `* {commit.title} by @{commit.author} in [{hash}]({BASE_COMMIT_URL}{hash})`)
 	end
 
 	if #notes ~= 0 then
