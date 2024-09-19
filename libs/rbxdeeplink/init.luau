@@ -34,7 +34,6 @@ function rbxdeeplink.format_appsflyer(
 	data: string,
 	encode_spaces_as: url.SpaceEncoding?
 ): string
-
 	if #data > DATA_LEN_LIMIT then
 		error(DATA_LEN_ERROR)
 	else

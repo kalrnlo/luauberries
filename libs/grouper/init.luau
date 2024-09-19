@@ -15,10 +15,15 @@ local Players = game:GetService("Players")
 local connector = require("../connector")
 
 type FireRankChanged = (send_to_player: Player, player_whose_rank_changed: Player, rank: number, role: string) -> ()
+
 type FireAllRankChanged = (player_whose_rank_changed: Player, rank: number, role: string) -> ()
+
 type ReplicateRankUpdateCallback = (player: Player, rank: number, role: string) -> ()
+
 type RankChangedCallback = (player: Player, new_rank: number, old_rank: number) -> ()
+
 type Groups = { { Role: string, Rank: number, Id: number } }
+
 type FetchInfo = {
 	last_fetched: number,
 	is_fetching: boolean,
