@@ -47,7 +47,7 @@ function pull_requests.get_all_after_time(time: number?): { [string]: { PullRequ
 end
 
 function pull_requests.get_after_time(lib: string, time: number?): { PullRequestInfo }
-	return get_after_time(lib, LIBS_TO_PRS[lib], time or first_release_time)
+	return (get_after_time(lib, LIBS_TO_PRS[lib], time or first_release_time))
 end
 
 do

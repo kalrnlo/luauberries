@@ -35,10 +35,8 @@ export type PackagedLibInfo = {
 
 local CACHED_PACKAGED_LIBS = {} :: { [string]: PackagedLibInfo }
 local RBXMIFY = roblox.serializeModel
-local RBXMIFY = roblox.serializeModel
 local MATCH = string.match
 local GSUB = string.gsub
-local SUB = string.sub
 
 local function package_lib(lib: string): PackagedLibInfo
 	local version = libinfo(lib).version
