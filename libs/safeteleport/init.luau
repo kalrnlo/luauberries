@@ -4,7 +4,7 @@
 -- and api improvements
 
 local TeleportService = game:GetService("TeleportService")
-local retryer = require("../Retryer")
+local retryer = require("../retryer")
 
 type SafeTeleportPrototype = { 
     __call: (
