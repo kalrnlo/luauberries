@@ -2,10 +2,10 @@
 -- release
 -- makes new releases for each lib thats changed
 
-local mock_module_script = require("mock_module_script")
 local first_release_time = require("first_release_time")
 local pull_requests = require("pull_requests")
 local diff_reader = require("../diff_reader")
+local impl = require("../mock/roblox/impl")
 local DateTime = require("@lune/DateTime")
 local process = require("@lune/process")
 local packager = require("packager")
@@ -21,11 +21,11 @@ type ReleaseLibInfo = {
 	name: string,
 }
 
-local BASE_REPO_URL = "https://github.com/kalrnlo/rbxlibs"
+local BASE_REPO_URL = "https://github.com/kalrnlo/luauberries"
 local BASE_COMMIT_URL = `{BASE_REPO_URL}/commits/`
 local BASE_PULL_URL = `{BASE_REPO_URL}/pull/`
 
-local RELEASES = summon("gh", "release list --repo kalrnlo/rbxlibs --limit 500")
+local RELEASES = summon("gh", "release list --repo kalrnlo/luauberries --limit 500")
 local LIBS_CHANGED = diff_reader.libs()
 local ARGS = process.args
 
@@ -45,7 +45,7 @@ local function write_and_insert(t: { string }, path: string, contents: string | 
 	table.insert(t, path)
 end
 
-mock_module_script()
+impl("ModuleScript"):rwprop("Source", "")
 
 for index, lib in LIB_LIST do
 	local pattern = `{lib} v%d+%.%d+%.%d+\t([^\t]-)\t{lib}@%d+%.%d+%.%d+\t(%S+)`
